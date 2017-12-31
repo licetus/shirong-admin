@@ -1,0 +1,13 @@
+.idea
+.idea/
+.DS_Store
+node_modules/
+.project
+dist
+dist/*
+src/config/*.tmp
+src/config/env.js
+src/config/config.js
+npm-debug.log
+deploy.sh
+index_prod.html

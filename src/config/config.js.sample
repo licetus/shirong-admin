@@ -1,0 +1,47 @@
+import Env from './env'
+
+const config = {
+	env: Env,
+	// localhost: '//192.168.31.240/',
+	// server: '//aerolink.me:8083/',
+	// host: '//192.1／68.31.240/',
+	host: '//aerolink.me:8083/',
+	httpRequestInterval: 30000,
+	fetchMessageInterval: 5000,
+	googleMapApiKey: 'AIzaSyDrTZ3GfxMgMFNEV4Ma-gX52maEV4GF34s',
+	remarkLength: {
+		order: 150,
+		pilot: 150,
+		passport: 150,
+		operator: 150,
+		user: 50,
+	},
+	selectorOptionCount: 20,
+	rate: {
+		pilot: {
+			performanceRate: {
+				min: 0,
+				max: 5,
+			},
+			promotionRate: {
+				min: 1,
+				max: 5,
+				step: 0.1,
+				featureScore: 3,
+			},
+			paymentRate: {
+				min: 0,
+				max: 10,
+				step: 0.1,
+			},
+		},
+		operator: {
+			discountRate: {
+				min: 0.01,
+				max: 1,
+				step: 0.01,
+			},
+		},
+	},
+}
+export default config

@@ -1,0 +1,29 @@
+{
+  "root": true,
+  "parser": "babel-eslint",
+  "extends": ["vue", "airbnb"],
+  "globals": {
+    "__DEV__": true,
+    "db": true
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "browser": true
+  },
+  "ecmaFeatures": {
+    "modules": true
+  },
+  "rules": {
+    "no-prototype-builtins": "off",
+    "no-param-reassign": "off",
+    "no-restricted-syntax": "off",
+    "import/prefer-default-export": "off",
+    "max-len": "off",
+    "no-confusing-arrow": 0,
+    "semi": [2, "never"],
+    "global-require": 0,
+    "indent": ["error", "tab"],
+    "no-tabs": "off",
+  }
+}
