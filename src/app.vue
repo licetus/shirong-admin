@@ -1,41 +1,37 @@
 <template>
-	<div>
-		<router-view></router-view>
-	</div>
+    <div id="main" class="app-main">
+        <router-view></router-view>
+    </div>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
+    export default {
+        data () {
+            return {
+                theme: this.$store.state.app.themeColor
+            };
+        },
+        mounted () {
 
-			}
-		},
+        },
+        beforeDestroy () {
 
-		mounted() {
-		},
+        },
+        methods: {
 
-		beforeDestroy() {
-
-		},
-		methods: {
-
-		},
-	}
+        }
+    };
 </script>
 
-<style lang="scss">
-	body {
-		font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
-		background-color: #49505f;
-		.table-selector {
-			margin-right: -1px;
-		}
-		.table-search-button {
-			margin-left: -1px;
-		}
-		.ivu-tabs-tab {
-			font-weight: 500;
-		}
-	}
+<style>
+html,body{
+    width: 100%;
+    height: 100%;
+    background: #f0f0f0;
+    overflow: hidden;
+}
+.app-main{
+    width: 100%;
+    height: 100%;
+}
 </style>

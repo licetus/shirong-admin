@@ -1,6 +1,4 @@
-src/libs/util.js
-src/vendors.js
-webpack.base.config.js
-webpack.dev.config.js
-webpack.prod.config.js
-webpack.test.config.js
+src/vendors
+src/libs/table2excel.js
+build
+src/views/my-components/text-editor/tinymce

@@ -1,129 +1,193 @@
-changelog
+<p align="center">
+    <a href="https://www.iviewui.com">
+        <img width="200" src="https://file.iviewui.com/logo.svg">
+    </a>
+</p>
 
-v 1.0.21
-26/12/2017 8:00 PM
-
-	1. add pilot document blur copy tip
-	2. update pilot document image detail: click image to zoom up
-	3. fix some visual bug
-
-v 1.0.20
-25/12/2017 9:20 PM
-
-	1. update image source
-	2. fix nav-menu item
-	3. update table styles
-
-v 1.0.19
-24/12/2017 2:30 PM
-
-	1. update pilot document rule: unrequired title/description
-
-v 1.0.18
-21/12/2017 11:30 PM
-
-	1. update image source
-
-v 1.0.17
-20/12/2017 2:40 PM
-
-	1. update login page
-
-v 1.0.16
-15/12/2017 5:00 PM
-
-	1. fix pilot dynamic form duplicate check
-	2. update pilot document type enum
-	3. add pilot payment details
-	4. fix pilot profile date format
-
-v 1.0.15
-14/12/2017 5:40 PM
-
-	1. update md5
-
-v 1.0.14
-14/12/2017 3:20 PM
-
-	1. update reg. list
-
-v 1.0.13
-13/12/2017 9:30 PM
-
-	1. add logo img in navigation
-	2. fix dynamic
-
-v 1.0.12
-12/12/2017 10:00 PM
-
-	1. update aircraft wording
-	2. fix pilot message & notification
-
-v 1.0.11
-10/12/2017 9:30 PM
-
-	1. update airport list max length, add icao code
-	2. fix table messages count bug
-	3. change discount rate form to off (- x%)
-
-v 1.0.10
-08/12/2017 10:20 PM
-	1. change relogin modal style when modify user profile
-	2. update breadcrumbs
-	3. add row click in business to open modify modal
-	4. fix img uploader placeholder bug
-
-v 1.0.9
-05/12/2017 2:00 PM
-
-	1. update visual effects
-
-v 1.0.8
-01/12/2017 10:00 AM
-
-	1. localStorage geo info
-	2. add duplicate check in pilot profile: aircraft/license/passport/visa/flightExp
-
-v 1.0.7
-27/11/2017 6:40 PM
-
-	1. remove order & pilot table style 'Tab'
-
-v 1.0.6
-24/11/2017 10:40 AM
-
-	1. fix message create time format error
-	2. change pilot location loading timing: after profile loaded
-
-v 1.0.5
-23/11/2017 10:50 AM
-	1. add selector in pilot modify health
-	2. fix pilot verification message
-	3. fix message detail get reference data error
-
-v 1.0.4
-22/11/2017 11:00 PM
-
-	1. fix pilot modify validator
+# iView Admin
+[![](https://img.shields.io/travis/iview/iview-admin.svg?style=flat-square)](https://travis-ci.org/iview/iview-admin)
+[![vue](https://img.shields.io/badge/vue-2.5.2-brightgreen.svg?style=flat-square)](https://github.com/vuejs/vue)
+[![iview ui](https://img.shields.io/badge/iview-2.7.2-brightgreen.svg?style=flat-square)](https://github.com/iview/iview)
 
 
-v 1.0.3
-22/11/2017 7:00 PM
-	1. sort channels by recent message createtime
+## 当前版本：v1.2.3
+[更新日志](https://github.com/iview/iview-admin/releases)
 
-v 1.0.2
-22/11/2017 1:00 PM
+[使用教程](https://github.com/iview/iview-admin/wiki)
 
-	1. add config.js.sample, change file name to config.js to activate it
-	2. change page title to 'Aerolink Admin Portal'
-	3. add README.md to show changlog
+[在线访问](https://iview.github.io/iview-admin)
 
-v 1.0.1
-21/11/2017 10:00 PM
+[English Doc](https://github.com/iview/iview-admin/blob/dev/README_EN.md)
 
-	1. fix static image requirment
-	2. add confirmation after re-login in profile modify successfully
-	3. notification-center: mouse over to read message
-	4. notfication-center: add order id, on click jump to order detail
-	5. fix short-info-tag padding in tables
-	6. settings menu is only available for super admin
+[简化版模板](https://github.com/iview/iview-admin/tree/template)
+
+`注：在线版本会在开发版本新小版本发布后更新到相应版本，所以如果想体验最新版本iview-admin，请clone完整项目代码到本地运行。`
+
+## Install
+```bush
+// install dependencies
+npm install
+```
+## Run
+### Development
+```bush
+npm run dev
+```
+### Production(Build)
+```bush
+npm run build
+```
+
+## 简介
+&emsp;&emsp;iView admin是基于Vue.js，搭配使用[iView](https://www.iviewui.com) UI组件库形成的一套后台集成解决方案，由TalkingData前端可视化团队部分成员开发维护。iView admin遵守iView设计和开发约定，风格统一，设计考究，并且更多功能在不停开发中。
+如果您想查看iview-admin的更新动态，您可以到[更新日志](https://github.com/iview/iview-admin/releases)查看了解最新更新；如果您是新手，想快速入手iview-admin，您可以到[使用教程](https://github.com/iview/iview-admin/wiki)查看讲解；如果您想在线体验iview-admin，您可以到[在线访问](https://iview.github.io/iview-admin)体验。如果你只是想要一个清醒爽朗的界面，那你可以下载[简化版模板](https://github.com/iview/iview-admin/tree/template)来做开发。
+
+## 功能
+
+- 登录/登出
+- 权限管理
+    - 列表过滤
+    - 权限切换
+- 多语言切换
+- 组件
+    - 富文本编辑器
+    - Markdown编辑器
+    - 城市级联
+    - 图片预览编辑
+    - 可拖拽列表
+    - 文件上传
+    - 数字渐变
+- 表单编辑
+    - 文章发布
+    - 工作流
+- 表格
+    - 可拖拽排序
+    - 可编辑表格
+        - 行内编辑
+        - 单元格编辑
+    - 可搜索表格
+    - 表格导出数据
+        - 导出为Csv文件
+        - 导出为Xls文件
+    - 表格转图片
+- 错误页面
+    - 403页面
+    - 404页面
+    - 500页面
+- 高级路由
+    - 动态路由
+    - 带参页面
+- 换肤
+- 收缩侧边栏
+- tag标签导航
+- 面包屑导航
+- 全屏/退出全屏
+- 锁屏
+- 消息中心
+- 个人中心
+
+## 文件结构
+```shell
+.
+├── build  项目构建配置
+└── src
+    ├── images  图片文件
+    ├── libs  工具方法
+    ├── locale  多语言文件
+    ├── router  路由配置
+    ├── store  状态管理
+    ├── styles  样式文件
+    ├── template  模板文件
+    ├── vendors  公共库文件
+    └── views
+        ├── access  权限管理
+        ├── advanced-router  高级路由
+        ├── error_page  错误页面
+        ├── form  表单编辑
+        ├── home  首页
+        │   ├── components  首页组件
+        ├── international  多语言
+        ├── main_components  Main组件
+        │   ├── lockscreen  锁屏
+        │   ├── shrinkable-menu  可收缩菜单
+        │   └── theme-switch  主题切换
+        ├── message  消息中心
+        ├── my_components  业务组件
+        │   ├── area-linkage  中国行政区级联选择器
+        │   ├── count-to  数字渐变
+        │   ├── draggable-list  可拖拽列表
+        │   ├── file-upload  文件上传
+        │   ├── image-editor  图片预览编辑
+        │   ├── markdown-editor  Markdown编辑器
+        │   └── text-editor  富文本编辑器
+        ├── own-space  个人中心
+        └── tables  综合表格
+```
+
+## Links
+
+- [TalkingData](https://github.com/TalkingData)
+- [iView](https://github.com/iview/iview)
+- [Vue](https://github.com/vuejs/vue)
+- [Webpack](https://github.com/webpack/webpack)
+
+## 效果展示
+
+- 响应式布局首页
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/home.gif)
+
+- 标签导航
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/page-tags.gif)
+
+- 权限管理
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/access.gif)
+
+- 可拖拽列表
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/dragable-list.gif)
+
+- 图片预览编辑
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/image-editor.gif)
+
+- 文件上传
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/upload.gif)
+
+- 数字渐变
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/count-to.gif)
+
+- 文章发布
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/article-publish.gif)
+
+- 工作流
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/workflow.gif)
+
+- 可拖拽表格
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/dragable-table.gif)
+
+- 可编辑表格
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/editable-table.gif)
+
+- 表格导出数据
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/exportable-table.gif)
+
+- 表格转图片
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/table2image.gif)
+
+- 错误页面
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/error-page.gif)
+
+- 锁屏
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/locking.gif)
+
+- 可收缩侧边栏
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/sidebarmenu.gif)s
+
+- 主题切换
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/theme.gif)
+
+- 消息中心
+![image](https://github.com/iview/iview-admin/raw/dev/github-gif/message.gif)
+
+## License
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2016-present, iView
