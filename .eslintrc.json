@@ -11,14 +11,15 @@
     },
     "plugins": [ "html", "standard" ],
     "rules": {
-        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "indent": ["error", "tab"],
         "quotes": ["error", "single"],
-        "semi": ["error", "always"],
+        "semi": [2, "never"],
         "no-console": ["error"],
         "no-empty": 2,
         "no-eq-null": 2,
         "no-new": 0,
         "no-fallthrough": 0,
-        "no-unreachable": 0
+        "no-unreachable": 0,
+        "no-tabs": "off"
     }
 }
