@@ -9,6 +9,10 @@
 	"rules": {
 		"semi": [2, "never"],
 		"indent": ["error", "tab"],
-		"no-tabs": "off"
+		"no-tabs": "off",
+		"max-len": "off",
+		"global-require": "off",
+		"import/no-dynamic-require": "off",
+		"object-curly-newline": "off"
 	}
 }
