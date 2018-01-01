@@ -61,6 +61,9 @@ export const otherRouter = {
 		{ path: 'order/:order_id', title: '订单详情', name: 'order-info', component: (resolve) => { require(['@/views/advanced-router/component/order-info.vue'], resolve) } }, // 用于展示动态路由
 		{ path: 'shopping', title: '购物详情', name: 'shopping', component: (resolve) => { require(['@/views/advanced-router/component/shopping-info.vue'], resolve) } }, // 用于展示带参路由
 		{ path: 'message', title: '消息中心', name: 'message_index', component: (resolve) => { require(['@/views/message/message.vue'], resolve) } },
+		{ path: '/customers/:customer_id', title: '资料详情', name: 'customer_detail', component: (resolve) => { require(['@/views/customers/detail.vue'], resolve) } },
+		{ path: '/products/:product_id', title: '项目详情', name: 'product_detail', component: (resolve) => { require(['@/views/products/detail.vue'], resolve) } },
+		{ path: '/loans/:loan_id', title: '贷款详情', name: 'loan_detail', component: (resolve) => { require(['@/views/loans/detail.vue'], resolve) } },
 	],
 }
 
@@ -68,12 +71,61 @@ export const otherRouter = {
 export const appRouter = [
 	{
 		path: '/customers',
-		icon: '', // TODO: add icon
+		icon: 'ios-person',
 		name: 'customers',
 		title: '客户管理',
 		component: Main,
 		children: [
-			{ path: 'index', title: '客户列表', name: 'customers_index', component: (resolve) => { require(['@/views/customers/index.vue'], resolve) } },
+			{ path: 'index', title: '客户列表', name: 'customers_index', icon: '', component: (resolve) => { require(['@/views/customers/index.vue'], resolve) } },
+			{ path: 'verification', title: '实名认证', name: 'customers_verification', icon: '', component: (resolve) => { require(['@/views/customers/verification.vue'], resolve) } },
+			{ path: 'evaluation', title: '信用评估', name: 'customers_evaluation', icon: '', component: (resolve) => { require(['@/views/customers/index.vue'], resolve) } },
+		],
+	},
+	{
+		path: '/products',
+		icon: 'ios-paper-outline', // TODO: add icon
+		name: 'products',
+		title: '项目管理',
+		component: Main,
+		children: [
+			{ path: 'index', title: '项目列表', name: 'products_index', icon: '', component: (resolve) => { require(['@/views/products/index.vue'], resolve) } },
+		],
+	},
+	{
+		path: '/messages',
+		icon: 'image', // TODO: add icon
+		name: 'messages',
+		title: '信息管理',
+		component: Main,
+		children: [
+			{ path: 'notification', title: '公告栏信息', name: 'messages_notification', icon: '', component: (resolve) => { require(['@/views/messages/notification.vue'], resolve) } },
+			{ path: 'activity', title: '活动信息', name: 'messages_activity', icon: '', component: (resolve) => { require(['@/views/messages/activity.vue'], resolve) } },
+			{ path: 'carousel', title: '轮播图', name: 'messages_carousel', icon: '', component: (resolve) => { require(['@/views/messages/carousel.vue'], resolve) } },
+			{ path: 'comments', title: '用户评论', name: 'messages_comments', icon: '', component: (resolve) => { require(['@/views/messages/comments.vue'], resolve) } },
+		],
+	},
+	{
+		path: '/loans',
+		icon: 'card', // TODO: add icon
+		name: 'loans',
+		title: '贷款管理',
+		component: Main,
+		children: [
+			{ path: 'verification', title: '贷款审核', name: 'loans_verification', icon: '', component: (resolve) => { require(['@/views/loans/verification.vue'], resolve) } },
+			{ path: 'delivery', title: '贷款发放', name: 'loans_delivery', icon: '', component: (resolve) => { require(['@/views/loans/delivery.vue'], resolve) } },
+			{ path: 'recycling', title: '贷款审核', name: 'loans_recycling', icon: '', component: (resolve) => { require(['@/views/loans/recycling.vue'], resolve) } },
+		],
+	},
+	{
+		path: '/data',
+		icon: 'stats-bars', // TODO: add icon
+		name: 'data',
+		title: '数据统计',
+		component: Main,
+		children: [
+			{ path: 'transactions', title: '流水统计', name: 'data_transactions', icon: '', component: (resolve) => { require(['@/views/data/transactions.vue'], resolve) } },
+			{ path: 'customers', title: '客户统计', name: 'data_customers', icon: '', component: (resolve) => { require(['@/views/data/customers.vue'], resolve) } },
+			{ path: 'transaction', title: '产品统计', name: 'data_products', icon: '', component: (resolve) => { require(['@/views/data/products.vue'], resolve) } },
 		],
 	},
 	{
