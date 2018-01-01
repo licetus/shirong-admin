@@ -113,7 +113,7 @@ export const appRouter = [
 		children: [
 			{ path: 'verification', title: '贷款审核', name: 'loans_verification', icon: '', component: (resolve) => { require(['@/views/loans/verification.vue'], resolve) } },
 			{ path: 'delivery', title: '贷款发放', name: 'loans_delivery', icon: '', component: (resolve) => { require(['@/views/loans/delivery.vue'], resolve) } },
-			{ path: 'recycling', title: '贷款审核', name: 'loans_recycling', icon: '', component: (resolve) => { require(['@/views/loans/recycling.vue'], resolve) } },
+			{ path: 'recycling', title: '贷款回收', name: 'loans_recycling', icon: '', component: (resolve) => { require(['@/views/loans/recycling.vue'], resolve) } },
 		],
 	},
 	{
