@@ -3,6 +3,13 @@
 </template>
 
 <script>
+export default {
+	name: 'customer_detail',
+	data() {
+		return {
+		}
+	},
+}
 </script>
 
 <style lang="less">

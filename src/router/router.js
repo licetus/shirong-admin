@@ -78,7 +78,7 @@ export const appRouter = [
 		children: [
 			{ path: 'index', title: '客户列表', name: 'customers_index', icon: '', component: (resolve) => { require(['@/views/customers/index.vue'], resolve) } },
 			{ path: 'verification', title: '实名认证', name: 'customers_verification', icon: '', component: (resolve) => { require(['@/views/customers/verification.vue'], resolve) } },
-			{ path: 'evaluation', title: '信用评估', name: 'customers_evaluation', icon: '', component: (resolve) => { require(['@/views/customers/index.vue'], resolve) } },
+			{ path: 'evaluation', title: '信用评估', name: 'customers_evaluation', icon: '', component: (resolve) => { require(['@/views/customers/evaluation.vue'], resolve) } },
 		],
 	},
 	{
