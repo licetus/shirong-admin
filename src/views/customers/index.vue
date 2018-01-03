@@ -65,6 +65,12 @@ export default {
 					key: 'customerName',
 					searchable: true,
 				},
+				{
+					name: 'action',
+					title: '操作',
+					render: () => {
+					},
+				},
 			],
 		}
 	},
