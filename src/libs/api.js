@@ -18,12 +18,12 @@ const errorParser = (response) => {
 	return Promise.reject(new Error('unknown network error'))
 }
 
-export const createInstance = (authenticated) => {
+const createInstance = (authenticated) => {
 	const baseURL = `${config.host}api/v0`
 	const timeout = config.httpRequestInterval || 30000
 	let headers = {}
 	if (authenticated) {
-		const token = JSON.parse(sessionStorage.getItem('token'))
+		const token = sessionStorage.getItem('token')
 		headers = { 'X-Auth-Key': token }
 	}
 	const instance = axios.create({
@@ -36,4 +36,13 @@ export const createInstance = (authenticated) => {
 	return instance
 }
 
-export const createAuthInstance = () => createInstance(true)
+const createAuthInstance = () => createInstance(true)
+
+const api = {}
+
+api.login = async (username, password) => {
+	const params = { username, password }
+	return createInstance().post('auth/admin/login', params).then(res => res.data)
+}
+
+export default api

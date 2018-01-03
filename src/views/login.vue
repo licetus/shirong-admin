@@ -23,7 +23,7 @@
 							</Input>
 						</FormItem>
 						<FormItem>
-							<Button @click="onClickLogin" type="primary" long>登录</Button>
+							<Button @click="onClickLogin" type="primary" :loading="isLoginLoading" long>登录</Button>
 						</FormItem>
 					</Form>
 					<p class="login-tip">输入任意用户名和密码即可</p>
@@ -35,12 +35,15 @@
 
 <script>
 import Cookies from 'js-cookie'
+import Api from '../libs/api'
+import util from '../libs/util'
 
 export default {
 	data() {
 		return {
+			isLoginLoading: false,
 			loginForm: {
-				username: 'iview_admin',
+				username: '',
 				password: '',
 			},
 			loginFormRules: {
@@ -57,20 +60,43 @@ export default {
 		onClickLogin() {
 			this.$refs.loginForm.validate((valid) => {
 				if (valid) {
+					this.loginLoading()
 					this.login()
-					Cookies.set('user', this.loginForm.username)
-					Cookies.set('password', this.loginForm.password)
-					this.$store.commit('setAvatar', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg')
-					if (this.loginForm.username === 'iview_admin') {
-						Cookies.set('access', 0)
-					} else {
-						Cookies.set('access', 1)
+				}
+			})
+		},
+		loginLoading() {
+			this.isLoginLoading = true
+		},
+		loginUnloading() {
+			this.isLoginLoading = false
+		},
+		async login() {
+			try {
+				const res = await Api.login(this.loginForm.username, util.md5(this.loginForm.password))
+				if (res && res.id && res.token && res.role) {
+					const user = {
+						id: res.id,
+						username: res.username,
+						name: res.name,
+						avatarUrl: res.avatarUrl,
+						remark: res.remark,
 					}
+					Cookies.set('username', this.loginForm.username)
+					Cookies.set('password', this.loginForm.password)
+					Cookies.set('access', res.role)
+					// Cookies.set('user', user)
+					sessionStorage.setItem('token', res.token)
+					this.$store.commit('setAvatar', user.avatarUrl)
+					this.loginUnloading()
 					this.$router.push({
 						name: 'home_index',
 					})
 				}
-			})
+			} catch (error) {
+				this.$Message.error(error.message)
+				this.loginUnloading()
+			}
 		},
 	},
 }

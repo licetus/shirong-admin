@@ -1,4 +1,5 @@
 import axios from 'axios'
+import jsmd5 from 'js-md5'
 // import env from '../../build/env'
 import packjson from '../../package.json'
 
@@ -8,6 +9,7 @@ import semver from 'semver'
 let util = {
 
 }
+
 util.title = function (title) {
 	title = title || 'iView admin'
 	window.document.title = title
@@ -268,6 +270,11 @@ util.checkUpdate = function (vm) {
 	})
 }
 /* eslint-enable */
+
+util.md5 = (string) => {
+	if (!string) return ''
+	return jsmd5(string).toUpperCase()
+}
 
 util.inputLengthCheck = (string, length, vm) => {
 	if (string.length <= length) return true
