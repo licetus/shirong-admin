@@ -6,13 +6,33 @@
 					<p slot="title">
 						Profile
 					</p>
-					<Form :model="profileForm" :rules="profileFormRules" label-position="left" :label-width="labelWidth.profile" inline>
+					<div slot="extra">
+						<div v-if="!profile.isEditable">
+							<Button type="text" @click="onClickEditProfile" >编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickCancelProfile">取消</Button>
+							<Button type="text" @click="onClickSaveProfile" :loading="profile.isSaving">保存</Button>
+						</div>
+					</div>
+					<Form ref="profileForm" :model="profile.form" :rules="profile.rules" label-position="left" :label-width="profile.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="项目状态">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="项目状态">
+								<p v-if="!profile.isEditable">{{profile.form.status}}</p>
+								<Select v-else v-model="profile.form.status">
+									<Option :value="1"></Option>
+									<Option :value="2"></Option>
+									<Option :value="3"></Option>
+									<Option :value="4"></Option>
+								</Select>
+							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目类型">测试数据</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="项目名称">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="项目名称">
+								<p v-if="!profile.isEditable">{{profile.form.name}}</p>
+								<Input v-else v-model="profile.form.name" />
+							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目标签">测试数据</FormItem></Col>
 							<Col :span="8"><FormItem label="排名参数">测试数据</FormItem></Col>
 						</Row>
@@ -29,7 +49,7 @@
 					<p slot="title">
 						Finance
 					</p>
-					<Form :model="financeForm" :rules="financeFormRules" label-position="left" :label-width="labelWidth.finance" inline>
+					<Form :model="finance.form" :rules="finance.rules" label-position="left" :label-width="finance.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="项目总额">测试数据</FormItem></Col>
 							<Col :span="8"><FormItem label="项目周期">测试数据</FormItem></Col>
@@ -46,7 +66,7 @@
 					<p slot="title">
 						Additional Info
 					</p>
-					<Form :model="additionalInfoForm" :rules="additionalInfoFormRules" label-position="left" :label-width="labelWidth.additionalInfo" inline>
+					<Form :model="additionalInfo.form" :rules="additionalInfo.rules" label-position="left" :label-width="additionalInfo.labelWidth" inline>
 						<Row>
 							<Col :span="12"><FormItem label="借款人姓名">测试数据</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证号码">测试数据</FormItem></Col>
@@ -68,7 +88,7 @@
 					<p slot="title">
 						Sale
 					</p>
-					<Form label-position="left" :label-width="labelWidth.sale">
+					<Form label-position="left" :label-width="sale.labelWidth">
 						<FormItem label="上架状态">测试数据</FormItem>
 						<FormItem label="上架时间">测试数据</FormItem>
 					</Form>
@@ -77,13 +97,15 @@
 					<p slot="title">
 						Investment Record
 					</p>
-					<Table :data="investmentList" :columns="investmentColumns"></Table>
+					<Table :data="investmentRecord.data" :columns="investmentRecord.columns"></Table>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">
 						Approval
 					</p>
-					<Form :model="approvalForm" label-position="left" :label-width="labelWidth.approval">
+					<Form :model="approval.form" label-position="left" :label-width="approval.labelWidth">
+						<FormItem label="业务员">测试数据</FormItem>
+						<FormItem label="评估内容">测试数据</FormItem>
 						<FormItem label="审核员">测试数据</FormItem>
 						<FormItem label="审核意见">测试数据</FormItem>
 						<FormItem label="提交时间">测试数据</FormItem>
@@ -96,59 +118,135 @@
 </template>
 
 <script>
+import defaultProduct from './data'
+
 export default {
+	name: 'product_detail',
 	data() {
 		return {
-			labelWidth: {
-				profile: 75,
-				finance: 75,
-				additionalInfo: 75,
-				sale: 75,
-				approval: 75,
-			},
-			profileForm: {
-			},
-			profileFormRules: {
-			},
-			financeForm: {
-			},
-			financeFormRules: {
-			},
-			approvalForm: {
-			},
-			investmentList: [
-				{
-					username: '15996496248',
-					amount: 10000,
-					createTime: '2018-1-10',
+			product: defaultProduct.testProduct,
+			profile: {
+				labelWidth: 75,
+				isLoading: false,
+				isEditable: false,
+				isSaving: false,
+				form: {
+					status: defaultProduct.testProduct.status,
+					type: defaultProduct.testProduct.type,
+					name: defaultProduct.testProduct.name,
+					tagId: defaultProduct.testProduct.tagId,
+					rank: defaultProduct.testProduct.rank,
+					description: defaultProduct.testProduct.description,
+					createTime: defaultProduct.testProduct.createTime,
+					lastUpdateTime: defaultProduct.testProduct.lastUpdateTime,
 				},
-				{
-					username: '15996496248',
-					amount: 10000,
-					createTime: '2018-1-10',
+				rules: {},
+			},
+			finance: {
+				labelWidth: 75,
+				isEditable: false,
+				form: {
+					totalAmount: defaultProduct.testProduct.totalAmount,
+					termType: defaultProduct.testProduct.termType,
+					interestRateBase: defaultProduct.testProduct.interestRateBase,
+					interestRateDelta: defaultProduct.testProduct.interestRateDelta,
+					minInvestment: defaultProduct.testProduct.minInvestment,
+					currentInvestment: defaultProduct.testProduct.currentInvestment,
+					repayType: defaultProduct.testProduct.repayType,
+					interestWay: defaultProduct.testProduct.interestWay,
 				},
-				{
-					username: '15996496248',
-					amount: 10000,
-					createTime: '2018-1-10',
-				},
-			],
-			investmentColumns: [
-				{
-					name: 'investor',
-					title: '投资人',
-					key: 'username',
-				},
-				{
-					name: 'amount',
-					title: '金额',
-					key: 'amount',
-				},
-			],
+				rules: {},
+			},
+			additionalInfo: {
+				labelWidth: 75,
+				form: {},
+			},
+			sale: {
+				labelWidth: 75,
+				isOnSale: defaultProduct.testProduct.isOnSale,
+				publishTime: defaultProduct.testProduct.publishTime,
+			},
+			approval: {
+				labelWidth: 75,
+				data: defaultProduct.testProduct.approval,
+			},
+			investmentRecord: {
+				data: [
+					{
+						username: '15996496248',
+						amount: 10000,
+						createTime: '2018-1-10',
+					},
+					{
+						username: '15996496248',
+						amount: 10000,
+						createTime: '2018-1-10',
+					},
+					{
+						username: '15996496248',
+						amount: 10000,
+						createTime: '2018-1-10',
+					},
+				],
+				columns: [
+					{
+						name: 'investor',
+						title: '投资人',
+						key: 'username',
+					},
+					{
+						name: 'amount',
+						title: '金额',
+						key: 'amount',
+						align: 'right',
+					},
+				],
+			},
 		}
+	},
+	methods: {
+		// profile
+		onClickEditProfile() {
+			this.editProfile()
+		},
+		onClickCancelProfile() {
+			this.initProfileForm()
+			this.uneditProfile()
+		},
+		onClickSaveProfile() {
+		},
+		editProfile() {
+			this.profile.isEditable = true
+		},
+		uneditProfile() {
+			this.profile.isEditable = false
+		},
+		profileLoading() {
+			this.profile.isLoading = true
+		},
+		profileUnloading() {
+			this.profile.isLoading = false
+		},
+		initProfileForm() {
+			this.profile.form = {
+				status: this.product.status,
+				type: this.product.type,
+				name: this.product.name,
+				tagId: this.product.tagId,
+				rank: this.product.rank,
+				description: this.product.description,
+				createTime: this.product.createTime,
+				lastUpdateTime: this.product.lastUpdateTime,
+			}
+		},
+		async updateProfile() {
+		},
+		async fetchProfile() {
+		},
 	},
 }
 </script>
 
 <style lang="less">
+@import '../../styles/common.less';
 </style>
