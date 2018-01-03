@@ -289,24 +289,41 @@ util.getProductStatus = (status, vm) => {
 		return null
 	}
 	switch (status) {
-		case Enum.ProductStatus.Submitted:
+		case Enum.Product.Status.Submitted:
 			return '审核中'
-		case Enum.ProductStatus.Disapproved:
+		case Enum.Product.Status.Disapproved:
 			return '未通过'
-		case Enum.ProductStatus.Approved:
+		case Enum.Product.Status.Approved:
 			return '已审核'
-		case Enum.ProductStatus.Selling:
+		case Enum.Product.Status.Selling:
 			return '销售中'
-		case Enum.ProductStatus.Running:
+		case Enum.Product.Status.Running:
 			return '运行中'
-		case Enum.ProductStatus.Paused:
+		case Enum.Product.Status.Paused:
 			return '暂停中'
-		case Enum.ProductStatus.Canceled:
+		case Enum.Product.Status.Canceled:
 			return '已取消'
-		case Enum.ProductStatus.Completed:
+		case Enum.Product.Status.Completed:
 			return '已完成'
 		default: {
 			vm.$Message.error('错误: 未知的项目状态')
+			return null
+		}
+	}
+}
+
+util.getProductType = (type, vm) => {
+	if (!type) {
+		vm.$Message.error('错误: 项目类型缺失')
+		return null
+	}
+	switch (type) {
+		case Enum.Product.Type.Other:
+			return '其他'
+		case Enum.Product.Type.Car:
+			return '车贷'
+		default: {
+			vm.$Message.error('错误: 未知的项目类型')
 			return null
 		}
 	}

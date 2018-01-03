@@ -42,7 +42,7 @@ export default {
 		isOnSale: true,
 		publishTime: '2018-1-1',
 		// profile
-		type: 1,
+		type: 2,
 		name: '布加迪威龙',
 		description: '82年出厂布加迪威龙',
 		rank: 1,

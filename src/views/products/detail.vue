@@ -18,9 +18,11 @@
 					<Form ref="profileForm" :model="profile.form" :rules="profile.rules" label-position="left" :label-width="profile.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="项目状态">
-								<p v-if="!profile.isEditable">{{productStatus}}</p>
+								<p>{{productStatus}}</p>
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="项目类型">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="项目类型">
+								<p>{{productType}}</p>
+							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="8"><FormItem label="项目名称">
@@ -215,7 +217,10 @@ export default {
 	},
 	computed: {
 		productStatus() {
-			return util.getProductStatus(this.product.status)
+			return util.getProductStatus(this.product.status, this)
+		},
+		productType() {
+			return util.getProductType(this.product.type, this)
 		},
 	},
 	methods: {
