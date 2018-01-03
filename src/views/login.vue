@@ -76,26 +76,19 @@ export default {
 				const res = await Api.login(this.loginForm.username, util.md5(this.loginForm.password))
 				console.log('here', res)
 				if (res && res.id && res.token && res.role) {
-					const user = {
-						id: res.id,
-						username: res.username,
-						name: res.name,
-						avatarUrl: res.avatarUrl,
-						remark: res.remark,
-					}
 					Cookies.set('username', this.loginForm.username)
 					Cookies.set('password', this.loginForm.password)
 					Cookies.set('access', res.role)
-					// Cookies.set('user', user)
 					sessionStorage.setItem('token', res.token)
-					this.$store.commit('setAvatar', user.avatarUrl)
+					// this.$store.commit('setAvatar', user.avatarUrl)
 					this.loginUnloading()
 					this.$router.push({
 						name: 'home_index',
 					})
 				}
 			} catch (error) {
-				this.$Message.error(error.message)
+				if (error.code === 'INVALID_ADMIN_ID_ERROR') this.$Message.error('用户名或密码错误')
+				else this.$Message.error(error.message)
 				this.loginUnloading()
 			}
 		},
