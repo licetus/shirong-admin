@@ -37,7 +37,7 @@ export default {
 	},
 	testProduct: {
 		id: 1000000000,
-		status: 1,
+		status: 4,
 		// business
 		isOnSale: true,
 		publishTime: '2018-1-1',

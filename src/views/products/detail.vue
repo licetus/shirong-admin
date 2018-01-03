@@ -18,13 +18,7 @@
 					<Form ref="profileForm" :model="profile.form" :rules="profile.rules" label-position="left" :label-width="profile.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="项目状态">
-								<p v-if="!profile.isEditable">{{profile.form.status}}</p>
-								<Select v-else v-model="profile.form.status">
-									<Option :value="1"></Option>
-									<Option :value="2"></Option>
-									<Option :value="3"></Option>
-									<Option :value="4"></Option>
-								</Select>
+								<p v-if="!profile.isEditable">{{productStatus}}</p>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目类型">测试数据</FormItem></Col>
 						</Row>
@@ -119,6 +113,7 @@
 
 <script>
 import defaultProduct from './data'
+import util from '../../libs/util'
 
 export default {
 	name: 'product_detail',
@@ -203,6 +198,11 @@ export default {
 				],
 			},
 		}
+	},
+	computed: {
+		productStatus() {
+			return util.getProductStatus(this.product.status)
+		},
 	},
 	methods: {
 		// profile

@@ -2,6 +2,7 @@ import axios from 'axios'
 import jsmd5 from 'js-md5'
 // import env from '../../build/env'
 import packjson from '../../package.json'
+import Enum from '../models/enum'
 
 /* eslint-disable */
 import semver from 'semver'
@@ -280,6 +281,35 @@ util.inputLengthCheck = (string, length, vm) => {
 	if (string.length <= length) return true
 	vm.$Message.error(`输入长度请勿超过 ${length} 个字符`)
 	return false
+}
+
+util.getProductStatus = (status, vm) => {
+	if (!status) {
+		vm.$Message.error('错误: 项目状态缺失')
+		return null
+	}
+	switch (status) {
+		case Enum.ProductStatus.Submitted:
+			return '审核中'
+		case Enum.ProductStatus.Disapproved:
+			return '未通过'
+		case Enum.ProductStatus.Approved:
+			return '已审核'
+		case Enum.ProductStatus.Selling:
+			return '销售中'
+		case Enum.ProductStatus.Running:
+			return '运行中'
+		case Enum.ProductStatus.Paused:
+			return '暂停中'
+		case Enum.ProductStatus.Canceled:
+			return '已取消'
+		case Enum.ProductStatus.Completed:
+			return '已完成'
+		default: {
+			vm.$Message.error('错误: 未知的项目状态')
+			return null
+		}
+	}
 }
 
 export default util
