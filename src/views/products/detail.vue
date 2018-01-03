@@ -78,6 +78,20 @@
 				</Card>
 			</Col>
 			<Col :span="8" class="padding-left-10">
+				<!-- TODO need add auth check -->
+				<Card class="margin-bottom-10">
+					<p slot="title">
+						Control
+					</p>
+					<Row>
+						<Col :span="4">
+							<Button long>暂停</Button>
+						</Col>
+						<Col :span="4" :offset="1">
+							<Button type="error" long>停止</Button>
+						</Col>
+					</Row>
+				</Card>
 				<Card>
 					<p slot="title">
 						Sale
