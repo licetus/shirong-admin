@@ -45,7 +45,7 @@ export default {
 		type: 2,
 		name: '布加迪威龙',
 		description: '82年出厂布加迪威龙',
-		rank: 1,
+		rank: 1.85,
 		debtorId: 1000000000,
 		tagId: 1,
 		createTime: '2018-1-1',

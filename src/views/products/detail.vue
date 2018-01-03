@@ -30,7 +30,10 @@
 								<Input v-else v-model="profile.form.name" />
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目标签">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="排名参数">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="排名参数">
+								<p v-if="!profile.isEditable">{{profile.form.rank}}</p>
+								<InputNumber v-else v-model="profile.form.rank" :min="0" :max="9.99" :step="0.1"></InputNumber>
+							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="8"><FormItem label="项目描述">测试数据</FormItem></Col>
@@ -233,6 +236,7 @@ export default {
 			this.uneditProfile()
 		},
 		onClickSaveProfile() {
+			this.uneditProfile()
 		},
 		editProfile() {
 			this.profile.isEditable = true
