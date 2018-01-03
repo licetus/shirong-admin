@@ -49,7 +49,7 @@ export default {
     data () {
         return {
             accessCode: parseInt(Cookies.get('access')),
-            switchValue: parseInt(Cookies.get('access')) === 1
+            switchValue: parseInt(Cookies.get('access')) === 2
         };
     },
     computed: {
@@ -60,11 +60,11 @@ export default {
     methods: {
         changeAccess (res) {
             if (res) {
+                this.accessCode = 2;
+                Cookies.set('access', 2);
+            } else {
                 this.accessCode = 1;
                 Cookies.set('access', 1);
-            } else {
-                this.accessCode = 0;
-                Cookies.set('access', 0);
             }
             this.$store.commit('updateMenulist');
         }

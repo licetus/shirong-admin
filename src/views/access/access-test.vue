@@ -1,7 +1,7 @@
 <template>
   <div>
     <Card shadow>
-      <p>当前用户的权限值是 0 时，才可以看到这个页面。</p>
+      <p>当前用户的权限值是 1 时，才可以看到这个页面。</p>
     </Card>
   </div>
 </template>
@@ -13,5 +13,5 @@ export default {
 </script>
 
 <style>
-  
+
 </style>

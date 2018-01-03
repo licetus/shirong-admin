@@ -6,7 +6,7 @@
 					<p slot="title">
 						Profile
 					</p>
-					<div slot="extra">
+					<div v-if="access <= Access.Admin" slot="extra">
 						<div v-if="!profile.isEditable">
 							<Button type="text" @click="onClickEditProfile" >编辑</Button>
 						</div>
@@ -39,8 +39,8 @@
 							<Col :span="8"><FormItem label="项目描述">测试数据</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="创建时间">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="修改时间">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="创建时间">{{productCreateTime}}</FormItem></Col>
+							<Col :span="8"><FormItem label="修改时间">{{productLastUpdateTime}}</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -84,7 +84,7 @@
 			</Col>
 			<Col :span="8" class="padding-left-10">
 				<!-- TODO need add auth check -->
-				<Card class="margin-bottom-10">
+				<Card v-if="access === Access.SuperAdmin" class="margin-bottom-10">
 					<p slot="title">
 						Control
 					</p>
@@ -131,13 +131,17 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import defaultProduct from './data'
 import util from '../../libs/util'
+import Enum from '../../models/enum'
 
 export default {
 	name: 'product_detail',
 	data() {
 		return {
+			Access: Enum.Role,
+			access: parseInt(Cookies.get('access'), 10),
 			product: defaultProduct.testProduct,
 			profile: {
 				labelWidth: 75,
@@ -224,6 +228,12 @@ export default {
 		},
 		productType() {
 			return util.getProductType(this.product.type, this)
+		},
+		productCreateTime() {
+			return this.product.createTime // TODO for test
+		},
+		productLastUpdateTime() {
+			return this.product.lastUpdateTime // TODO for test
 		},
 	},
 	methods: {

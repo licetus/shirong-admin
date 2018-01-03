@@ -1,4 +1,10 @@
 const Enum = {
+	Role: {
+		SuperAdmin: 1,
+		Admin: 2,
+		Approver: 3,
+		Agent: 4,
+	},
 	Product: {
 		Status: {
 			Submitted: 1,
