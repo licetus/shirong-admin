@@ -29,7 +29,7 @@
                         <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
                     </div>
                 </div>
-                <div class="header-avator-con">
+                <div class="header-avatar-con">
                     <full-screen v-model="isFullScreen" @on-change="fullscreenChange"></full-screen>
                     <lock-screen></lock-screen>
                     <message-tip v-model="mesCount"></message-tip>
@@ -47,7 +47,7 @@
                                     <DropdownItem name="loginout" divided>退出登录</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
-                            <Avatar :src="avatorPath" style="background: #619fe7;margin-left: 10px;"></Avatar>
+                            <Avatar :src="avatarPath" style="background: #619fe7;margin-left: 10px;"></Avatar>
                         </Row>
                     </div>
                 </div>
@@ -104,8 +104,8 @@
             currentPath () {
                 return this.$store.state.app.currentPath; // 当前面包屑数组
             },
-            avatorPath () {
-                return localStorage.avatorImgPath;
+            avatarPath () {
+                return localStorage.avatarImgPath;
             },
             cachePage () {
                 return this.$store.state.app.cachePage;

@@ -13,7 +13,7 @@
                         当前用户
                     </p>
                     <div class="access-user-con access-current-user-con">
-                        <img :src="avatorPath" alt="">
+                        <img :src="avatarPath" alt="">
                         <p>当前用户权限值:<b>{{ accessCode }}</b></p>
                     </div>
                 </Card>
@@ -53,8 +53,8 @@ export default {
         };
     },
     computed: {
-        avatorPath () {
-            return localStorage.avatorImgPath;
+        avatarPath () {
+            return localStorage.avatarImgPath;
         }
     },
     methods: {

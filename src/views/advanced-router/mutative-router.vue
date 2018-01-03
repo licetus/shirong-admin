@@ -84,8 +84,8 @@ export default {
         };
     },
     computed: {
-        avatorImage () {
-            return localStorage.avatorImgPath;
+        avatarImage () {
+            return localStorage.avatarImgPath;
         }
     }
 };

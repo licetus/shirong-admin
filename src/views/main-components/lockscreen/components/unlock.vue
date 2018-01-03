@@ -5,14 +5,14 @@
 <template>
     <transition name="show-unlock">
         <div class="unlock-body-con" v-if="showUnlock" @keydown.enter="handleUnlock">
-            <div @click="handleClickAvator" class="unlock-avator-con" :style="{marginLeft: avatorLeft}">
-                <img class="unlock-avator-img" :src="avatorPath">
-                <div  class="unlock-avator-cover">
+            <div @click="handleClickAvatar" class="unlock-avatar-con" :style="{marginLeft: avatarLeft}">
+                <img class="unlock-avatar-img" :src="avatarPath">
+                <div  class="unlock-avatar-cover">
                     <span><Icon type="unlocked" :size="30"></Icon></span>
                     <p>解锁</p>
                 </div>
             </div>
-            <div class="unlock-avator-under-back" :style="{marginLeft: avatorLeft}"></div>
+            <div class="unlock-avatar-under-back" :style="{marginLeft: avatarLeft}"></div>
             <div class="unlock-input-con">
                 <div class="unlock-input-overflow-con">
                     <div class="unlock-overflow-body" :style="{right: inputLeft}">
@@ -32,7 +32,7 @@ export default {
     name: 'Unlock',
     data () {
         return {
-            avatorLeft: '0px',
+            avatarLeft: '0px',
             inputLeft: '400px',
             password: '',
             check: null
@@ -45,22 +45,22 @@ export default {
         }
     },
     computed: {
-        avatorPath () {
-            return localStorage.avatorImgPath;
+        avatarPath () {
+            return localStorage.avatarImgPath;
         }
     },
     methods: {
         validator () {
             return true; // 你可以在这里写密码验证方式，如发起ajax请求将用户输入的密码this.password与数据库用户密码对比
         },
-        handleClickAvator () {
-            this.avatorLeft = '-180px';
+        handleClickAvatar () {
+            this.avatarLeft = '-180px';
             this.inputLeft = '0px';
             this.$refs.inputEle.focus();
         },
         handleUnlock () {
             if (this.validator()) {
-                this.avatorLeft = '0px';
+                this.avatarLeft = '0px';
                 this.inputLeft = '400px';
                 this.password = '';
                 Cookies.set('locking', '0');
