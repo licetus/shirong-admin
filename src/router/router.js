@@ -129,6 +129,17 @@ export const appRouter = [
 		],
 	},
 	{
+		path: '/settings',
+		icon: 'gear-a',
+		name: 'settings',
+		title: '设置',
+		access: 1,
+		component: Main,
+		children: [
+			{ path: 'index', title: '设置', name: 'settings_index', access: 1, component: (resolve) => { require(['@/views/settings/settings.vue'], resolve) } },
+		],
+	},
+	{
 		path: '/access',
 		icon: 'key',
 		name: 'access',
