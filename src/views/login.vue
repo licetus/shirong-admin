@@ -74,6 +74,7 @@ export default {
 		async login() {
 			try {
 				const res = await Api.login(this.loginForm.username, util.md5(this.loginForm.password))
+				console.log('here', res)
 				if (res && res.id && res.token && res.role) {
 					const user = {
 						id: res.id,

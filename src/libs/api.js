@@ -40,9 +40,21 @@ const createAuthInstance = () => createInstance(true)
 
 const api = {}
 
+// api.login = async (username, password) => {
+// 	const params = { username, password }
+// 	return createInstance().post('auth/admin/login', params).then(res => res.data)
+// }
 api.login = async (username, password) => {
-	const params = { username, password }
-	return createInstance().post('auth/admin/login', params).then(res => res.data)
+	const res = {
+		id: 1000000000,
+		role: 1,
+		token: 'abcdef',
+		username,
+		name: 'Licetus',
+		avatarUrl: '@/images/test-avatar.png',
+		remark: 'he is a good guy',
+	}
+	return res
 }
 
 export default api
