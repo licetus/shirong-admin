@@ -20,6 +20,19 @@ const Enum = {
 			Other: 1,
 			Car: 2,
 		},
+		TermType: {
+			SevenDays: 1,
+			OneMonth: 2,
+			ThreeMonths: 3,
+			SixMonths: 4,
+		},
+		RepayType: {
+			LumpSumPayment: 1,
+			BeforeInterestAfterPricipalPayment: 2,
+		},
+		InterestWay: {
+			CalculatingInterestAfterObjectCompleted: 1,
+		},
 	},
 }
 

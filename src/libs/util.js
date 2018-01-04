@@ -329,4 +329,57 @@ util.getProductType = (type, vm) => {
 	}
 }
 
+util.getProductTermType = (type, vm) => {
+	if (!type) {
+		vm.$Message.error('错误: 周期类型缺失')
+		return null
+	}
+	switch (type) {
+		case Enum.Product.TermType.SevenDays:
+			return '7天'
+		case Enum.Product.TermType.OneMonth:
+			return '1个月'
+		case Enum.Product.TermType.ThreeMonths:
+			return '3个月'
+		case Enum.Product.TermType.SixMonths:
+			return '6个月'
+		default: {
+			vm.$Message.error('错误: 未知的周期类型')
+			return null
+		}
+	}
+}
+
+util.getProductRepayType = (type, vm) => {
+	if (!type) {
+		vm.$Message.error('错误: 还款方式缺失')
+		return null
+	}
+	switch (type) {
+		case Enum.Product.RepayType.LumpSumPayment:
+			return '一次性还款'
+		case Enum.Product.RepayType.BeforeInterestAfterPricipalPayment:
+			return '先息后本'
+		default: {
+			vm.$Message.error('错误: 未知的还款方式')
+			return null
+		}
+	}
+}
+
+util.getProductInterestWay = (type, vm) => {
+	if (!type) {
+		vm.$Message.error('错误: 计息方式缺失')
+		return null
+	}
+	switch (type) {
+		case Enum.Product.InterestWay.CalculatingInterestAfterObjectCompleted:
+			return '满标计息'
+		default: {
+			vm.$Message.error('错误: 未知的计息方式')
+			return null
+		}
+	}
+}
+
 export default util

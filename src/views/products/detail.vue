@@ -6,9 +6,9 @@
 					<p slot="title">
 						Profile
 					</p>
-					<div v-if="access <= Access.Admin" slot="extra">
+					<div v-if="isEditVisible" slot="extra">
 						<div v-if="!profile.isEditable">
-							<Button type="text" @click="onClickEditProfile" >编辑</Button>
+							<Button type="text" @click="onClickEditProfile">编辑</Button>
 						</div>
 						<div v-else>
 							<Button type="text" @click="onClickCancelProfile">取消</Button>
@@ -48,16 +48,38 @@
 					<p slot="title">
 						Finance
 					</p>
+					<div v-if="isEditVisible" slot="extra">
+						<div v-if="!finance.isEditable">
+							<Button type="text" @click="onClickEditFinance">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickCancelFinance">取消</Button>
+							<Button type="text" @click="onClickSaveFinance" :loading="finance.isSaving">保存</Button>
+						</div>
+					</div>
 					<Form :model="finance.form" :rules="finance.rules" label-position="left" :label-width="finance.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="项目总额">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="项目周期">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="基础利率">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="附加利率">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="最小投资">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="项目进度">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="还款方式">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="计息方式">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="项目总额"><p>{{product.loanAmount}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="项目周期"><p>{{productTerm}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="项目进度"><p>{{product.currentInvestment}}</p></FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="8"><FormItem label="基础利率">
+								<p v-if="!finance.isEditable">{{finance.form.interestRateBase}}</p>
+								<InputNumber v-else v-model="finance.form.interestRateBase" :min="0" :max="0.99" :step="0.01"></InputNumber>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="附加利率">
+								<p v-if="!finance.isEditable">{{finance.form.interestRateDelta}}</p>
+								<InputNumber v-else v-model="finance.form.interestRateDelta" :min="0" :max="0.99" :step="0.01"></InputNumber>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="最小投资">
+								<p v-if="!finance.isEditable">{{finance.form.minInvestment}}</p>
+								<InputNumber v-else v-model="finance.form.minInvestment" :min="0" :max="10000" :step="100"></InputNumber>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="8"><FormItem label="还款方式"><p>{{productRepayType}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="计息方式"><p>{{productInterestWay}}</p></FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -84,7 +106,7 @@
 			</Col>
 			<Col :span="8" class="padding-left-10">
 				<!-- TODO need add auth check -->
-				<Card v-if="access === Access.SuperAdmin" class="margin-bottom-10">
+				<Card v-if="isControlVisible" class="margin-bottom-10">
 					<p slot="title">
 						Control
 					</p>
@@ -102,8 +124,8 @@
 						Sale
 					</p>
 					<Form label-position="left" :label-width="sale.labelWidth">
-						<FormItem label="上架状态">测试数据</FormItem>
-						<FormItem label="上架时间">测试数据</FormItem>
+						<FormItem label="上架状态">{{isOnSale}}</FormItem>
+						<FormItem label="上架时间">{{publishTime}}</FormItem>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
@@ -141,7 +163,6 @@ export default {
 	data() {
 		const blankProduct = new Product()
 		return {
-			Access: Enum.Role,
 			access: parseInt(Cookies.get('access'), 10),
 			product: blankProduct,
 			profile: {
@@ -163,7 +184,9 @@ export default {
 			},
 			finance: {
 				labelWidth: 75,
+				isLoading: false,
 				isEditable: false,
+				isSaving: false,
 				form: {
 					totalAmount: blankProduct.totalAmount,
 					termType: blankProduct.termType,
@@ -224,6 +247,18 @@ export default {
 		}
 	},
 	computed: {
+		isControlVisible() {
+			return this.access === Enum.Role.SuperAdmin
+		},
+		isEditVisible() {
+			return this.access <= Enum.Role.Admin
+		},
+		isOnSale() {
+			return this.product.isOnSale ? '已上架' : '未上架'
+		},
+		publishTime() {
+			return this.product.publishTime // TODO for test
+		},
 		productStatus() {
 			return util.getProductStatus(this.product.status, this)
 		},
@@ -235,6 +270,15 @@ export default {
 		},
 		productLastUpdateTime() {
 			return this.product.lastUpdateTime // TODO for test
+		},
+		productTerm() {
+			return util.getProductTermType(this.product.termType, this)
+		},
+		productRepayType() {
+			return util.getProductRepayType(this.product.repayType, this)
+		},
+		productInterestWay() {
+			return util.getProductInterestWay(this.product.interestWay, this)
 		},
 	},
 	methods: {
@@ -273,10 +317,45 @@ export default {
 				lastUpdateTime: this.product.lastUpdateTime,
 			}
 		},
-		async updateProfile() {
+		// finance
+		onClickEditFinance() {
+			this.editFinance()
 		},
-		async fetchProfile() {
+		onClickCancelFinance() {
+			this.initFinanceForm()
+			this.uneditFinance()
 		},
+		onClickSaveFinance() {
+			this.uneditFinance()
+		},
+		editFinance() {
+			this.finance.isEditable = true
+		},
+		uneditFinance() {
+			this.finance.isEditable = false
+		},
+		financeLoading() {
+			this.finance.isLoading = true
+		},
+		financeUnloading() {
+			this.finance.isLoading = false
+		},
+		initFinanceForm() {
+			this.finance.form = {
+				totalAmount: this.product.totalAmount,
+				termType: this.product.termType,
+				interestRateBase: this.product.interestRateBase,
+				interestRateDelta: this.product.interestRateDelta,
+				minInvestment: this.product.minInvestment,
+				currentInvestment: this.product.currentInvestment,
+				repayType: this.product.repayType,
+				interestWay: this.product.interestWay,
+			}
+		},
+		// async updateProfile() {
+		// },
+		// async fetchProfile() {
+		// },
 	},
 }
 </script>
