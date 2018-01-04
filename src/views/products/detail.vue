@@ -92,14 +92,38 @@
 							<Col :span="12"><FormItem label="借款人姓名">测试数据</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证号码">测试数据</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证住址">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="身份证正面">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="身份证背面">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆行驶证">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆检验证">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆正面照">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆背面照">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆里程照">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆内饰照">测试数据</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="身份证正面">
+								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="身份证背面">
+								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="车辆行驶证">
+								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆检验证">
+								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="车辆正面照">
+								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆背面照">
+								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="车辆里程照">
+								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆内饰照">
+								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
+							</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
