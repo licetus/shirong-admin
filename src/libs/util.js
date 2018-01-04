@@ -356,9 +356,9 @@ util.getProductRepayType = (type, vm) => {
 		return null
 	}
 	switch (type) {
-		case Enum.Product.RepayType.LumpSumPayment:
+		case Enum.Product.RepayType.LumpSum:
 			return '一次性还款'
-		case Enum.Product.RepayType.BeforeInterestAfterPricipalPayment:
+		case Enum.Product.RepayType.InterestFirst:
 			return '先息后本'
 		default: {
 			vm.$Message.error('错误: 未知的还款方式')
@@ -373,7 +373,7 @@ util.getProductInterestWay = (type, vm) => {
 		return null
 	}
 	switch (type) {
-		case Enum.Product.InterestWay.CalculatingInterestAfterObjectCompleted:
+		case Enum.Product.InterestWay.ObjectCompleted:
 			return '满标计息'
 		default: {
 			vm.$Message.error('错误: 未知的计息方式')

@@ -27,11 +27,11 @@ const Enum = {
 			SixMonths: 4,
 		},
 		RepayType: {
-			LumpSumPayment: 1,
-			BeforeInterestAfterPricipalPayment: 2,
+			LumpSum: 1,
+			InterestFirst: 2,
 		},
 		InterestWay: {
-			CalculatingInterestAfterObjectCompleted: 1,
+			ObjectCompleted: 1,
 		},
 	},
 }
