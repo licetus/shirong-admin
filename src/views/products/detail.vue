@@ -132,31 +132,32 @@
 
 <script>
 import Cookies from 'js-cookie'
-import defaultProduct from './data'
+import { Product } from '../../models/test-data'
 import util from '../../libs/util'
 import Enum from '../../models/enum'
 
 export default {
 	name: 'product_detail',
 	data() {
+		const blankProduct = new Product()
 		return {
 			Access: Enum.Role,
 			access: parseInt(Cookies.get('access'), 10),
-			product: defaultProduct.testProduct,
+			product: blankProduct,
 			profile: {
 				labelWidth: 75,
 				isLoading: false,
 				isEditable: false,
 				isSaving: false,
 				form: {
-					status: defaultProduct.testProduct.status,
-					type: defaultProduct.testProduct.type,
-					name: defaultProduct.testProduct.name,
-					tagId: defaultProduct.testProduct.tagId,
-					rank: defaultProduct.testProduct.rank,
-					description: defaultProduct.testProduct.description,
-					createTime: defaultProduct.testProduct.createTime,
-					lastUpdateTime: defaultProduct.testProduct.lastUpdateTime,
+					status: blankProduct.status,
+					type: blankProduct.type,
+					name: blankProduct.name,
+					tagId: blankProduct.tagId,
+					rank: blankProduct.rank,
+					description: blankProduct.description,
+					createTime: blankProduct.createTime,
+					lastUpdateTime: blankProduct.lastUpdateTime,
 				},
 				rules: {},
 			},
@@ -164,14 +165,14 @@ export default {
 				labelWidth: 75,
 				isEditable: false,
 				form: {
-					totalAmount: defaultProduct.testProduct.totalAmount,
-					termType: defaultProduct.testProduct.termType,
-					interestRateBase: defaultProduct.testProduct.interestRateBase,
-					interestRateDelta: defaultProduct.testProduct.interestRateDelta,
-					minInvestment: defaultProduct.testProduct.minInvestment,
-					currentInvestment: defaultProduct.testProduct.currentInvestment,
-					repayType: defaultProduct.testProduct.repayType,
-					interestWay: defaultProduct.testProduct.interestWay,
+					totalAmount: blankProduct.totalAmount,
+					termType: blankProduct.termType,
+					interestRateBase: blankProduct.interestRateBase,
+					interestRateDelta: blankProduct.interestRateDelta,
+					minInvestment: blankProduct.minInvestment,
+					currentInvestment: blankProduct.currentInvestment,
+					repayType: blankProduct.repayType,
+					interestWay: blankProduct.interestWay,
 				},
 				rules: {},
 			},
@@ -181,12 +182,12 @@ export default {
 			},
 			sale: {
 				labelWidth: 75,
-				isOnSale: defaultProduct.testProduct.isOnSale,
-				publishTime: defaultProduct.testProduct.publishTime,
+				isOnSale: blankProduct.isOnSale,
+				publishTime: blankProduct.publishTime,
 			},
 			approval: {
 				labelWidth: 75,
-				data: defaultProduct.testProduct.approval,
+				data: blankProduct.approval,
 			},
 			investmentRecord: {
 				data: [
