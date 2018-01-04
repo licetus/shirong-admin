@@ -33,4 +33,39 @@ export function Product() {
 			lastUpdateTime: null,
 		},
 	]
+	// car
+	this.carBrand = '-'
+	this.purchasePrice = 0
+	this.milage = 0
+	this.evaluatePrice = 0
+	this.carPictureFront = ''
+	this.carPictureBack = ''
+	this.carPictureMilage = ''
+	this.carPictureInside = ''
+	this.carPictureVehicleLicense = ''
+	this.carPictureInspectionLicense = ''
+}
+
+export function Debtor() {
+	// profile
+	this.id = null
+	this.realName = '-'
+	this.gender = null
+	this.primaryNumber = '-'
+	this.alternativeNumber = '-'
+	this.isCarOwner = false
+	// id card
+	this.idCardNumber = '-'
+	this.idCardPictureFront = ''
+	this.idCardPictureFrontBlur = ''
+	this.idCardPictureBack = ''
+	this.idCardPictureBackBlur = ''
+	this.idCardResidence = '-'
+	// credit info
+	this.workPlace = '-'
+	this.address = '-'
+	this.education = '-'
+	this.yearlyStableIncome = 0
+	this.monthlyStableIncome = 0
+	this.hasHouse = false
 }

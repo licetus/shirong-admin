@@ -33,4 +33,39 @@ export function Product() {
 			lastUpdateTime: '2018-1-1',
 		},
 	]
+	// car
+	this.carBrand = '布加迪威龙'
+	this.purchasePrice = 5000000
+	this.milage = 1000
+	this.evaluatePrice = 3500000
+	this.carPictureFront = ''
+	this.carPictureBack = ''
+	this.carPictureMilage = ''
+	this.carPictureInside = ''
+	this.carPictureVehicleLicense = ''
+	this.carPictureInspectionLicense = ''
+}
+
+export function Debtor() {
+	// profile
+	this.id = 1000000000
+	this.realName = '司马懿'
+	this.gender = 1
+	this.primaryNumber = '18888888888'
+	this.alternativeNumber = '-'
+	this.isCarOwner = true
+	// id card
+	this.idCardNumber = '310000000000000000'
+	this.idCardPictureFront = ''
+	this.idCardPictureFrontBlur = ''
+	this.idCardPictureBack = ''
+	this.idCardPictureBackBlur = ''
+	this.idCardResidence = '魏国洛阳'
+	// credit info
+	this.workPlace = '曹氏魏国'
+	this.address = '洛阳'
+	this.education = '少熟经史'
+	this.yearlyStableIncome = 1000000
+	this.monthlyStableIncome = 100000
+	this.hasHouse = true
 }

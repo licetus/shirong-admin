@@ -1,8 +1,8 @@
-import Picture from './image-controler'
+import SafeImg from './image-controler'
 
 const Public = {
 	install(Vue) {
-		Vue.component('Picture', Picture)
+		Vue.component('SafeImg', SafeImg)
 	},
 }
 

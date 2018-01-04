@@ -5,6 +5,10 @@ const Enum = {
 		Approver: 3,
 		Agent: 4,
 	},
+	Gender: {
+		Male: 1,
+		Female: 2,
+	},
 	Product: {
 		Status: {
 			Submitted: 1,

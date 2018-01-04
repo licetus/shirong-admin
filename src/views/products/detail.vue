@@ -87,50 +87,79 @@
 					<p slot="title">
 						Additional Info
 					</p>
-					<Form :model="additionalInfo.form" :rules="additionalInfo.rules" label-position="left" :label-width="additionalInfo.labelWidth" inline>
+					<div slot="extra">
+						<Button type="text" @click="onClickAdditionalDetail">详情</Button>
+					</div>
+					<Form :model="additionalInfo.data" label-position="left" :label-width="additionalInfo.labelWidth" inline>
 						<Row>
-							<Col :span="12"><FormItem label="借款人姓名">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="身份证号码">测试数据</FormItem></Col>
-							<Col :span="12"><FormItem label="身份证住址">测试数据</FormItem></Col>
+							<Col :span="12"><FormItem label="借款人姓名">
+								<p>{{additionalInfo.data.realName}}</p>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="身份证号码">
+								<p>{{additionalInfo.data.idCardNumber}}</p>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="身份证住址">
+								<p>{{additionalInfo.data.idCardResidence}}</p>
+							</FormItem></Col>
 						</Row>
+						<div v-if="product.type === ProductType.Car">
+							<Row>
+								<Col :span="12"><FormItem label="车辆型号">
+									<p>{{product.carBrand}}</p>
+								</FormItem></Col>
+								<Col :span="12"><FormItem label="购买价格">
+									<p>{{product.purchasePrice}}</p>
+								</FormItem></Col>
+							</Row>
+							<Row>
+								<Col :span="12"><FormItem label="行驶里程">
+									<p>{{product.milage}}</p>
+								</FormItem></Col>
+								<Col :span="12"><FormItem label="评估价格">
+									<p>{{product.evaluatePrice}}</p>
+								</FormItem></Col>
+							</Row>
+						</div>
 						<Row>
 							<Col :span="12"><FormItem label="身份证正面">
-								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="additionalInfo.data.idCardPictureFront" type="certificate-md"></SafeImg></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证背面">
-								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="additionalInfo.data.idCardPictureBack" type="certificate-md"></SafeImg></Col></Row>
 							</FormItem></Col>
 						</Row>
-						<Row>
-							<Col :span="12"><FormItem label="车辆行驶证">
-								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
-							</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆检验证">
-								<Row><Col :span="18"><Picture src="" type="certificate-md"></Picture></Col></Row>
-							</FormItem></Col>
-						</Row>
-						<Row>
-							<Col :span="12"><FormItem label="车辆正面照">
-								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
-							</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆背面照">
-								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
-							</FormItem></Col>
-						</Row>
-						<Row>
-							<Col :span="12"><FormItem label="车辆里程照">
-								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
-							</FormItem></Col>
-							<Col :span="12"><FormItem label="车辆内饰照">
-								<Row><Col :span="18"><Picture src="" type="photo-sm"></Picture></Col></Row>
-							</FormItem></Col>
-						</Row>
+						<div v-if="product.type === ProductType.Car">
+							<Row>
+								<Col :span="12"><FormItem label="车辆行驶证">
+									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureVehicleLicense" type="certificate-md"></SafeImg></Col></Row>
+								</FormItem></Col>
+								<Col :span="12"><FormItem label="车辆检验证">
+									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureInspectionLicense" type="certificate-md"></SafeImg></Col></Row>
+								</FormItem></Col>
+							</Row>
+							<Row>
+								<Col :span="12"><FormItem label="车辆正面照">
+									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureFront" type="photo-sm"></SafeImg></Col></Row>
+								</FormItem></Col>
+								<Col :span="12"><FormItem label="车辆背面照">
+									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureBack" type="photo-sm"></SafeImg></Col></Row>
+								</FormItem></Col>
+							</Row>
+							<Row>
+								<Col :span="12"><FormItem label="车辆里程照">
+									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureMilage" type="photo-sm"></SafeImg></Col></Row>
+								</FormItem></Col>
+								<Col :span="12"><FormItem label="车辆内饰照">
+									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureInside" type="photo-sm"></SafeImg></Col></Row>
+								</FormItem></Col>
+							</Row>
+						</div>
 					</Form>
 				</Card>
 			</Col>
 			<Col :span="8" class="padding-left-10">
 				<!-- TODO need add auth check -->
-				<Card v-if="isControlVisible" class="margin-bottom-10">
+				<Card class="margin-bottom-10">
 					<p slot="title">
 						Control
 					</p>
@@ -178,7 +207,7 @@
 
 <script>
 import Cookies from 'js-cookie'
-import { Product } from '../../models/test-data'
+import { Product, Debtor } from '../../models/test-data'
 import util from '../../libs/util'
 import Enum from '../../models/enum'
 
@@ -186,9 +215,12 @@ export default {
 	name: 'product_detail',
 	data() {
 		const blankProduct = new Product()
+		const blankDebtor = new Debtor()
 		return {
 			access: parseInt(Cookies.get('access'), 10),
 			product: blankProduct,
+			debtor: blankDebtor,
+			ProductType: Enum.Product.Type,
 			profile: {
 				labelWidth: 75,
 				isLoading: false,
@@ -225,7 +257,19 @@ export default {
 			},
 			additionalInfo: {
 				labelWidth: 75,
-				form: {},
+				data: {
+					realName: blankDebtor.realName,
+					idCardNumber: blankDebtor.idCardNumber,
+					idCardResidence: blankDebtor.idCardResidence,
+					idCardPictureFront: blankDebtor.idCardPictureFrontBlur,
+					idCardPictureBack: blankDebtor.idCardPictureBackBlur,
+					carPictureVehicleLicense: blankProduct.carPictureVehicleLicense,
+					carPictureInspectionLicense: blankProduct.carPictureInspectionLicense,
+					carPictureFront: blankProduct.carPictureFront,
+					carPictureBack: blankProduct.carPictureBack,
+					carPictureMilage: blankProduct.carPictureMilage,
+					carPictureInside: blankProduct.carPictureInside,
+				},
 			},
 			sale: {
 				labelWidth: 75,
@@ -375,6 +419,15 @@ export default {
 				repayType: this.product.repayType,
 				interestWay: this.product.interestWay,
 			}
+		},
+		// additional info
+		onClickAdditionalDetail() {
+			this.$router.push({
+				name: 'customer_detail',
+				params: {
+					customer_id: 1,
+				},
+			})
 		},
 		// async updateProfile() {
 		// },

@@ -1,5 +1,5 @@
 <template>
-	<img :src="imageUrl" @error="onImageError" :style="style"/>
+	<img :src="imageUrl" @error="onImageError" :style="styles"/>
 </template>
 
 <script>
@@ -12,11 +12,11 @@ import photoSm from './assets/photo@1x.png'
 import photoLg from './assets/photo@3x.png'
 
 export default {
-	name: 'picture',
+	name: 'safe-img',
 	props: {
 		src: String,
 		type: String,
-		style: String,
+		styles: String,
 	},
 	data() {
 		return {

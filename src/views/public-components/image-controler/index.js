@@ -1,3 +1,3 @@
-import Picture from './image-controler.vue'
+import SafeImg from './image-controler.vue'
 
-export default Picture
+export default SafeImg
