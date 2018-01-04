@@ -31,12 +31,14 @@
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目标签">测试数据</FormItem></Col>
 							<Col :span="8"><FormItem label="排名参数">
-								<p v-if="!profile.isEditable">{{profile.form.rank}}</p>
-								<InputNumber v-else v-model="profile.form.rank" :min="0" :max="9.99" :step="0.1"></InputNumber>
+								<p v-if="!profile.isEditable">{{profile.form.rankingScore}}</p>
+								<InputNumber v-else v-model="profile.form.rankingScore" :min="0" :max="9.99" :step="0.1"></InputNumber>
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="项目描述">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="项目备注">
+								<p>{{profile.form.remark}}</p>
+							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="8"><FormItem label="创建时间">{{productCreateTime}}</FormItem></Col>
@@ -59,7 +61,7 @@
 					</div>
 					<Form :model="finance.form" :rules="finance.rules" label-position="left" :label-width="finance.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="项目总额"><p>{{product.loanAmount}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="项目总额"><p>{{product.amount}}</p></FormItem></Col>
 							<Col :span="8"><FormItem label="项目周期"><p>{{productTerm}}</p></FormItem></Col>
 							<Col :span="8"><FormItem label="项目进度"><p>{{product.currentInvestment}}</p></FormItem></Col>
 						</Row>
@@ -85,21 +87,21 @@
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">
-						Additional Info
+						Loan Information
 					</p>
 					<div slot="extra">
 						<Button type="text" @click="onClickAdditionalDetail">详情</Button>
 					</div>
-					<Form :model="additionalInfo.data" label-position="left" :label-width="additionalInfo.labelWidth" inline>
+					<Form :model="loanInfo.data" label-position="left" :label-width="loanInfo.labelWidth" inline>
 						<Row>
 							<Col :span="12"><FormItem label="借款人姓名">
-								<p>{{additionalInfo.data.realName}}</p>
+								<p>{{loanInfo.data.realName}}</p>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证号码">
-								<p>{{additionalInfo.data.idCardNumber}}</p>
+								<p>{{loanInfo.data.idNumber}}</p>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证住址">
-								<p>{{additionalInfo.data.idCardResidence}}</p>
+								<p>{{loanInfo.data.location}}</p>
 							</FormItem></Col>
 						</Row>
 						<div v-if="product.type === ProductType.Car">
@@ -122,35 +124,35 @@
 						</div>
 						<Row>
 							<Col :span="12"><FormItem label="身份证正面">
-								<Row><Col :span="18"><SafeImg :src="additionalInfo.data.idCardPictureFront" type="certificate-md"></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="loanInfo.data.frontImageUrl" type="certificate-md"></SafeImg></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证背面">
-								<Row><Col :span="18"><SafeImg :src="additionalInfo.data.idCardPictureBack" type="certificate-md"></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="loanInfo.data.backImageUrl" type="certificate-md"></SafeImg></Col></Row>
 							</FormItem></Col>
 						</Row>
-						<div v-if="product.type === ProductType.Car">
+						<div v-if="loan.type === ProductType.Car">
 							<Row>
 								<Col :span="12"><FormItem label="车辆行驶证">
-									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureVehicleLicense" type="certificate-md"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loanInfo.data.vehicleLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆检验证">
-									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureInspectionLicense" type="certificate-md"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loanInfo.data.inspectionLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆正面照">
-									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureFront" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loanInfo.data.carFrontImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆背面照">
-									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureBack" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loanInfo.data.carBackImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆里程照">
-									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureMilage" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loanInfo.data.carMilageImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆内饰照">
-									<Row><Col :span="18"><SafeImg :src="additionalInfo.data.carPictureInside" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loanInfo.data.carInsideImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 						</div>
@@ -207,34 +209,40 @@
 
 <script>
 import Cookies from 'js-cookie'
-import { Product, Debtor } from '../../models/test-data'
+import { Loan, LoanComment, Product, Debtor } from '../../models/test-data'
 import util from '../../libs/util'
 import Enum from '../../models/enum'
 
 export default {
 	name: 'product_detail',
 	data() {
-		const blankProduct = new Product()
-		const blankDebtor = new Debtor()
+		const blank = {
+			loan: new Loan(),
+			loanComment: new LoanComment(),
+			product: new Product(),
+			debtor: new Debtor(),
+		}
 		return {
 			access: parseInt(Cookies.get('access'), 10),
-			product: blankProduct,
-			debtor: blankDebtor,
-			ProductType: Enum.Product.Type,
+			loan: blank.loan,
+			loanComment: blank.loanComment,
+			product: blank.product,
+			debtor: blank.debtor,
+			ProductType: Enum.Loan.Type,
 			profile: {
 				labelWidth: 75,
 				isLoading: false,
 				isEditable: false,
 				isSaving: false,
 				form: {
-					status: blankProduct.status,
-					type: blankProduct.type,
-					name: blankProduct.name,
-					tagId: blankProduct.tagId,
-					rank: blankProduct.rank,
-					description: blankProduct.description,
-					createTime: blankProduct.createTime,
-					lastUpdateTime: blankProduct.lastUpdateTime,
+					status: blank.product.status,
+					type: blank.product.type,
+					name: blank.product.name,
+					tagId: blank.product.tagId,
+					rankingScore: blank.product.rankingScore,
+					remark: blank.product.remark,
+					createTime: blank.product.createTime,
+					lastUpdateTime: blank.product.lastUpdateTime,
 				},
 				rules: {},
 			},
@@ -244,41 +252,41 @@ export default {
 				isEditable: false,
 				isSaving: false,
 				form: {
-					totalAmount: blankProduct.totalAmount,
-					termType: blankProduct.termType,
-					interestRateBase: blankProduct.interestRateBase,
-					interestRateDelta: blankProduct.interestRateDelta,
-					minInvestment: blankProduct.minInvestment,
-					currentInvestment: blankProduct.currentInvestment,
-					repayType: blankProduct.repayType,
-					interestWay: blankProduct.interestWay,
+					amount: blank.product.amount,
+					interestRateBase: blank.product.interestRateBase,
+					interestRateDelta: blank.product.interestRateDelta,
+					minInvestment: blank.product.minInvestment,
+					currentInvestment: blank.product.currentInvestment,
+					repaymentWay: blank.loan.repaymentWay,
+					termType: blank.product.termType,
+					interestWay: blank.product.interestWay,
 				},
 				rules: {},
 			},
-			additionalInfo: {
+			loanInfo: {
 				labelWidth: 75,
 				data: {
-					realName: blankDebtor.realName,
-					idCardNumber: blankDebtor.idCardNumber,
-					idCardResidence: blankDebtor.idCardResidence,
-					idCardPictureFront: blankDebtor.idCardPictureFrontBlur,
-					idCardPictureBack: blankDebtor.idCardPictureBackBlur,
-					carPictureVehicleLicense: blankProduct.carPictureVehicleLicense,
-					carPictureInspectionLicense: blankProduct.carPictureInspectionLicense,
-					carPictureFront: blankProduct.carPictureFront,
-					carPictureBack: blankProduct.carPictureBack,
-					carPictureMilage: blankProduct.carPictureMilage,
-					carPictureInside: blankProduct.carPictureInside,
+					realName: blank.debtor.realName,
+					idNumber: blank.debtor.idNumber,
+					location: blank.debtor.location,
+					frontImageUrl: blank.debtor.frontImageUrlBlur,
+					backImageUrl: blank.debtor.backImageUrlBlur,
+					vehicleLicenseImageUrl: blank.loan.sub.vehicleLicenseImageUrl,
+					inspectionLicenseImageUrl: blank.loan.sub.inspectionLicenseImageUrl,
+					carFrontImageUrl: blank.loan.sub.carFrontImageUrl,
+					carBackImageUrl: blank.loan.sub.carBackImageUrl,
+					carMilageImageUrl: blank.loan.sub.carMilageImageUrl,
+					carInsideImageUrl: blank.loan.sub.carInsideImageUrl,
 				},
 			},
 			sale: {
 				labelWidth: 75,
-				isOnSale: blankProduct.isOnSale,
-				publishTime: blankProduct.publishTime,
+				isOnSale: blank.product.isOnSale,
+				publishTime: blank.product.publishTime,
 			},
 			approval: {
 				labelWidth: 75,
-				data: blankProduct.approval,
+				data: blank.product.approval,
 			},
 			investmentRecord: {
 				data: [
@@ -331,7 +339,7 @@ export default {
 			return util.getProductStatus(this.product.status, this)
 		},
 		productType() {
-			return util.getProductType(this.product.type, this)
+			return util.getLoanType(this.loan.type, this)
 		},
 		productCreateTime() {
 			return this.product.createTime // TODO for test
@@ -343,7 +351,7 @@ export default {
 			return util.getProductTermType(this.product.termType, this)
 		},
 		productRepayType() {
-			return util.getProductRepayType(this.product.repayType, this)
+			return util.getLoanRepaymentWay(this.loan.repaymentWay, this)
 		},
 		productInterestWay() {
 			return util.getProductInterestWay(this.product.interestWay, this)
@@ -379,8 +387,8 @@ export default {
 				type: this.product.type,
 				name: this.product.name,
 				tagId: this.product.tagId,
-				rank: this.product.rank,
-				description: this.product.description,
+				rankingScore: this.product.rankingScore,
+				remark: this.product.remark,
 				createTime: this.product.createTime,
 				lastUpdateTime: this.product.lastUpdateTime,
 			}
@@ -410,13 +418,13 @@ export default {
 		},
 		initFinanceForm() {
 			this.finance.form = {
-				totalAmount: this.product.totalAmount,
+				amount: this.product.amount,
 				termType: this.product.termType,
 				interestRateBase: this.product.interestRateBase,
 				interestRateDelta: this.product.interestRateDelta,
 				minInvestment: this.product.minInvestment,
 				currentInvestment: this.product.currentInvestment,
-				repayType: this.product.repayType,
+				repaymentWay: this.loan.repaymentWay,
 				interestWay: this.product.interestWay,
 			}
 		},

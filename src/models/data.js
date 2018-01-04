@@ -1,49 +1,65 @@
+export function Loan() {
+	this.id = null
+	this.status = null
+	this.type = null
+	this.debtorId = null
+	this.agentId = null
+	this.amount = 0
+	this.interest = 0
+	this.termType = null
+	this.repaymentWay = null
+	this.remark = '-'
+	this.approvalStatus = null
+	this.createTime = null
+	this.lastUpdateTime = null
+	// car
+	this.sub = {
+		id: null,
+		carBrand: '-',
+		purchasePrice: 0,
+		milage: 0,
+		evaluatePrice: 0,
+		carFrontImageUrl: '',
+		carBackImageUrl: '',
+		carMilageImageUrl: '',
+		carInsideImageUrl: '',
+		vehicleLicenseImageUrl: '',
+		inspectionLicenseImageUrl: '',
+	}
+}
+
+export function LoanComment() {
+	this.id = null
+	this.loanId = null
+	this.adminId = null
+	this.content = '-'
+	this.createTime = null
+	this.lastUpdateTime = null
+}
+
 export function Product() {
 	this.id = null
+	this.loanId = null
 	this.status = null
 	// business
 	this.isOnSale = false
+	this.startInterestTime = null
 	this.publishTime = null
 	// profile
-	this.type = null
 	this.name = '-'
-	this.description = '-'
-	this.rank = 0
-	this.debtorId = null
+	this.remark = '-'
+	this.rankingScore = 0
 	this.tagId = null
 	this.createTime = null
 	this.lastUpdateTime = null
 	// finance
-	this.loanAmount = 0
-	this.termType = null
+	this.amount = 0
 	this.interestRateBase = 0
 	this.interestRateDelta = 0
 	this.minInvestment = 0
 	this.currentInvestment = 0
+	this.termType = null
 	this.interestWay = null
-	this.repayType = null
-	// approval
-	this.approval = [
-		{
-			id: null,
-			approverId: null,
-			content: '-',
-			comment: '-',
-			createTime: null,
-			lastUpdateTime: null,
-		},
-	]
-	// car
-	this.carBrand = '-'
-	this.purchasePrice = 0
-	this.milage = 0
-	this.evaluatePrice = 0
-	this.carPictureFront = ''
-	this.carPictureBack = ''
-	this.carPictureMilage = ''
-	this.carPictureInside = ''
-	this.carPictureVehicleLicense = ''
-	this.carPictureInspectionLicense = ''
 }
 
 export function Debtor() {
@@ -55,12 +71,12 @@ export function Debtor() {
 	this.alternativeNumber = '-'
 	this.isCarOwner = false
 	// id card
-	this.idCardNumber = '-'
-	this.idCardPictureFront = ''
-	this.idCardPictureFrontBlur = ''
-	this.idCardPictureBack = ''
-	this.idCardPictureBackBlur = ''
-	this.idCardResidence = '-'
+	this.idNumber = '-'
+	this.frontImageUrl = ''
+	this.frontBlurImageUrl = ''
+	this.backImageUrl = ''
+	this.backBlurImaegUrl = ''
+	this.location = '-'
 	// credit info
 	this.workPlace = '-'
 	this.address = '-'

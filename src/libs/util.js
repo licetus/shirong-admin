@@ -283,17 +283,108 @@ util.inputLengthCheck = (string, length, vm) => {
 	return false
 }
 
+util.getLoanStatus = (status, vm) => {
+	if (!status) {
+		vm.$Message.error('错误: 贷款状态缺失')
+		return null
+	}
+	switch (status) {
+		case Enum.Loan.Status.Prepared:
+			return '已签约'
+		case Enum.Product.Status.Canceled:
+			return '已取消'
+		case Enum.Product.Status.Running:
+			return '计息中'
+		case Enum.Product.Status.Completed:
+			return '已完成'
+		default: {
+			vm.$Message.error('错误: 未知的贷款状态')
+			return null
+		}
+	}
+}
+
+util.getLoanApprovalStatus = (status, vm) => {
+	if (!status) {
+		vm.$Message.error('错误: 审核状态缺失')
+		return null
+	}
+	switch (status) {
+		case Enum.Loan.ApprovalStatus.Submitted:
+			return '审核中'
+		case Enum.Product.ApprovalStatus.Disapproved:
+			return '未通过'
+		case Enum.Product.ApprovalStatus.Approved:
+			return '已通过'
+		default: {
+			vm.$Message.error('错误: 未知的审核状态')
+			return null
+		}
+	}
+}
+
+util.getLoanType = (type, vm) => {
+	if (!type) {
+		vm.$Message.error('错误: 贷款类型缺失')
+		return null
+	}
+	switch (type) {
+		case Enum.Loan.Type.Other:
+			return '其他'
+		case Enum.Loan.Type.Car:
+			return '车贷'
+		default: {
+			vm.$Message.error('错误: 未知的贷款类型')
+			return null
+		}
+	}
+}
+
+util.getLoanTermType = (type, vm) => {
+	if (!type) {
+		vm.$Message.error('错误: 周期类型缺失')
+		return null
+	}
+	switch (type) {
+		case Enum.Loan.TermType.SevenDays:
+			return '7天'
+		case Enum.Loan.TermType.OneMonth:
+			return '1个月'
+		case Enum.Loan.TermType.ThreeMonths:
+			return '3个月'
+		case Enum.Loan.TermType.SixMonths:
+			return '6个月'
+		default: {
+			vm.$Message.error('错误: 未知的周期类型')
+			return null
+		}
+	}
+}
+
+util.getLoanRepaymentWay = (type, vm) => {
+	if (!type) {
+		vm.$Message.error('错误: 还款方式缺失')
+		return null
+	}
+	switch (type) {
+		case Enum.Loan.RepaymentWay.LumpSum:
+			return '一次性还款'
+		case Enum.Loan.RepaymentWay.InterestFirst:
+			return '先息后本'
+		default: {
+			vm.$Message.error('错误: 未知的还款方式')
+			return null
+		}
+	}
+}
+
 util.getProductStatus = (status, vm) => {
 	if (!status) {
 		vm.$Message.error('错误: 项目状态缺失')
 		return null
 	}
 	switch (status) {
-		case Enum.Product.Status.Submitted:
-			return '审核中'
-		case Enum.Product.Status.Disapproved:
-			return '未通过'
-		case Enum.Product.Status.Approved:
+		case Enum.Product.Status.Prepared:
 			return '已审核'
 		case Enum.Product.Status.Selling:
 			return '销售中'
@@ -307,23 +398,6 @@ util.getProductStatus = (status, vm) => {
 			return '已完成'
 		default: {
 			vm.$Message.error('错误: 未知的项目状态')
-			return null
-		}
-	}
-}
-
-util.getProductType = (type, vm) => {
-	if (!type) {
-		vm.$Message.error('错误: 项目类型缺失')
-		return null
-	}
-	switch (type) {
-		case Enum.Product.Type.Other:
-			return '其他'
-		case Enum.Product.Type.Car:
-			return '车贷'
-		default: {
-			vm.$Message.error('错误: 未知的项目类型')
 			return null
 		}
 	}
@@ -350,22 +424,6 @@ util.getProductTermType = (type, vm) => {
 	}
 }
 
-util.getProductRepayType = (type, vm) => {
-	if (!type) {
-		vm.$Message.error('错误: 还款方式缺失')
-		return null
-	}
-	switch (type) {
-		case Enum.Product.RepayType.LumpSum:
-			return '一次性还款'
-		case Enum.Product.RepayType.InterestFirst:
-			return '先息后本'
-		default: {
-			vm.$Message.error('错误: 未知的还款方式')
-			return null
-		}
-	}
-}
 
 util.getProductInterestWay = (type, vm) => {
 	if (!type) {
