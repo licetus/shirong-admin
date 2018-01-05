@@ -61,10 +61,10 @@ export const otherRouter = {
 		{ path: 'order/:order_id', title: '订单详情', name: 'order-info', component: (resolve) => { require(['@/views/advanced-router/component/order-info.vue'], resolve) } }, // 用于展示动态路由
 		{ path: 'shopping', title: '购物详情', name: 'shopping', component: (resolve) => { require(['@/views/advanced-router/component/shopping-info.vue'], resolve) } }, // 用于展示带参路由
 		{ path: 'message', title: '消息中心', name: 'message_index', component: (resolve) => { require(['@/views/message/message.vue'], resolve) } },
-		{ path: '/customers/:customer_id', title: '客户详情', name: 'customer_detail', component: (resolve) => { require(['@/views/customers/detail.vue'], resolve) } },
-		{ path: '/debtors/:debtor_id', title: '借款人详情', name: 'debtor_detail', component: (resolve) => { require(['@/views/debtors/detail.vue'], resolve) } },
-		{ path: '/products/:product_id', title: '项目详情', name: 'product_detail', component: (resolve) => { require(['@/views/products/detail.vue'], resolve) } },
-		{ path: '/loans/:loan_id', title: '贷款详情', name: 'loan_detail', component: (resolve) => { require(['@/views/loans/detail.vue'], resolve) } },
+		{ path: '/customers/:customer_id(\\d+)', title: '客户详情', name: 'customer_detail', component: (resolve) => { require(['@/views/customers/detail.vue'], resolve) } },
+		{ path: '/debtors/:debtor_id(\\d+)', title: '借款人详情', name: 'debtor_detail', component: (resolve) => { require(['@/views/debtors/detail.vue'], resolve) } },
+		{ path: '/products/:product_id(\\d+)', title: '项目详情', name: 'product_detail', component: (resolve) => { require(['@/views/products/detail.vue'], resolve) } },
+		{ path: '/loans/:loan_id(\\d+)', title: '贷款详情', name: 'loan_detail', component: (resolve) => { require(['@/views/loans/detail.vue'], resolve) } },
 	],
 }
 
@@ -105,6 +105,19 @@ export const appRouter = [
 		],
 	},
 	{
+		path: '/loans',
+		icon: 'card', // TODO: add icon
+		name: 'loans',
+		title: '贷款管理',
+		component: Main,
+		children: [
+			{ path: 'new', title: '新增贷款', name: 'loans_new', icon: '', component: (resolve) => { require(['@/views/loans/new.vue'], resolve) } },
+			{ path: 'verification', title: '贷款审核', name: 'loans_verification', icon: '', component: (resolve) => { require(['@/views/loans/verification.vue'], resolve) } },
+			{ path: 'delivery', title: '贷款发放', name: 'loans_delivery', icon: '', component: (resolve) => { require(['@/views/loans/delivery.vue'], resolve) } },
+			{ path: 'recycling', title: '贷款回收', name: 'loans_recycling', icon: '', component: (resolve) => { require(['@/views/loans/recycling.vue'], resolve) } },
+		],
+	},
+	{
 		path: '/messages',
 		icon: 'image', // TODO: add icon
 		name: 'messages',
@@ -115,18 +128,6 @@ export const appRouter = [
 			{ path: 'activity', title: '活动信息', name: 'messages_activity', icon: '', component: (resolve) => { require(['@/views/messages/activity.vue'], resolve) } },
 			{ path: 'carousel', title: '轮播图', name: 'messages_carousel', icon: '', component: (resolve) => { require(['@/views/messages/carousel.vue'], resolve) } },
 			{ path: 'comments', title: '用户评论', name: 'messages_comments', icon: '', component: (resolve) => { require(['@/views/messages/comments.vue'], resolve) } },
-		],
-	},
-	{
-		path: '/loans',
-		icon: 'card', // TODO: add icon
-		name: 'loans',
-		title: '贷款管理',
-		component: Main,
-		children: [
-			{ path: 'verification', title: '贷款审核', name: 'loans_verification', icon: '', component: (resolve) => { require(['@/views/loans/verification.vue'], resolve) } },
-			{ path: 'delivery', title: '贷款发放', name: 'loans_delivery', icon: '', component: (resolve) => { require(['@/views/loans/delivery.vue'], resolve) } },
-			{ path: 'recycling', title: '贷款回收', name: 'loans_recycling', icon: '', component: (resolve) => { require(['@/views/loans/recycling.vue'], resolve) } },
 		],
 	},
 	{
