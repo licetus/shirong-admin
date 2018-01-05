@@ -152,7 +152,7 @@
 							<Button long>取消</Button>
 						</Col>
 						<Col :span="4" :offset="1">
-							<Button type="primary" long>提交</Button>
+							<Button type="primary" long>关闭</Button>
 						</Col>
 					</Row>
 				</Card>
