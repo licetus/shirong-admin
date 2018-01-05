@@ -90,7 +90,6 @@ export const appRouter = [
 		component: Main,
 		children: [
 			{ path: 'index', title: '借款人列表', name: 'debtors_index', icon: '', component: (resolve) => { require(['@/views/debtors/index.vue'], resolve) } },
-			{ path: 'new', title: '新借款人', name: 'debtors_new', icon: '', component: (resolve) => { require(['@/views/debtors/detail.vue'], resolve) } },
 			{ path: 'verification', title: '实名认证', name: 'debtors_verification', icon: '', component: (resolve) => { require(['@/views/debtors/verification.vue'], resolve) } },
 			{ path: 'evaluation', title: '信用评估', name: 'debtors_evaluation', icon: '', component: (resolve) => { require(['@/views/debtors/evaluation.vue'], resolve) } },
 		],

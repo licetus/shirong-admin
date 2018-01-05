@@ -1,5 +1,6 @@
 import axios from 'axios'
 import config from '../../build/config'
+import util from '../libs/util'
 
 class ServerError extends Error {
 	constructor(code, message) {
@@ -48,10 +49,34 @@ api.login = async (account, password) => {
 
 // debtor
 api.debtor = {
-	addProfile: async params =>
-		createAuthInstance().post('debtor', params).then(res => res.data),
-	updateProfile: async (params, id) =>
-		createAuthInstance().patch(`debtor/${id}`, params).then(res => res.data),
+	fetchList: async (pagesize, page, filters, orderBy) => {
+		const query = {
+			pagesize,
+			page,
+			filters,
+			orderBy,
+		}
+		const str = util.generateQueryString(query)
+		return createAuthInstance().get(`debtor/?${str}`).then(res => res.data)
+	},
+	profile: {
+		add: async params =>
+			createAuthInstance().post('debtor', params).then(res => res.data),
+		delete: async id =>
+			createAuthInstance().delete(`debtor/${id}`).then(res => res.data),
+		update: async (params, id) =>
+			createAuthInstance().patch(`debtor/${id}`, params).then(res => res.data),
+		fetch: async id =>
+			createAuthInstance().get(`debtor/${id}`).then(res => res.data),
+	},
+	identify: {
+		delete: async id =>
+			createAuthInstance().delete(`debtor/${id}/idCard`).then(res => res.data),
+		update: async (params, id) =>
+			createAuthInstance().post(`debtor/${id}/idCard`, params).then(res => res.data),
+		fetch: async id =>
+			createAuthInstance().get(`debtor/${id}/idCard`).then(res => res.data),
+	},
 }
 
 export default api

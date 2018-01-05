@@ -305,6 +305,13 @@ util.formatBirthday = (date, vm) => {
 	}
 	return moment(date).format('YYYY-MM-DD')
 }
+util.getAge = (timestamp, vm) => {
+	if (!timestamp) {
+		vm.$Message.error('错误: timestamp')
+		return null
+	}
+	return moment().diff(moment(timestamp), 'years')
+}
 
 util.getGender = (gender, vm) => {
 	if (!gender) {
@@ -478,6 +485,24 @@ util.getProductInterestWay = (type, vm) => {
 			return null
 		}
 	}
+}
+
+util.generateQueryString = (params) => {
+	const urlEncode = (param, key, encode) => {
+		if (param == null) return ''
+		let paramStr = ''
+		const t = typeof (param)
+		if (t === 'string' || t === 'number' || t === 'boolean') {
+			paramStr += `&${key}=${((encode == null || encode) ? encodeURIComponent(param) : param)}`
+		} else {
+			Object.keys(param).forEach((i) => {
+				const k = key == null ? i : key + (param instanceof Array ? `[${i}]` : `.${i}`)
+				paramStr += urlEncode(param[i], k, encode)
+			})
+		}
+		return paramStr
+	}
+	return urlEncode(params).slice(1)
 }
 
 export default util
