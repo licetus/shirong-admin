@@ -71,7 +71,7 @@ export function Debtor() {
 	this.creatorId = null
 	this.primaryNumber = ''
 	this.alternativeNumber = ''
-	this.isCarOwner = null
+	this.remark = ''
 	// id card
 	this.idNumber = ''
 	this.frontImageUrl = ''

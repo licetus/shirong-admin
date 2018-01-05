@@ -40,21 +40,18 @@ const createAuthInstance = () => createInstance(true)
 
 const api = {}
 
+// auth
 api.login = async (account, password) => {
 	const params = { account, password }
 	return createInstance().post('auth/admin/login', params).then(res => res.data)
 }
-// api.login = async (username, password) => {
-// 	const res = {
-// 		id: 1000000000,
-// 		role: 1,
-// 		token: 'abcdef',
-// 		username,
-// 		name: 'Licetus',
-// 		avatarUrl: '@/images/test-avatar.png',
-// 		remark: 'he is a good guy',
-// 	}
-// 	return res
-// }
+
+// debtor
+api.debtor = {
+	addProfile: async params =>
+		createAuthInstance().post('debtor', params).then(res => res.data),
+	updateProfile: async (params, id) =>
+		createAuthInstance().patch(`debtor/${id}`, params).then(res => res.data),
+}
 
 export default api
