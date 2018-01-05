@@ -8,14 +8,14 @@ export function Loan() {
 	this.interest = 0
 	this.termType = null
 	this.repaymentWay = null
-	this.remark = '-'
+	this.remark = ''
 	this.approvalStatus = null
 	this.createTime = null
 	this.lastUpdateTime = null
 	// car
 	this.sub = {
 		id: null,
-		carBrand: '-',
+		carBrand: '',
 		purchasePrice: 0,
 		milage: 0,
 		evaluatePrice: 0,
@@ -42,12 +42,12 @@ export function Product() {
 	this.loanId = null
 	this.status = null
 	// business
-	this.isOnSale = false
+	this.isOnSale = null
 	this.startInterestTime = null
 	this.publishTime = null
 	// profile
-	this.name = '-'
-	this.remark = '-'
+	this.name = ''
+	this.remark = ''
 	this.rankingScore = 0
 	this.tagId = null
 	this.createTime = null
@@ -65,26 +65,26 @@ export function Product() {
 export function Debtor() {
 	// profile
 	this.id = null
-	this.realName = '-'
+	this.realName = ''
 	this.gender = null
 	this.birthday = null
 	this.creatorId = null
-	this.primaryNumber = '-'
-	this.alternativeNumber = '-'
-	this.isCarOwner = false
+	this.primaryNumber = ''
+	this.alternativeNumber = ''
+	this.isCarOwner = null
 	// id card
-	this.idNumber = '-'
+	this.idNumber = ''
 	this.frontImageUrl = ''
 	this.frontBlurImageUrl = ''
 	this.backImageUrl = ''
 	this.backBlurImaegUrl = ''
-	this.location = '-'
+	this.location = ''
 	// credit info
-	this.workPlace = '-'
-	this.address = '-'
-	this.education = '-'
+	this.workPlace = ''
+	this.address = ''
+	this.education = ''
 	this.yearlyStableIncome = 0
 	this.monthlyStableIncome = 0
-	this.hasCar = false
-	this.hasHouse = false
+	this.hasCar = null
+	this.hasHouse = null
 }

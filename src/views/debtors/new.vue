@@ -4,10 +4,23 @@
 			<Col :span="16" class="padding-right-5">
 				<Card>
 					<p slot="title">借款人信息</p>
-					<Form ref="profileForm" :model="debtor.profile.form" :rules="debtor.profile.rules" label-position="left" :label-width="debtor.profile.labelWidth" inline>
+					<div v-if="isEditVisible" slot="extra">
+						<div v-if="!profile.isEditable">
+							<Button type="text" @click="onClickEditProfile">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickCancelProfile">取消</Button>
+							<Button type="text" @click="onClickSaveProfile" :loading="profile.isSaving">保存</Button>
+						</div>
+					</div>
+					<Form ref="profileForm" :model="profile.form" :rules="profile.rules" label-position="left" :label-width="profile.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="姓名"></FormItem></Col>
-							<Col :span="8"><FormItem label="性别"></FormItem></Col>
+							<Col :span="8"><FormItem label="姓名">
+								<p>{{profile.form.realName}}</p>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="性别">
+								<p>{{debtorGender}}</p>
+							</FormItem></Col>
 							<Col :span="8"><FormItem label="出生日期"></FormItem></Col>
 						</Row>
 						<Row>
@@ -19,7 +32,7 @@
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">实名信息</p>
-					<Form ref="identifyForm" :model="debtor.identify.form" :rules="debtor.identify.rules" label-position="left" :label-width="debtor.identify.labelWidth" inline>
+					<Form ref="identifyForm" :model="identify.form" :rules="identify.rules" label-position="left" :label-width="identify.labelWidth" inline>
 						<Row>
 							<Col :span="12"><FormItem label="身份证号码"></FormItem></Col>
 							<Col :span="12"><FormItem label="户籍所在地"></FormItem></Col>
@@ -44,7 +57,7 @@
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">信用信息</p>
-					<Form ref="creditForm" :model="debtor.credit.form" :rules="debtor.credit.rules" label-position="left" :label-width="debtor.credit.labelWidth" inline>
+					<Form ref="creditForm" :model="credit.form" :rules="credit.rules" label-position="left" :label-width="credit.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="工作地点"></FormItem></Col>
 							<Col :span="8"><FormItem label="常住地址"></FormItem></Col>
@@ -96,6 +109,7 @@
 
 <script>
 import { Debtor } from '../../models/data'
+import util from '../../libs/util'
 
 export default {
 	name: 'debtors_new',
@@ -104,48 +118,102 @@ export default {
 			debtor: new Debtor(),
 		}
 		return {
-			debtor: {
-				profile: {
-					labelWidth: 75,
-					form: {
-						realName: blank.debtor.realName,
-						gender: blank.debtor.gender,
-						birthday: blank.debtor.birthday,
-						isCarOwner: blank.debtor.isCarOwner,
-						primaryNumber: blank.debtor.primaryNumber,
-						alternativeNumber: blank.debtor.alternativeNumber,
-					},
-					rules: {},
+			isEditable: true,
+			debtor: blank.debtor,
+			profile: {
+				isEditable: false,
+				isLoading: false,
+				isSaving: false,
+				labelWidth: 75,
+				form: {
+					realName: blank.debtor.realName,
+					gender: blank.debtor.gender,
+					birthday: blank.debtor.birthday,
+					isCarOwner: blank.debtor.isCarOwner,
+					primaryNumber: blank.debtor.primaryNumber,
+					alternativeNumber: blank.debtor.alternativeNumber,
 				},
-				identify: {
-					labelWidth: 75,
-					form: {
-						idNumber: blank.debtor.idNumber,
-						location: blank.debtor.location,
-						frontImageUrl: blank.debtor.frontImageUrl,
-						frontBlurImageUrl: blank.debtor.frontBlurImageUrl,
-						backImageUrl: blank.debtor.backImageUrl,
-						backBlurImageUrl: blank.debtor.backBlurImaegUrl,
-					},
+				rules: {},
+			},
+			identify: {
+				isEditable: false,
+				isLoading: false,
+				isSaving: false,
+				labelWidth: 75,
+				form: {
+					idNumber: blank.debtor.idNumber,
+					location: blank.debtor.location,
+					frontImageUrl: blank.debtor.frontImageUrl,
+					frontBlurImageUrl: blank.debtor.frontBlurImageUrl,
+					backImageUrl: blank.debtor.backImageUrl,
+					backBlurImageUrl: blank.debtor.backBlurImaegUrl,
 				},
-				credit: {
-					labelWidth: 100,
-					form: {
-						workPlace: blank.debtor.workPlace,
-						address: blank.debtor.address,
-						education: blank.debtor.education,
-						monthlyStableIncome: blank.debtor.monthlyStableIncome,
-						yearlyStableIncome: blank.debtor.yearlyStableIncome,
-						hasCar: blank.debtor.hasCar,
-						hasHouse: blank.debtor.hasHouse,
-					},
+			},
+			credit: {
+				isEditable: false,
+				isLoading: false,
+				isSaving: false,
+				labelWidth: 100,
+				form: {
+					workPlace: blank.debtor.workPlace,
+					address: blank.debtor.address,
+					education: blank.debtor.education,
+					monthlyStableIncome: blank.debtor.monthlyStableIncome,
+					yearlyStableIncome: blank.debtor.yearlyStableIncome,
+					hasCar: blank.debtor.hasCar,
+					hasHouse: blank.debtor.hasHouse,
 				},
 			},
 		}
 	},
 	mounted() {
 	},
+	computed: {
+		debtorGender() {
+			return util.getGender(this.profile.form.gender, this)
+		},
+	},
 	methods: {
+		// profile
+		editProfile() {
+			this.profile.isEditable = true
+		},
+		uneditProfile() {
+			this.profile.isEditable = false
+		},
+		profileLoading() {
+			this.profile.isLoading = true
+		},
+		profileUnloading() {
+			this.profile.isLoading = false
+		},
+		profileSaving() {
+			this.profile.isSaving = true
+		},
+		profileUnsaving() {
+			this.profile.isSaving = false
+		},
+		initProfileForm() {
+			this.profile.form = {
+				realName: this.debtor.realName,
+				gender: this.debtor.gender,
+				birthday: this.debtor.birthday,
+				isCarOwner: this.debtor.isCarOwner,
+				primaryNumber: this.debtor.primaryNumber,
+				alternativeNumber: this.debtor.alternativeNumber,
+			}
+		},
+		onClickEditProfile() {
+			this.editProfile()
+		},
+		onClickCancelProfile() {
+			this.initProfileForm()
+			this.uneditProfile()
+		},
+		onClickSaveProfile() {
+			this.saveProfile()
+		},
+
 		onClickImage() {
 			console.log('upload img')
 		},

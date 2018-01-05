@@ -1,5 +1,6 @@
 import axios from 'axios'
 import jsmd5 from 'js-md5'
+import moment from 'moment'
 // import env from '../../build/env'
 import packjson from '../../package.json'
 import Enum from '../models/enum'
@@ -281,6 +282,45 @@ util.inputLengthCheck = (string, length, vm) => {
 	if (string.length <= length) return true
 	vm.$Message.error(`输入长度请勿超过 ${length} 个字符`)
 	return false
+}
+
+util.getTimestamp = (date, vm) => {
+	if (!date) {
+		vm.$Message.error('错误: Date缺失')
+		return null
+	}
+	return moment(date).valueOf()
+}
+util.timestampToDate = (timestamp, vm) => {
+	if (!timestamp && timestamp !== 0) {
+		vm.$Message.error('错误: timestamp缺失')
+		return null
+	}
+	return moment(timestamp).toDate()
+}
+util.formatBirthday = (date, vm) => {
+	if (!date) {
+		vm.$Message.error('错误: Date缺失')
+		return null
+	}
+	return moment(date).format('YYYY-MM-DD')
+}
+
+util.getGender = (gender, vm) => {
+	if (!gender) {
+		vm.$Message.error('错误: 性别数据缺失')
+		return null
+	}
+	switch (gender) {
+		case Enum.Gender.Male:
+			return '男'
+		case Enum.Gender.Female:
+			return '女'
+		default: {
+			vm.$Message.error('错误: 未知的性别数据')
+			return null
+		}
+	}
 }
 
 util.getLoanStatus = (status, vm) => {
