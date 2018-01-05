@@ -32,7 +32,7 @@ export function LoanComment() {
 	this.id = null
 	this.loanId = null
 	this.adminId = null
-	this.content = '-'
+	this.content = ''
 	this.createTime = null
 	this.lastUpdateTime = null
 }

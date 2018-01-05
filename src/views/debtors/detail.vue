@@ -90,20 +90,51 @@
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
+					<Spin v-if="credit.isLoading" size="large" fix></Spin>
 					<p slot="title">信用信息</p>
+					<div v-if="isEditVisible" slot="extra">
+						<div v-if="!credit.isEditable">
+							<Button type="text" @click="onClickEditCredit">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickResetCredit">重置</Button>
+							<Button type="text" @click="onClickSaveCredit" :loading="credit.isSaving">保存</Button>
+						</div>
+					</div>
 					<Form ref="creditForm" :model="credit.form" :rules="credit.rules" label-position="left" :label-width="credit.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="工作地点"></FormItem></Col>
-							<Col :span="8"><FormItem label="常住地址"></FormItem></Col>
-							<Col :span="8"><FormItem label="学历状况"></FormItem></Col>
+							<Col :span="8"><FormItem label="工作地点">
+								<p v-if="!credit.isEditable">{{credit.form.workPlace || '-'}}</p>
+								<Input v-else v-model="credit.form.workPlace"/>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="常住地址">
+								<p v-if="!credit.isEditable">{{credit.form.address || '-'}}</p>
+								<Input v-else v-model="credit.form.address"/>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="学历状况">
+								<p v-if="!credit.isEditable">{{credit.form.education || '-'}}</p>
+								<Input v-else v-model="credit.form.education"/>
+							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="月稳定收入"></FormItem></Col>
-							<Col :span="8"><FormItem label="年稳定收入"></FormItem></Col>
+							<Col :span="8"><FormItem label="月稳定收入">
+								<p v-if="!credit.isEditable">{{credit.form.monthlyStableIncome || '-'}}</p>
+								<Input v-else v-model="credit.form.monthlyStableIncome"/>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="年稳定收入">
+								<p v-if="!credit.isEditable">{{credit.form.yearlyStableIncome || '-'}}</p>
+								<Input v-else v-model="credit.form.yearlyStableIncome"/>
+							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="车产认证"></FormItem></Col>
-							<Col :span="8"><FormItem label="房产认证"></FormItem></Col>
+							<Col :span="8"><FormItem label="车产认证">
+								<p v-if="!credit.isEditable">{{debtorHasCar}}</p>
+								<i-switch v-else v-model="credit.form.hasCar"><span slot="open">是</span><span slot="close">否</span></i-switch>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="房产认证">
+								<p v-if="!credit.isEditable">{{debtorHasHouse}}</p>
+								<i-switch v-else v-model="credit.form.hasHouse"><span slot="open">是</span><span slot="close">否</span></i-switch>
+							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="8"><FormItem label="申请次数"></FormItem></Col>
@@ -217,6 +248,14 @@ export default {
 			if (this.profile.form.isCarOwner || this.profile.form.isCarOwner === false) return `${this.profile.form.isCarOwner ? '是' : '否'}`
 			return '-'
 		},
+		debtorHasCar() {
+			if (this.credit.form.hasCar || this.credit.form.hasCar === false) return `${this.credit.form.hasCar ? '是' : '否'}`
+			return '-'
+		},
+		debtorHasHouse() {
+			if (this.credit.form.hasHouse || this.credit.form.hasHouse === false) return `${this.credit.form.hasHouse ? '是' : '否'}`
+			return '-'
+		},
 	},
 	methods: {
 		// profile
@@ -296,6 +335,45 @@ export default {
 		},
 		onClickSaveIdentify() {
 			this.uneditIdentify()
+		},
+		// credit
+		editCredit() {
+			this.credit.isEditable = true
+		},
+		uneditCredit() {
+			this.credit.isEditable = false
+		},
+		creditLoading() {
+			this.credit.isLoading = true
+		},
+		creditUnloading() {
+			this.credit.isLoading = false
+		},
+		creditSaving() {
+			this.credit.isSaving = true
+		},
+		creditUnsaving() {
+			this.credit.isSaving = false
+		},
+		initCreditForm() {
+			this.credit.form = {
+				idNumber: this.debtor.idNumber,
+				location: this.debtor.location,
+				frontImageUrl: this.debtor.frontImageUrl,
+				frontBlurImageUrl: this.debtor.frontBlurImageUrl,
+				backImageUrl: this.debtor.backImageUrl,
+				backBlurImageUrl: this.debtor.backBlurImaegUrl,
+			}
+		},
+		onClickEditCredit() {
+			this.editCredit()
+		},
+		onClickResetCredit() {
+			this.initCreditForm()
+			this.uneditCredit()
+		},
+		onClickSaveCredit() {
+			this.uneditCredit()
 		},
 
 		onClickImage() {
