@@ -61,7 +61,8 @@ export const otherRouter = {
 		{ path: 'order/:order_id', title: '订单详情', name: 'order-info', component: (resolve) => { require(['@/views/advanced-router/component/order-info.vue'], resolve) } }, // 用于展示动态路由
 		{ path: 'shopping', title: '购物详情', name: 'shopping', component: (resolve) => { require(['@/views/advanced-router/component/shopping-info.vue'], resolve) } }, // 用于展示带参路由
 		{ path: 'message', title: '消息中心', name: 'message_index', component: (resolve) => { require(['@/views/message/message.vue'], resolve) } },
-		{ path: '/customers/:customer_id', title: '资料详情', name: 'customer_detail', component: (resolve) => { require(['@/views/customers/detail.vue'], resolve) } },
+		{ path: '/customers/:customer_id', title: '客户详情', name: 'customer_detail', component: (resolve) => { require(['@/views/customers/detail.vue'], resolve) } },
+		{ path: '/debtors/:debtor_id', title: '借款人详情', name: 'debtor_detail', component: (resolve) => { require(['@/views/debtors/detail.vue'], resolve) } },
 		{ path: '/products/:product_id', title: '项目详情', name: 'product_detail', component: (resolve) => { require(['@/views/products/detail.vue'], resolve) } },
 		{ path: '/loans/:loan_id', title: '贷款详情', name: 'loan_detail', component: (resolve) => { require(['@/views/loans/detail.vue'], resolve) } },
 	],
@@ -79,6 +80,18 @@ export const appRouter = [
 			{ path: 'index', title: '客户列表', name: 'customers_index', icon: '', component: (resolve) => { require(['@/views/customers/index.vue'], resolve) } },
 			{ path: 'verification', title: '实名认证', name: 'customers_verification', icon: '', component: (resolve) => { require(['@/views/customers/verification.vue'], resolve) } },
 			{ path: 'evaluation', title: '信用评估', name: 'customers_evaluation', icon: '', component: (resolve) => { require(['@/views/customers/evaluation.vue'], resolve) } },
+		],
+	},
+	{
+		path: '/debtors',
+		icon: 'ios-person',
+		name: 'debtors',
+		title: '借款人管理',
+		component: Main,
+		children: [
+			{ path: 'index', title: '借款人列表', name: 'debtors_index', icon: '', component: (resolve) => { require(['@/views/debtors/index.vue'], resolve) } },
+			{ path: 'verification', title: '实名认证', name: 'debtors_verification', icon: '', component: (resolve) => { require(['@/views/debtors/verification.vue'], resolve) } },
+			{ path: 'evaluation', title: '信用评估', name: 'debtors_evaluation', icon: '', component: (resolve) => { require(['@/views/debtors/evaluation.vue'], resolve) } },
 		],
 	},
 	{
