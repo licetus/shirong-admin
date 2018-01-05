@@ -3,6 +3,7 @@
 		<Row>
 			<Col :span="16" class="padding-right-5">
 				<Card>
+					<Spin v-if="profile.isLoading" size="large" fix></Spin>
 					<p slot="title">借款人信息</p>
 					<div v-if="isEditVisible" slot="extra">
 						<div v-if="!profile.isEditable">
@@ -48,13 +49,29 @@
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
+					<Spin v-if="identify.isLoading" size="large" fix></Spin>
 					<p slot="title">实名信息</p>
+					<div v-if="isEditVisible" slot="extra">
+						<div v-if="!identify.isEditable">
+							<Button type="text" @click="onClickEditIdentify">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickResetIdentify">重置</Button>
+							<Button type="text" @click="onClickSaveIdentify" :loading="identify.isSaving">保存</Button>
+						</div>
+					</div>
 					<Form ref="identifyForm" :model="identify.form" :rules="identify.rules" label-position="left" :label-width="identify.labelWidth" inline>
 						<Row>
-							<Col :span="12"><FormItem label="身份证号码"></FormItem></Col>
-							<Col :span="12"><FormItem label="户籍所在地"></FormItem></Col>
+							<Col :span="12"><FormItem label="身份证号码">
+								<p v-if="!identify.isEditable">{{identify.form.idNumber || '-'}}</p>
+								<Input v-else v-model="identify.form.idNumber"/>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="户籍所在地">
+								<p v-if="!identify.isEditable">{{identify.form.location || '-'}}</p>
+								<Input v-else v-model="identify.form.location"/>
+							</FormItem></Col>
 						</Row>
-						<Row>
+						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="身份证正面">
 								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
 							</FormItem></Col>
@@ -240,6 +257,45 @@ export default {
 		},
 		onClickSaveProfile() {
 			this.uneditProfile()
+		},
+		// identify
+		editIdentify() {
+			this.identify.isEditable = true
+		},
+		uneditIdentify() {
+			this.identify.isEditable = false
+		},
+		identifyLoading() {
+			this.identify.isLoading = true
+		},
+		identifyUnloading() {
+			this.identify.isLoading = false
+		},
+		identifySaving() {
+			this.identify.isSaving = true
+		},
+		identifyUnsaving() {
+			this.identify.isSaving = false
+		},
+		initIdentifyForm() {
+			this.identify.form = {
+				idNumber: this.debtor.idNumber,
+				location: this.debtor.location,
+				frontImageUrl: this.debtor.frontImageUrl,
+				frontBlurImageUrl: this.debtor.frontBlurImageUrl,
+				backImageUrl: this.debtor.backImageUrl,
+				backBlurImageUrl: this.debtor.backBlurImaegUrl,
+			}
+		},
+		onClickEditIdentify() {
+			this.editIdentify()
+		},
+		onClickResetIdentify() {
+			this.initIdentifyForm()
+			this.uneditIdentify()
+		},
+		onClickSaveIdentify() {
+			this.uneditIdentify()
 		},
 
 		onClickImage() {
