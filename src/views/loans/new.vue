@@ -105,6 +105,7 @@
 
 <script>
 export default {
+	name: 'loans_new',
 	data() {
 		return {
 			debtor: {

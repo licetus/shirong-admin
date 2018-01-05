@@ -67,6 +67,8 @@ export function Debtor() {
 	this.id = null
 	this.realName = '-'
 	this.gender = null
+	this.birthday = null
+	this.creatorId = null
 	this.primaryNumber = '-'
 	this.alternativeNumber = '-'
 	this.isCarOwner = false
@@ -83,5 +85,6 @@ export function Debtor() {
 	this.education = '-'
 	this.yearlyStableIncome = 0
 	this.monthlyStableIncome = 0
+	this.hasCar = false
 	this.hasHouse = false
 }

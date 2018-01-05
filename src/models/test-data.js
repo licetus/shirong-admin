@@ -67,6 +67,8 @@ export function Debtor() {
 	this.id = 1000000000
 	this.realName = '司马懿'
 	this.gender = 1
+	this.birthday = '1921-7-1'
+	this.creatorId = null
 	this.primaryNumber = '18519866248'
 	this.alternativeNumber = '-'
 	this.isCarOwner = true
@@ -83,5 +85,6 @@ export function Debtor() {
 	this.education = '熟读经史'
 	this.yearlyStableIncome = 100000
 	this.monthlyStableIncome = 1500000
+	this.hasCar = true
 	this.hasHouse = true
 }
