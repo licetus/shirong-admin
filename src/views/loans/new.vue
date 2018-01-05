@@ -72,13 +72,29 @@
 							<Col :span="6"><FormItem label="行驶里程"></FormItem></Col>
 							<Col :span="6"><FormItem label="评估价格"></FormItem></Col>
 						</Row>
+						<Row class="margin-top-20">
+							<Col :span="12"><FormItem label="车辆行驶证">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆检验证">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
 						<Row>
-							<Col :span="12"><FormItem label="车辆行驶证"></FormItem></Col>
-							<Col :span="12"><FormItem label="车辆检验证"></FormItem></Col>
-							<Col :span="12"><FormItem label="正面照片"></FormItem></Col>
-							<Col :span="12"><FormItem label="背面照片"></FormItem></Col>
-							<Col :span="12"><FormItem label="里程照片"></FormItem></Col>
-							<Col :span="12"><FormItem label="内饰照片"></FormItem></Col>
+							<Col :span="12"><FormItem label="正面照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="背面照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="里程照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="内饰照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -111,11 +127,15 @@ export default {
 		}
 	},
 	mounted() {
-		console.log(this.$route)
 	},
-	methods: {},
+	methods: {
+		onClickImage() {
+			console.log('upload img')
+		},
+	},
 }
 </script>
 
 <style lang="less">
+@import '../../styles/common.less';
 </style>
