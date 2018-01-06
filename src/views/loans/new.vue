@@ -39,24 +39,23 @@
 								<p>{{debtor.data.profile.realName || '-'}}</p>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="性别">
-								<p>{{debtorGender}}</p>
+								<p>{{debtorGender || '-'}}</p>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="年龄">
-								<p>{{debtorAge}}</p>
+								<p>{{debtorAge || '-'}}</p>
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="16"><FormItem label="身份认证">
+							<Col :span="24"><FormItem label="身份认证">
 								<CheckboxGroup :value="identifyArray">
-									<Checkbox label="idNumber">号码</Checkbox>
-									<Checkbox label="location">地址</Checkbox>
-									<Checkbox label="frontImageUrl">正面</Checkbox>
+									<Checkbox label="idNumber">身份号码</Checkbox>
+									<Checkbox label="location">户籍地址</Checkbox>
+									<Checkbox label="frontImageUrl">正面照片</Checkbox>
 									<Checkbox label="frontBlurImageUrl">正面打码</Checkbox>
-									<Checkbox label="backImageUrl">背面</Checkbox>
+									<Checkbox label="backImageUrl">背面照片</Checkbox>
 									<Checkbox label="backBlurImageUrl">背面打码</Checkbox>
 								</CheckboxGroup>
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="备注"></FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -194,12 +193,10 @@ export default {
 			return (this.debtor.data.profile.id && this.loan.form.type === Enum.Loan.Type.Car)
 		},
 		debtorGender() {
-			if (this.debtor.data.profile.gender) return util.getGender(this.debtor.data.profile.gender, this)
-			return '-'
+			return util.getGender(this.debtor.data.profile.gender, this)
 		},
 		debtorAge() {
-			if (this.debtor.data.profile.birthday) return util.getAge(this.debtor.data.profile.birthday, this)
-			return '-'
+			return util.getAge(this.debtor.data.profile.birthday, this)
 		},
 		identifyArray() {
 			const arr = []
