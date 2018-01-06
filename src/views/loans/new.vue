@@ -11,6 +11,7 @@
 						</div>
 						<div v-else>
 							<Button type="text" @click="onClickRefreshDebtor" :loading="debtor.isLoading">刷新</Button>
+							<Button type="text" @click="onClickSubmitLoan" :loading="loan.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form ref="debtorForm" :model="debtor.form" :rules="debtor.rules" label-position="left" :label-width="debtor.labelWidth" inline>
@@ -65,9 +66,23 @@
 			<Col :span="16" class="padding-right-5">
 				<Card v-if="isPaneVisible">
 					<p slot="title">贷款信息</p>
+					<div v-if="isEditable" slot="extra">
+						<div v-if="!loan.isEditable">
+							<Button type="text" @click="onClickEditLoan">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickResetLoan">重置</Button>
+							<Button type="text" @click="onClickSaveLoan">保存</Button>
+						</div>
+					</div>
 					<Form ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="贷款类型"></FormItem></Col>
+							<Col :span="8"><FormItem label="贷款类型">
+								<RadioGroup v-model="loan.form.type">
+									<Radio :label="Enum.Loan.Type.Car">车辆抵押</Radio>
+									<Radio :label="Enum.Loan.Type.Other" disabled>其他</Radio>
+								</RadioGroup>
+							</FormItem></Col>
 							<Col :span="8"><FormItem label="贷款金额"></FormItem></Col>
 						</Row>
 						<Row>
@@ -137,7 +152,7 @@
 </template>
 
 <script>
-import { Debtor, Loan } from '../../models/data'
+import { Debtor, Loan, Car } from '../../models/data'
 import Enum from '../../models/enum'
 import api from '../../libs/api'
 import util from '../../libs/util'
@@ -148,8 +163,10 @@ export default {
 		const blank = {
 			debtor: new Debtor(),
 			Loan: new Loan(),
+			Car: new Car(),
 		}
 		return {
+			Enum,
 			debtor: {
 				data: blank.debtor,
 				isEditable: true,
@@ -164,11 +181,15 @@ export default {
 			},
 			loan: {
 				data: blank.loan,
+				isEditable: false,
+				isSubmitting: false,
+				isLoading: false,
 				labelWidth: 75,
 				form: {},
 				rules: {},
 				sub: {
 					car: {
+						data: blank.car,
 						labelWidth: 75,
 						form: {},
 						rules: {},
@@ -184,8 +205,12 @@ export default {
 		}
 	},
 	mounted() {
+		this.debtor.data.profile.id = 1000000  // TODO for test
 	},
 	computed: {
+		isEditable() {
+			return true
+		},
 		isPaneVisible() {
 			return this.debtor.data.profile.id
 		},
@@ -193,10 +218,10 @@ export default {
 			return (this.debtor.data.profile.id && this.loan.form.type === Enum.Loan.Type.Car)
 		},
 		debtorGender() {
-			return util.getGender(this.debtor.data.profile.gender, this)
+			return util.getGender(this, this.debtor.data.profile.gender)
 		},
 		debtorAge() {
-			return util.getAge(this.debtor.data.profile.birthday, this)
+			return util.getAge(this, this.debtor.data.profile.birthday)
 		},
 		identifyArray() {
 			const arr = []
@@ -205,7 +230,6 @@ export default {
 					if (item !== 'id' && this.debtor.data.identify[item]) arr.push(item)
 				}
 			}
-			console.log(arr)
 			return arr
 		},
 	},
@@ -284,7 +308,7 @@ export default {
 				this.debtorUnsubmitting()
 			}
 		},
-		async matchDebtor(number) { // TODO async function, get debtor list, match primaryNumber
+		async matchDebtor(number) {
 			try {
 				const query = {
 					pagesize: 1,
@@ -343,6 +367,119 @@ export default {
 				this.$Message.error(e.message)
 			} finally {
 			}
+		},
+		// loan
+		loanSubmitting() {
+			this.loan.isSubmitting = true
+		},
+		loanUnsubmitting() {
+			this.loan.isSubmitting = false
+		},
+		onClickSubmitLoan() {
+			const subMapping = ['', 'other', 'car']
+			const loanCheck = this.$refs.loanForm.validate((valid) => valid)
+			const subCheck = this.$refs[`${subMapping[this.loan.form.type]}Form`].validate((valid) => valid)
+			if (loanCheck && subCheck) {
+				let sub = {}
+				switch (this.loan.form.type) {
+					case Enum.Loan.Type.Car:
+						sub = {
+							carBrand: this.loan.sub.car.form.carBrand,
+							purchasePrice: this.loan.sub.car.form.purchasePrice,
+							milage: this.loan.sub.car.form.milage,
+							evaluatePrice: this.loan.sub.car.form.evaluatePrice,
+							carFrontImageUrl: this.loan.sub.car.form.carFrontImageUrl,
+							carBackImageUrl: this.loan.sub.car.form.carBackImageUrl,
+							carMilageImageUrl: this.loan.sub.car.form.carMilageImageUrl,
+							carInsideImageUrl: this.loan.sub.car.form.carInsideImageUrl,
+							vehicleLicenseImageUrl: this.loan.sub.car.form.vehicleLicenseImageUrl,
+							inspectionLicenseImageUrl: this.loan.sub.car.form.inspectionLicenseImageUrl,
+						}
+						break
+					default: return null
+				}
+				const loan = {
+					type: this.loan.form.type,
+					amount: this.loan.form.amount,
+					termType: this.loan.form.termType,
+					interest: this.loan.form.interest,
+					repaymentWay: this.loan.form.repaymentWay,
+					remark: this.loan.form.remark,
+					sub,
+				}
+				this.loanSubmitting()
+				this.updateLoan(loan)
+			}
+		},
+		async updateLoan(loan) {
+			try {
+				await api.loan.update(loan, this.debtor.loan.id)
+				this.uneditLoan()
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUnsubmitting()
+			}
+		},
+
+		// loan_main
+		editLoan() {
+			this.loan.isEditable = true
+		},
+		uneditLoan() {
+			this.loan.isEditable = false
+		},
+		initLoanForm() {
+			this.loan.form = {
+				type: this.loan.data.type,
+				amount: this.loan.data.amount,
+				termType: this.loan.data.termType,
+				interest: this.loan.data.interest,
+				repaymentWay: this.loan.data.repaymentWay,
+				remark: this.loan.data.remark,
+			}
+		},
+		onClickEditLoan() {
+			this.editLoan()
+		},
+		onClickResetLoan() {
+			this.initLoanForm()
+			this.uneditLoan()
+		},
+		onClickSaveLoan() {
+			this.uneditLoan()
+		},
+		// loan_sub_car
+		editCar() {
+			this.loan.sub.car.isEditable = true
+		},
+		uneditCar() {
+			this.loan.sub.car.isEditable = false
+		},
+		initCarForm() {
+			this.loan.sub.car.form = {
+				carBrand: this.loan.sub.car.data.carBrand,
+				purchasePrice: this.loan.sub.car.data.purchasePrice,
+				milage: this.loan.sub.car.data.milage,
+				evaluatePrice: this.loan.sub.car.data.evaluatePrice,
+				carFrontImageUrl: this.loan.sub.car.data.carFrontImageUrl,
+				carBackImageUrl: this.loan.sub.car.data.carBackImageUrl,
+				carMilageImageUrl: this.loan.sub.car.data.carMilageImageUrl,
+				carInsideImageUrl: this.loan.sub.car.data.carInsideImageUrl,
+				vehicleLicenseImageUrl: this.loan.sub.car.data.vehicleLicenseImageUrl,
+				inspectionLicenseImageUrl: this.loan.sub.car.data.inspectionLicenseImageUrl,
+			}
+		},
+		onClickEditCar() {
+			this.editCar()
+		},
+		onClickResetCar() {
+			this.initCarForm()
+			this.uneditCar()
+		},
+		onClickSaveCar() {
+			this.uneditCar()
 		},
 
 		onClickImage() {

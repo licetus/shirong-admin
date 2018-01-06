@@ -56,8 +56,8 @@ api.debtor = {
 			filters,
 			orderBy,
 		}
-		const str = util.generateQueryString(query)
-		return createAuthInstance().get(`debtor/?${str}`).then(res => res.data)
+		const str = `?${util.generateQueryString(query)}`
+		return createAuthInstance().get(`debtor/${str}`).then(res => res.data)
 	},
 	profile: {
 		add: async params =>
@@ -84,6 +84,49 @@ api.debtor = {
 			createAuthInstance().post(`debtor/${id}/creditInfo`, params).then(res => res.data),
 		fetch: async id =>
 			createAuthInstance().get(`debtor/${id}/creditInfo`).then(res => res.data),
+	},
+}
+// loan
+api.loan = {
+	fetchList: async (pagesize, page, filters, orderBy) => {
+		const query = {
+			pagesize,
+			page,
+			filters,
+			orderBy,
+		}
+		const str = `?${util.generateQueryString(query)}`
+		return createAuthInstance().get(`loan/${str}`).then(res => res.data)
+	},
+	add: async params =>
+		createAuthInstance().post('loan', params).then(res => res.data),
+	delete: async id =>
+		createAuthInstance().delete(`loan/${id}`).then(res => res.data),
+	update: async (params, id) =>
+		createAuthInstance().patch(`loan/${id}`, params).then(res => res.data),
+	fetch: async id =>
+		createAuthInstance().get(`loan/${id}`).then(res => res.data),
+	approve: async id =>
+		createAuthInstance().put(`loan/${id}/approve`).then(res => res.data),
+	disapprove: async id =>
+		createAuthInstance().put(`loan/${id}/disapprove`).then(res => res.data),
+	start: async id =>
+		createAuthInstance().put(`loan/${id}/start`).then(res => res.data),
+	complete: async id =>
+		createAuthInstance().put(`loan/${id}/complete`).then(res => res.data),
+	comment: {
+		fetchList: async (pagesize, page, filters, orderBy, id) => {
+			const query = {
+				pagesize,
+				page,
+				filters,
+				orderBy,
+			}
+			const str = `?${util.generateQueryString(query)}`
+			return createAuthInstance().get(`loan/${id}/comment${str}`).then(res => res.data)
+		},
+		add: async (params, id) =>
+			createAuthInstance().post(`loan/${id}/comment`, params).then(res => res.data),
 	},
 }
 

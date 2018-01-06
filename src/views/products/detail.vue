@@ -336,10 +336,10 @@ export default {
 			return this.product.publishTime // TODO for test
 		},
 		productStatus() {
-			return util.getProductStatus(this.product.status, this)
+			return util.getProductStatus(this, this.product.status)
 		},
 		productType() {
-			return util.getLoanType(this.loan.type, this)
+			return util.getLoanType(this, this.loan.type)
 		},
 		productCreateTime() {
 			return this.product.createTime // TODO for test
@@ -348,13 +348,13 @@ export default {
 			return this.product.lastUpdateTime // TODO for test
 		},
 		productTerm() {
-			return util.getProductTermType(this.product.termType, this)
+			return util.getProductTermType(this, this.product.termType)
 		},
 		productRepayType() {
-			return util.getLoanRepaymentWay(this.loan.repaymentWay, this)
+			return util.getLoanRepaymentWay(this, this.loan.repaymentWay)
 		},
 		productInterestWay() {
-			return util.getProductInterestWay(this.product.interestWay, this)
+			return util.getProductInterestWay(this, this.product.interestWay)
 		},
 	},
 	methods: {

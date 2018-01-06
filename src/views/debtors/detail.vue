@@ -193,7 +193,7 @@ export default {
 				form: {
 					realName: blank.debtor.profile.realName,
 					gender: blank.debtor.profile.gender,
-					birthDate: util.timestampToDate(blank.debtor.profile.birthday),
+					birthDate: util.timestampToDate(this, blank.debtor.profile.birthday),
 					primaryNumber: blank.debtor.profile.primaryNumber,
 					alternativeNumber: blank.debtor.profile.alternativeNumber,
 				},
@@ -235,11 +235,11 @@ export default {
 	},
 	computed: {
 		debtorGender() {
-			if (this.profile.form.gender) return util.getGender(this.profile.form.gender, this)
+			if (this.profile.form.gender) return util.getGender(this, this.profile.form.gender)
 			return '-'
 		},
 		debtorBirthday() {
-			if (this.profile.form.birthDate) return util.formatBirthday(this.profile.form.birthDate, this)
+			if (this.profile.form.birthDate) return util.formatBirthday(this, this.profile.form.birthDate)
 			return '-'
 		},
 		debtorHasCar() {
@@ -271,7 +271,7 @@ export default {
 					realName: res.realName,
 					gender: res.gender,
 					birthday: res.birthday,
-					birthDate: util.timestampToDate(res.birthday, this),
+					birthDate: util.timestampToDate(this, res.birthday),
 					primaryNumber: res.primaryNumber,
 					alternativeNumber: res.alternativeNumber,
 				}
@@ -317,7 +317,7 @@ export default {
 			this.profile.form = {
 				realName: this.debtor.profile.realName,
 				gender: this.debtor.profile.gender,
-				birthDate: util.timestampToDate(this.debtor.profile.birthday, this),
+				birthDate: util.timestampToDate(this, this.debtor.profile.birthday),
 				primaryNumber: this.debtor.profile.primaryNumber,
 				alternativeNumber: this.debtor.profile.alternativeNumber,
 			}
@@ -339,7 +339,7 @@ export default {
 					const profile = {
 						realName: this.profile.form.realName,
 						gender: this.profile.form.gender,
-						birthday: util.getTimestamp(this.profile.form.birthDate, this),
+						birthday: util.getTimestamp(this, this.profile.form.birthDate),
 						primaryNumber: this.profile.form.primaryNumber,
 						alternativeNumber: this.profile.form.alternativeNumber,
 					}
@@ -356,7 +356,7 @@ export default {
 					realName: res.realName,
 					gender: res.gender,
 					birthday: res.birthday,
-					birthDate: util.timestampToDate(res.birthday, this),
+					birthDate: util.timestampToDate(this, res.birthday),
 					primaryNumber: res.primaryNumber,
 					alternativeNumber: res.alternativeNumber,
 				}

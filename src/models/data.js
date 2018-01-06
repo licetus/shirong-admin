@@ -12,20 +12,20 @@ export function Loan() {
 	this.approvalStatus = null
 	this.createTime = null
 	this.lastUpdateTime = null
-	// car
-	this.sub = {
-		id: null,
-		carBrand: '',
-		purchasePrice: 0,
-		milage: 0,
-		evaluatePrice: 0,
-		carFrontImageUrl: '',
-		carBackImageUrl: '',
-		carMilageImageUrl: '',
-		carInsideImageUrl: '',
-		vehicleLicenseImageUrl: '',
-		inspectionLicenseImageUrl: '',
-	}
+}
+
+export function Car() {
+	this.id = null
+	this.carBrand = ''
+	this.purchasePrice = 0
+	this.milage = 0
+	this.evaluatePrice = 0
+	this.carFrontImageUrl = ''
+	this.carBackImageUrl = ''
+	this.carMilageImageUrl = ''
+	this.carInsideImageUrl = ''
+	this.vehicleLicenseImageUrl = ''
+	this.inspectionLicenseImageUrl = ''
 }
 
 export function LoanComment() {

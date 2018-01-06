@@ -284,28 +284,28 @@ util.inputLengthCheck = (string, length, vm) => {
 	return false
 }
 
-util.getTimestamp = (date, vm) => {
+util.getTimestamp = (vm, date) => {
 	if (!date) {
 		// vm.$Message.error('错误: Date缺失')
 		return null
 	}
 	return moment(date).valueOf()
 }
-util.timestampToDate = (timestamp, vm) => {
+util.timestampToDate = (vm, timestamp) => {
 	if (!timestamp && timestamp !== 0) {
 		// vm.$Message.error('错误: timestamp缺失')
 		return null
 	}
 	return moment(timestamp).toDate()
 }
-util.formatBirthday = (date, vm) => {
+util.formatBirthday = (vm, date) => {
 	if (!date) {
 		// vm.$Message.error('错误: Date缺失')
 		return null
 	}
 	return moment(date).format('YYYY-MM-DD')
 }
-util.getAge = (timestamp, vm) => {
+util.getAge = (vm, timestamp) => {
 	if (!timestamp) {
 		// vm.$Message.error('错误: timestamp')
 		return null
@@ -313,7 +313,7 @@ util.getAge = (timestamp, vm) => {
 	return moment().diff(moment(timestamp), 'years')
 }
 
-util.getGender = (gender, vm) => {
+util.getGender = (vm, gender) => {
 	if (!gender) {
 		// vm.$Message.error('错误: 性别数据缺失')
 		return null
@@ -330,7 +330,7 @@ util.getGender = (gender, vm) => {
 	}
 }
 
-util.getLoanStatus = (status, vm) => {
+util.getLoanStatus = (vm, status) => {
 	if (!status) {
 		// vm.$Message.error('错误: 贷款状态缺失')
 		return null
@@ -351,7 +351,7 @@ util.getLoanStatus = (status, vm) => {
 	}
 }
 
-util.getLoanApprovalStatus = (status, vm) => {
+util.getLoanApprovalStatus = (vm, status) => {
 	if (!status) {
 		// vm.$Message.error('错误: 审核状态缺失')
 		return null
@@ -370,7 +370,7 @@ util.getLoanApprovalStatus = (status, vm) => {
 	}
 }
 
-util.getLoanType = (type, vm) => {
+util.getLoanType = (vm, type) => {
 	if (!type) {
 		// vm.$Message.error('错误: 贷款类型缺失')
 		return null
@@ -387,7 +387,7 @@ util.getLoanType = (type, vm) => {
 	}
 }
 
-util.getLoanTermType = (type, vm) => {
+util.getLoanTermType = (vm, type) => {
 	if (!type) {
 		// vm.$Message.error('错误: 周期类型缺失')
 		return null
@@ -408,7 +408,7 @@ util.getLoanTermType = (type, vm) => {
 	}
 }
 
-util.getLoanRepaymentWay = (type, vm) => {
+util.getLoanRepaymentWay = (vm, type) => {
 	if (!type) {
 		// vm.$Message.error('错误: 还款方式缺失')
 		return null
@@ -425,7 +425,7 @@ util.getLoanRepaymentWay = (type, vm) => {
 	}
 }
 
-util.getProductStatus = (status, vm) => {
+util.getProductStatus = (vm, status) => {
 	if (!status) {
 		// vm.$Message.error('错误: 项目状态缺失')
 		return null
@@ -450,7 +450,7 @@ util.getProductStatus = (status, vm) => {
 	}
 }
 
-util.getProductTermType = (type, vm) => {
+util.getProductTermType = (vm, type) => {
 	if (!type) {
 		// vm.$Message.error('错误: 周期类型缺失')
 		return null
@@ -472,7 +472,7 @@ util.getProductTermType = (type, vm) => {
 }
 
 
-util.getProductInterestWay = (type, vm) => {
+util.getProductInterestWay = (vm, type) => {
 	if (!type) {
 		// vm.$Message.error('错误: 计息方式缺失')
 		return null
