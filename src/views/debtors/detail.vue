@@ -193,7 +193,7 @@ export default {
 				form: {
 					realName: blank.debtor.profile.realName,
 					gender: blank.debtor.profile.gender,
-					birthDate: null,
+					birthDate: util.timestampToDate(blank.debtor.profile.birthday),
 					primaryNumber: blank.debtor.profile.primaryNumber,
 					alternativeNumber: blank.debtor.profile.alternativeNumber,
 				},
@@ -271,7 +271,7 @@ export default {
 					realName: res.realName,
 					gender: res.gender,
 					birthday: res.birthday,
-					birthDate: util.timestampToDate(res.birthday),
+					birthDate: util.timestampToDate(res.birthday, this),
 					primaryNumber: res.primaryNumber,
 					alternativeNumber: res.alternativeNumber,
 				}
@@ -360,9 +360,7 @@ export default {
 					primaryNumber: res.primaryNumber,
 					alternativeNumber: res.alternativeNumber,
 				}
-				console.log('profile', this.debtor.profile)
 				this.initProfileForm()
-				console.log('form', this.profile.form)
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
@@ -449,7 +447,13 @@ export default {
 				}
 				this.initIdentifyForm()
 			} catch (e) {
-				this.$Message.error(e.message)
+				switch (e.code) {
+					case 'D_B_GET_FAILED_ERROR': {}
+						this.$Message.info('未创建实名信息')
+						break
+					default:
+						this.$Message.error(e.message)
+				}
 			} finally {
 				this.identifyUnloading()
 			}
@@ -537,7 +541,13 @@ export default {
 				}
 				this.initCreditForm()
 			} catch (e) {
-				this.$Message.error(e.message)
+				switch (e.code) {
+					case 'D_B_GET_FAILED_ERROR': {}
+						this.$Message.info('未创建信用信息')
+						break
+					default:
+						this.$Message.error(e.message)
+				}
 			} finally {
 				this.creditUnloading()
 			}

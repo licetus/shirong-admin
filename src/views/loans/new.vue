@@ -46,8 +46,17 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="身份认证"></FormItem></Col>
-							<Col :span="16"><FormItem label="备注"></FormItem></Col>
+							<Col :span="16"><FormItem label="身份认证">
+								<CheckboxGroup :value="identifyArray">
+									<Checkbox label="idNumber">号码</Checkbox>
+									<Checkbox label="location">地址</Checkbox>
+									<Checkbox label="frontImageUrl">正面</Checkbox>
+									<Checkbox label="frontBlurImageUrl">正面打码</Checkbox>
+									<Checkbox label="backImageUrl">背面</Checkbox>
+									<Checkbox label="backBlurImageUrl">背面打码</Checkbox>
+								</CheckboxGroup>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="备注"></FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -191,7 +200,17 @@ export default {
 		debtorAge() {
 			if (this.debtor.data.profile.birthday) return util.getAge(this.debtor.data.profile.birthday, this)
 			return '-'
-		}
+		},
+		identifyArray() {
+			const arr = []
+			for (const item in this.debtor.data.identify) {
+				if (this.debtor.data.identify.hasOwnProperty(item)) {
+					if (item !== 'id' && this.debtor.data.identify[item]) arr.push(item)
+				}
+			}
+			console.log(arr)
+			return arr
+		},
 	},
 	methods: {
 		// debtor
@@ -321,7 +340,7 @@ export default {
 					frontImageUrl: res.frontImageUrl,
 					frontBlurImageUrl: res.frontBlurImageUrl,
 					backImageUrl: res.backImageUrl,
-					backBlurImageUrl: res.backBlurImaegUrl,
+					backBlurImageUrl: res.backBlurImageUrl,
 				}
 			} catch (e) {
 				this.$Message.error(e.message)
