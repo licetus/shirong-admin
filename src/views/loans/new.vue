@@ -373,7 +373,6 @@ export default {
 					},
 				})
 			} catch(e) {
-				switch (e.code) {
 				this.$Message.error(e.message)
 			} finally {
 				this.debtorUnsubmitting()
