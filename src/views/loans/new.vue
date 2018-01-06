@@ -15,11 +15,11 @@
 					</div>
 					<Form ref="debtorForm" :model="debtor.form" :rules="debtor.rules" label-position="left" :label-width="debtor.labelWidth" inline>
 						<Row>
-							<Col :span="24"><FormItem label="借款人姓名">
+							<Col :span="24"><FormItem label="借款人姓名" prop="realName">
 								<p v-if="!debtor.isEditable">{{debtor.data.realName || '-'}}</p>
 								<Input v-else v-model="debtor.form.realName"/>
 							</FormItem></Col>
-							<Col :span="24"><FormItem label="借款人手机">
+							<Col :span="24"><FormItem label="借款人手机" prop="primaryNumber">
 								<p v-if="!debtor.isEditable">{{debtor.data.primaryNumber || '-'}}</p>
 								<Input v-else v-model="debtor.form.primaryNumber"/>
 							</FormItem></Col>
@@ -30,10 +30,13 @@
 			<Col :span="16" class="padding-left-5">
 				<Card v-if="isPaneVisible">
 					<p slot="title">借款人信息</p>
-					<Form :model="debtor.data" label-position="left" :label-width="debtor.labelWidth" inline>
+					<div slot="extra">
+						<Button type="text" @click="onClickDebtorDetail">详情</Button>
+					</div>
+					<Form label-position="left" :label-width="debtor.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="姓名">
-								<p>{{debtor.data.realName || '-'}}</p>
+								<p>{{debtor.data.profile.realName || '-'}}</p>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="性别">
 								<p>{{debtorGender}}</p>
@@ -73,7 +76,7 @@
 			<Col :span="8" class="padding-left-5">
 				<Card v-if="isPaneVisible">
 					<p slot="title">放款账户</p>
-						<Form ref="" :model="debtor.form" :rules="debtor.rules" label-position="left" :label-width="debtor.labelWidth" inline>
+						<Form ref="bankForm" :model="bank.form" :rules="bank.rules" label-position="left" :label-width="bank.labelWidth" inline>
 						<Row>
 							<Col :span="24"><FormItem label="开户人姓名"></FormItem></Col>
 							<Col :span="24"><FormItem label="开户行名称"></FormItem></Col>
@@ -129,6 +132,7 @@
 import { Debtor, Loan } from '../../models/data'
 import Enum from '../../models/enum'
 import api from '../../libs/api'
+import util from '../../libs/util'
 
 export default {
 	name: 'loans_new',
@@ -145,8 +149,8 @@ export default {
 				isLoading: false,
 				labelWidth: 75,
 				form: {
-					realName: blank.debtor.realName,
-					primaryNumber: blank.debtor.primaryNumber,
+					realName: blank.debtor.profile.realName,
+					primaryNumber: blank.debtor.profile.primaryNumber,
 				},
 				rules: {},
 			},
@@ -163,23 +167,29 @@ export default {
 					},
 				},
 			},
+			bank: {
+				data: blank.loan,
+				labelWidth: 75,
+				form: {},
+				rules: {},
+			},
 		}
 	},
 	mounted() {
 	},
 	computed: {
 		isPaneVisible() {
-			return this.debtor.data.id
+			return this.debtor.data.profile.id
 		},
 		isCarPaneVisible() {
-			return (this.debtor.id && this.loan.form.type === Enum.Loan.Type.Car)
+			return (this.debtor.data.profile.id && this.loan.form.type === Enum.Loan.Type.Car)
 		},
 		debtorGender() {
-			if (this.debtor.data.gender) return util.getGender(this.debtor.data.gender, this)
+			if (this.debtor.data.profile.gender) return util.getGender(this.debtor.data.profile.gender, this)
 			return '-'
 		},
 		debtorAge() {
-			if (this.debtor.data.birthday) return util.getAge(this.debtor.data.birthday, this)
+			if (this.debtor.data.profile.birthday) return util.getAge(this.debtor.data.profile.birthday, this)
 			return '-'
 		}
 	},
@@ -199,35 +209,45 @@ export default {
 		},
 		initDebtor() {
 			this.debtor.form = {
-				realName: blank.debtor.realName,
-				primaryNumber: blank.debtor.primaryNumber,
+				realName: blank.debtor.profile.realName,
+				primaryNumber: blank.debtor.profile.primaryNumber,
 			}
+		},
+		loadDebtor() {
+			this.debtorLoading()
+			this.fetchDebtorProfile()
+			this.fetchDebtorIdentify()
 		},
 		onClickResetDebtor() {
 			this.initDebtor()
 		},
 		onClickSubmitDebtor() {
-			// this.$refs.debtorForm.validate((valid) => {
-			// 	console.log('here')
-			// 	if (valid) {
-			// 	}
-			// })
-			const debtor = {
-				realName: this.debtor.form.realName,
-				primaryNumber: this.debtor.form.primaryNumber
-			}
-			this.debtorSubmitting()
-			this.submitDebtor(debtor)
+			this.$refs.debtorForm.validate((valid) => {
+				if (valid) {
+					const debtor = {
+						realName: this.debtor.form.realName,
+						primaryNumber: this.debtor.form.primaryNumber
+					}
+					this.debtorSubmitting()
+					this.submitDebtor(debtor)
+				}
+			})
 		},
 		onClickRefreshDebtor() {
-			this.debtorLoading()
-			this.fetchDebtor()
+			this.loadDebtor()
+		},
+		onClickDebtorDetail() {
+			this.$router.push({
+				name: 'debtor_detail',
+				params: {
+					debtor_id: this.debtor.data.profile.id,
+				},
+			})
 		},
 		async submitDebtor(debtor) {
 			try {
 				const res = await api.debtor.profile.add(debtor)
-				this.debtor.data.id = res
-				this.debtorUnsubmitting()
+				this.debtor.data.profile.id = res
 				this.$Message.success('创建借款人成功, 即将打开详情页，请补全信息')
 				this.$router.push({
 					name: 'debtor_detail',
@@ -236,39 +256,16 @@ export default {
 					},
 				})
 			} catch(e) {
+				switch (e.code) {
+					case 'ACCOUNT_EXIST_ERROR':
+						this.$Message.info('该号码已存在, 正在搜索借款人信息')
+						this.matchDebtor(this.debtor.form.primaryNumber)
+						break
+					default:
+						this.$Message.error(e.message)
+				}
+			} finally {
 				this.debtorUnsubmitting()
-				console.log(e)
-				if (e.code === 'ACCOUNT_EXIST_ERROR') {
-					this.$Message.info('正在搜索借款人信息')
-					this.debtorUnsubmitting()
-					this.matchDebtor(this.debtor.form.primaryNumber)
-				}
-				else {
-					this.$Message.error(e.message)
-				}
-			}
-		},
-		async fetchDebtor() {
-			try {
-				const id = this.debtor.data.id
-				const profileRes = await api.debtor.profile.fetch(id)
-				// const identifyRes = await api.debtor.identify.fetch(id)
-				const debtor = {
-					id,
-					realName: profileRes.realName,
-					gender: profileRes.gender,
-					birthday: profileRes.birthday,
-					remark: profileRes.remark,
-					// idNumber: identifyRes.idNumber,
-					// location: identifyRes.location,
-					// frontImageUrl: identifyRes.frontBlurImageUrl,
-					// backImageUrl: identifyRes.backBlurImaegUrl,
-				}
-				this.debtor.data = debtor
-				this.debtorUnLoading()
-			} catch (e) {
-				this.debtorUnLoading()
-				this.$Message.error(e.message)
 			}
 		},
 		async matchDebtor(number) { // TODO async function, get debtor list, match primaryNumber
@@ -285,19 +282,50 @@ export default {
 					query.filters,
 					query.orderBy,
 				)
-				if (res.length < 1) this.$Message.info('无匹配结果，请重试')
+				if (res.length < 1) this.$Message.info('无匹配结果, 请联系管理员')
 				else {
-					this.debtor.data.id = res[0].id
+					this.debtor.data.profile.id = res[0].id
 					this.debtor.form.realName = res[0].realName
 					this.debtor.form.primaryNumber = res[0].primaryNumber
 					this.$Message.info('匹配成功，正在获取数据')
-					this.debtorLoading()
-					this.fetchDebtor()
+					this.loadDebtor()
 				}
-				this.debtorUnsubmitting()
 			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
 				this.debtorUnsubmitting()
-				this.$Message.error(e.meaage)
+			}
+		},
+		async fetchDebtorProfile() {
+			try {
+				const res = await api.debtor.profile.fetch(this.debtor.data.profile.id)
+				this.debtor.data.profile = {
+					id: res.id,
+					realName: res.realName,
+					gender: res.gender,
+					birthday: res.birthday,
+					remark: res.remark,
+				}
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.debtorUnLoading()
+			}
+		},
+		async fetchDebtorIdentify() {
+			try {
+				const res = await api.debtor.identify.fetch(this.debtor.data.profile.id)
+				this.debtor.data.identify = {
+					idNumber: res.idNumber,
+					location: res.location,
+					frontImageUrl: res.frontImageUrl,
+					frontBlurImageUrl: res.frontBlurImageUrl,
+					backImageUrl: res.backImageUrl,
+					backBlurImageUrl: res.backBlurImaegUrl,
+				}
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
 			}
 		},
 

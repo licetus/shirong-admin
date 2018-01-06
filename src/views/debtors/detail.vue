@@ -27,7 +27,7 @@
 									<Radio :label="Gender.Female">女</Radio>
 								</RadioGroup>
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="出生日期" prop="birthday">
+							<Col :span="8"><FormItem label="出生日期" prop="birthDate">
 								<p v-if="!profile.isEditable">{{debtorBirthday}}</p>
 								<DatePicker v-else v-model="profile.form.birthDate"></DatePicker>
 							</FormItem></Col>
@@ -175,7 +175,7 @@ import api from '../../libs/api'
 import Enum from '../../models/enum'
 
 export default {
-	name: 'debtors_new',
+	name: 'debtor_detail',
 	data() {
 		const blank = {
 			debtor: new Debtor(),
@@ -193,7 +193,7 @@ export default {
 				form: {
 					realName: blank.debtor.profile.realName,
 					gender: blank.debtor.profile.gender,
-					birthday: blank.debtor.profile.birthday,
+					birthDate: null,
 					primaryNumber: blank.debtor.profile.primaryNumber,
 					alternativeNumber: blank.debtor.profile.alternativeNumber,
 				},
@@ -271,6 +271,7 @@ export default {
 					realName: res.realName,
 					gender: res.gender,
 					birthday: res.birthday,
+					birthDate: util.timestampToDate(res.birthday),
 					primaryNumber: res.primaryNumber,
 					alternativeNumber: res.alternativeNumber,
 				}
@@ -316,7 +317,7 @@ export default {
 			this.profile.form = {
 				realName: this.debtor.profile.realName,
 				gender: this.debtor.profile.gender,
-				birthday: this.debtor.profile.birthday,
+				birthDate: util.timestampToDate(this.debtor.profile.birthday, this),
 				primaryNumber: this.debtor.profile.primaryNumber,
 				alternativeNumber: this.debtor.profile.alternativeNumber,
 			}
@@ -338,7 +339,7 @@ export default {
 					const profile = {
 						realName: this.profile.form.realName,
 						gender: this.profile.form.gender,
-						birthday: util.getTimestamp(this.profile.form.birthday),
+						birthday: util.getTimestamp(this.profile.form.birthDate, this),
 						primaryNumber: this.profile.form.primaryNumber,
 						alternativeNumber: this.profile.form.alternativeNumber,
 					}
@@ -355,10 +356,13 @@ export default {
 					realName: res.realName,
 					gender: res.gender,
 					birthday: res.birthday,
+					birthDate: util.timestampToDate(res.birthday, this),
 					primaryNumber: res.primaryNumber,
 					alternativeNumber: res.alternativeNumber,
 				}
+				console.log('profile', this.debtor.profile)
 				this.initProfileForm()
+				console.log('form', this.profile.form)
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
