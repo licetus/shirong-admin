@@ -63,28 +63,31 @@ export function Product() {
 }
 
 export function Debtor() {
-	// profile
-	this.id = null
-	this.realName = ''
-	this.gender = null
-	this.birthday = null
-	this.creatorId = null
-	this.primaryNumber = ''
-	this.alternativeNumber = ''
-	this.remark = ''
-	// id card
-	this.idNumber = ''
-	this.frontImageUrl = ''
-	this.frontBlurImageUrl = ''
-	this.backImageUrl = ''
-	this.backBlurImaegUrl = ''
-	this.location = ''
-	// credit info
-	this.workPlace = ''
-	this.address = ''
-	this.education = ''
-	this.yearlyStableIncome = 0
-	this.monthlyStableIncome = 0
-	this.hasCar = null
-	this.hasHouse = null
+	this.profile = {
+		id: null,
+		realName: '',
+		gender: null,
+		birthday: null,
+		creatorId: null,
+		primaryNumber: '',
+		alternativeNumber: '',
+		remark: '',
+	}
+	this.identify = {
+		idNumber: '',
+		frontImageUrl: '',
+		frontBlurImageUrl: '',
+		backImageUrl: '',
+		backBlurImaegUrl: '',
+		location: '',
+	}
+	this.credit = {
+		workPlace: '',
+		address: '',
+		education: '',
+		yearlyStableIncome: '',
+		monthlyStableIncome: '',
+		hasCar: null,
+		hasHouse: null,
+	}
 }

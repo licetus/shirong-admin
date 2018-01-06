@@ -29,7 +29,7 @@
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="出生日期" prop="birthday">
 								<p v-if="!profile.isEditable">{{debtorBirthday}}</p>
-								<DatePicker v-else v-model="profile.form.birthday"></DatePicker>
+								<DatePicker v-else v-model="profile.form.birthDate"></DatePicker>
 							</FormItem></Col>
 						</Row>
 						<Row>
@@ -191,11 +191,11 @@ export default {
 				isSaving: false,
 				labelWidth: 75,
 				form: {
-					realName: blank.debtor.realName,
-					gender: blank.debtor.gender,
-					birthday: blank.debtor.birthday,
-					primaryNumber: blank.debtor.primaryNumber,
-					alternativeNumber: blank.debtor.alternativeNumber,
+					realName: blank.debtor.profile.realName,
+					gender: blank.debtor.profile.gender,
+					birthday: blank.debtor.profile.birthday,
+					primaryNumber: blank.debtor.profile.primaryNumber,
+					alternativeNumber: blank.debtor.profile.alternativeNumber,
 				},
 				rules: {},
 			},
@@ -205,12 +205,12 @@ export default {
 				isSaving: false,
 				labelWidth: 75,
 				form: {
-					idNumber: blank.debtor.idNumber,
-					location: blank.debtor.location,
-					frontImageUrl: blank.debtor.frontImageUrl,
-					frontBlurImageUrl: blank.debtor.frontBlurImageUrl,
-					backImageUrl: blank.debtor.backImageUrl,
-					backBlurImageUrl: blank.debtor.backBlurImaegUrl,
+					idNumber: blank.debtor.identify.idNumber,
+					location: blank.debtor.identify.location,
+					frontImageUrl: blank.debtor.identify.frontImageUrl,
+					frontBlurImageUrl: blank.debtor.identify.frontBlurImageUrl,
+					backImageUrl: blank.debtor.identify.backImageUrl,
+					backBlurImageUrl: blank.debtor.identify.backBlurImaegUrl,
 				},
 			},
 			credit: {
@@ -219,18 +219,19 @@ export default {
 				isSaving: false,
 				labelWidth: 100,
 				form: {
-					workPlace: blank.debtor.workPlace,
-					address: blank.debtor.address,
-					education: blank.debtor.education,
-					monthlyStableIncome: blank.debtor.monthlyStableIncome,
-					yearlyStableIncome: blank.debtor.yearlyStableIncome,
-					hasCar: blank.debtor.hasCar,
-					hasHouse: blank.debtor.hasHouse,
+					workPlace: blank.debtor.credit.workPlace,
+					address: blank.debtor.credit.address,
+					education: blank.debtor.credit.education,
+					monthlyStableIncome: blank.debtor.credit.monthlyStableIncome,
+					yearlyStableIncome: blank.debtor.credit.yearlyStableIncome,
+					hasCar: blank.debtor.credit.hasCar,
+					hasHouse: blank.debtor.credit.hasHouse,
 				},
 			},
 		}
 	},
 	mounted() {
+		this.initPage()
 	},
 	computed: {
 		debtorGender() {
@@ -238,7 +239,7 @@ export default {
 			return '-'
 		},
 		debtorBirthday() {
-			if (this.profile.form.birthday) return util.formatBirthday(this.profile.form.birthday, this)
+			if (this.profile.form.birthDate) return util.formatBirthday(this.profile.form.birthDate, this)
 			return '-'
 		},
 		debtorHasCar() {
@@ -252,6 +253,46 @@ export default {
 	},
 	methods: {
 		// main
+		initPage() {
+			this.loadAll()
+		},
+		closePage() {
+			this.$store.commit('removeTag', 'debtor_detail')
+			this.$store.commit('closePage', 'debtor_detail')
+		},
+		async loadAll() {
+			try {
+				this.profileLoading()
+				this.identifyLoading()
+				this.creditLoading()
+				const res = await api.debtor.profile.fetch(this.$route.params.debtor_id)
+				this.debtor.profile = {
+					id: res.id,
+					realName: res.realName,
+					gender: res.gender,
+					birthday: res.birthday,
+					primaryNumber: res.primaryNumber,
+					alternativeNumber: res.alternativeNumber,
+				}
+				this.initProfileForm()
+				this.loadIdentify()
+				this.loadCredit()
+			} catch (e) {
+				switch (e.code) {
+					case 'D_B_GET_FAILED_ERROR': {}
+						this.$Message.error('错误: 未知的借款人ID')
+						this.closePage()
+						this.$router.go(-1)
+						break
+					default:
+						this.$Message.error(e.message)
+				}
+			} finally {
+				this.profileUnloading()
+				this.identifyUnloading()
+				this.creditUnloading()
+			}
+		},
 		// profile
 		editProfile() {
 			this.profile.isEditable = true
@@ -273,12 +314,16 @@ export default {
 		},
 		initProfileForm() {
 			this.profile.form = {
-				realName: this.debtor.realName,
-				gender: this.debtor.gender,
-				birthday: this.debtor.birthday,
-				primaryNumber: this.debtor.primaryNumber,
-				alternativeNumber: this.debtor.alternativeNumber,
+				realName: this.debtor.profile.realName,
+				gender: this.debtor.profile.gender,
+				birthday: this.debtor.profile.birthday,
+				primaryNumber: this.debtor.profile.primaryNumber,
+				alternativeNumber: this.debtor.profile.alternativeNumber,
 			}
+		},
+		loadProfile() {
+			this.profileLoading()
+			this.fetchProfile()
 		},
 		onClickEditProfile() {
 			this.editProfile()
@@ -298,30 +343,38 @@ export default {
 						alternativeNumber: this.profile.form.alternativeNumber,
 					}
 					this.profileSaving()
-					if (this.debtor.id) this.updateProfile(profile, this.debtor.id)
-					else this.addProfile()
+					this.updateProfile(profile)
 				}
 			})
 		},
-		async addProfile(profile) {
+		async fetchProfile() {
 			try {
-				const res = await api.debtor.addProfile(profile)
-				this.debtor.id = res
-				this.profileUnsaving()
-				this.$Message.success('借款人创建成功，即将转入详情页')
-				this.$router.push({
-					name: 'debtor_detail',
-					params: {
-						debtor_id: this.debtor.id,
-					},
-				})
-			} catch (error) {
-				this.$Message.error(error.message)
-				this.profileUnsaving()
+				const res = await api.debtor.profile.fetch(this.debtor.profile.id)
+				this.debtor.profile = {
+					id: res.id,
+					realName: res.realName,
+					gender: res.gender,
+					birthday: res.birthday,
+					primaryNumber: res.primaryNumber,
+					alternativeNumber: res.alternativeNumber,
+				}
+				this.initProfileForm()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.profileUnloading()
 			}
 		},
-		async updateProfile(profile, id) {
-
+		async updateProfile(profile) {
+			try {
+				await api.debtor.profile.update(profile, this.debtor.profile.id)
+				this.uneditProfile()
+				this.loadProfile()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.profileUnsaving()
+			}
 		},
 		// identify
 		editIdentify() {
@@ -344,13 +397,17 @@ export default {
 		},
 		initIdentifyForm() {
 			this.identify.form = {
-				idNumber: this.debtor.idNumber,
-				location: this.debtor.location,
-				frontImageUrl: this.debtor.frontImageUrl,
-				frontBlurImageUrl: this.debtor.frontBlurImageUrl,
-				backImageUrl: this.debtor.backImageUrl,
-				backBlurImageUrl: this.debtor.backBlurImaegUrl,
+				idNumber: this.debtor.identify.idNumber,
+				location: this.debtor.identify.location,
+				frontImageUrl: this.debtor.identify.frontImageUrl,
+				frontBlurImageUrl: this.debtor.identify.frontBlurImageUrl,
+				backImageUrl: this.debtor.identify.backImageUrl,
+				backBlurImageUrl: this.debtor.identify.backBlurImaegUrl,
 			}
+		},
+		loadIdentify() {
+			this.identifyLoading()
+			this.fetchIdentify()
 		},
 		onClickEditIdentify() {
 			this.editIdentify()
@@ -362,9 +419,47 @@ export default {
 		onClickSaveIdentify() {
 			this.$refs.identifyForm.validate((valid) => {
 				if (valid) {
-					this.uneditIdentify()
+					const identify = {
+						idNumber: this.identify.form.idNumber,
+						location: this.identify.form.location,
+						frontImageUrl: this.identify.form.frontImageUrl,
+						frontBlurImageUrl: this.identify.form.frontBlurImageUrl,
+						backImageUrl: this.identify.form.backImageUrl,
+						backBlurImageUrl: this.identify.form.backBlurImaegUrl,
+					}
+					this.identifySaving()
+					this.updateIdentify(identify)
 				}
 			})
+		},
+		async fetchIdentify() {
+			try {
+				const res = await api.debtor.identify.fetch(this.debtor.profile.id)
+				this.debtor.identify = {
+					idNumber: res.idNumber,
+					location: res.location,
+					frontImageUrl: res.frontImageUrl,
+					frontBlurImageUrl: res.frontBlurImageUrl,
+					backImageUrl: res.backImageUrl,
+					backBlurImageUrl: res.backBlurImaegUrl,
+				}
+				this.initIdentifyForm()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.identifyUnloading()
+			}
+		},
+		async updateIdentify(identify) {
+			try {
+				await api.debtor.identify.update(identify, this.debtor.profile.id)
+				this.uneditIdentify()
+				this.loadIdentify()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.identifyUnsaving()
+			}
 		},
 		// credit
 		editCredit() {
@@ -387,13 +482,18 @@ export default {
 		},
 		initCreditForm() {
 			this.credit.form = {
-				idNumber: this.debtor.idNumber,
-				location: this.debtor.location,
-				frontImageUrl: this.debtor.frontImageUrl,
-				frontBlurImageUrl: this.debtor.frontBlurImageUrl,
-				backImageUrl: this.debtor.backImageUrl,
-				backBlurImageUrl: this.debtor.backBlurImaegUrl,
+				workPlace: this.debtor.credit.workPlace,
+				address: this.debtor.credit.address,
+				education: this.debtor.credit.education,
+				monthlyStableIncome: this.debtor.credit.monthlyStableIncome,
+				yearlyStableIncome: this.debtor.credit.yearlyStableIncome,
+				hasCar: this.debtor.credit.hasCar,
+				hasHouse: this.debtor.credit.hasHouse,
 			}
+		},
+		loadCredit() {
+			this.creditLoading()
+			this.fetchCredit()
 		},
 		onClickEditCredit() {
 			this.editCredit()
@@ -405,9 +505,49 @@ export default {
 		onClickSaveCredit() {
 			this.$refs.creditForm.validate((valid) => {
 				if (valid) {
-					this.uneditCredit()
+					const credit = {
+						workPlace: this.credit.form.workPlace,
+						address: this.credit.form.address,
+						education: this.credit.form.education,
+						monthlyStableIncome: this.credit.form.monthlyStableIncome,
+						yearlyStableIncome: this.credit.form.yearlyStableIncome,
+						hasCar: this.credit.form.hasCar,
+						hasHouse: this.credit.form.hasHouse,
+					}
+					this.creditSaving()
+					this.updateCredit(credit)
 				}
 			})
+		},
+		async fetchCredit() {
+			try {
+				const res = await api.debtor.credit.fetch(this.debtor.profile.id)
+				this.debtor.credit = {
+					workPlace: res.workPlace,
+					address: res.address,
+					education: res.education,
+					monthlyStableIncome: res.monthlyStableIncome,
+					yearlyStableIncome: res.yearlyStableIncome,
+					hasCar: res.hasCar,
+					hasHouse: res.hasHouse,
+				}
+				this.initCreditForm()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.creditUnloading()
+			}
+		},
+		async updateCredit(credit) {
+			try {
+				await api.debtor.credit.update(credit, this.debtor.profile.id)
+				this.uneditCredit()
+				this.loadCredit()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.creditUnsaving()
+			}
 		},
 		onClickImage() {
 			console.log('upload img')

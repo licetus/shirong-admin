@@ -77,6 +77,14 @@ api.debtor = {
 		fetch: async id =>
 			createAuthInstance().get(`debtor/${id}/idCard`).then(res => res.data),
 	},
+	credit: {
+		delete: async id =>
+			createAuthInstance().delete(`debtor/${id}/creditInfo`).then(res => res.data),
+		update: async (params, id) =>
+			createAuthInstance().post(`debtor/${id}/creditInfo`, params).then(res => res.data),
+		fetch: async id =>
+			createAuthInstance().get(`debtor/${id}/creditInfo`).then(res => res.data),
+	},
 }
 
 export default api
