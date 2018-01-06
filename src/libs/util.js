@@ -379,7 +379,7 @@ util.getLoanType = (vm, type) => {
 		case Enum.Loan.Type.Other:
 			return '其他'
 		case Enum.Loan.Type.Car:
-			return '车贷'
+			return '车辆抵押'
 		default: {
 			vm.$Message.error('错误: 未知的贷款类型')
 			return null

@@ -77,21 +77,52 @@
 					</div>
 					<Form ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="贷款类型">
-								<RadioGroup v-model="loan.form.type">
+							<Col :span="12"><FormItem label="贷款类型">
+								<RadioGroup v-if="!loan.isEditable" :value="loan.form.type">
+									<Radio :label="Enum.Loan.Type.Car" :disabled="loan.form.type !== Enum.Loan.Type.Car">车辆抵押</Radio>
+									<Radio :label="Enum.Loan.Type.Other" disabled>其他</Radio>
+								</RadioGroup>
+								<RadioGroup v-else v-model="loan.form.type">
 									<Radio :label="Enum.Loan.Type.Car">车辆抵押</Radio>
 									<Radio :label="Enum.Loan.Type.Other" disabled>其他</Radio>
 								</RadioGroup>
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="贷款金额"></FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="贷款期限"></FormItem></Col>
-							<Col :span="8"><FormItem label="贷款利率"></FormItem></Col>
-							<Col :span="8"><FormItem label="还款方式"></FormItem></Col>
+							<Col :span="12"><FormItem label="贷款金额">
+								<p v-if="!loan.isEditable">{{loan.form.amount || '-'}}</p>
+								<InputNumber v-else v-model="loan.form.amount" :min="0" :max="99999999" :step="10000"></InputNumber>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="贷款利率">
+								<p v-if="!loan.isEditable">{{loan.form.interest || '-'}}</p>
+								<InputNumber v-else v-model="loan.form.interest" :min="0" :max="1" :step="0.01"></InputNumber>
+							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="24"><FormItem label="备注信息"></FormItem></Col>
+							<Col :span="12"><FormItem label="贷款期限">
+								<RadioGroup v-if="!loan.isEditable" :value="loan.form.termType">
+									<Radio :label="Enum.Loan.TermType.SevenDays" :disabled="loan.form.termType !== Enum.Loan.TermType.SevenDays">7天</Radio>
+									<Radio :label="Enum.Loan.TermType.OneMonth" :disabled="loan.form.termType !== Enum.Loan.TermType.OneMonth">1个月</Radio>
+									<Radio :label="Enum.Loan.TermType.ThreeMonths" :disabled="loan.form.termType !== Enum.Loan.TermType.ThreeMonths">3个月</Radio>
+									<Radio :label="Enum.Loan.TermType.SixMonths" :disabled="loan.form.termType !== Enum.Loan.TermType.SixMonths">6个月</Radio>
+								</RadioGroup>
+								<RadioGroup v-else v-model="loan.form.termType">
+									<Radio :label="Enum.Loan.TermType.SevenDays">7天</Radio>
+									<Radio :label="Enum.Loan.TermType.OneMonth">1个月</Radio>
+									<Radio :label="Enum.Loan.TermType.ThreeMonths">3个月</Radio>
+									<Radio :label="Enum.Loan.TermType.SixMonths">6个月</Radio>
+								</RadioGroup>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="还款方式">
+								<RadioGroup v-if="!loan.isEditable" :value="loan.form.repaymentWay">
+									<Radio :label="Enum.Loan.RepaymentWay.LumpSum" :disabled="loan.form.repaymentWay !== Enum.Loan.RepaymentWay.LumpSum">一次性还款</Radio>
+									<Radio :label="Enum.Loan.RepaymentWay.InterestFirst" :disabled="loan.form.repaymentWay !== Enum.Loan.RepaymentWay.InterestFirst">先息后本</Radio>
+								</RadioGroup>
+								<RadioGroup v-else v-model="loan.form.repaymentWay">
+									<Radio :label="Enum.Loan.RepaymentWay.LumpSum">一次性还款</Radio>
+									<Radio :label="Enum.Loan.RepaymentWay.InterestFirst">先息后本</Radio>
+								</RadioGroup>
+							</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -113,12 +144,33 @@
 			<Col :span="24">
 				<Card v-if="isCarPaneVisible">
 					<p slot="title">车辆详情</p>
+					<div v-if="isEditable" slot="extra">
+						<div v-if="!loan.sub.car.isEditable">
+							<Button type="text" @click="onClickEditCar">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickResetCar">重置</Button>
+							<Button type="text" @click="onClickSaveCar">保存</Button>
+						</div>
+					</div>
 					<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
 						<Row>
-							<Col :span="6"><FormItem label="品牌型号"></FormItem></Col>
-							<Col :span="6"><FormItem label="购买价格"></FormItem></Col>
-							<Col :span="6"><FormItem label="行驶里程"></FormItem></Col>
-							<Col :span="6"><FormItem label="评估价格"></FormItem></Col>
+							<Col :span="6"><FormItem label="品牌型号">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.carBrand}}</p>
+								<Input v-else v-model="loan.sub.car.form.carBrand" />
+							</FormItem></Col>
+							<Col :span="6"><FormItem label="购买价格">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.purchasePrice}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.purchasePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+							<Col :span="6"><FormItem label="行驶里程">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.milage}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.milage" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+							<Col :span="6"><FormItem label="评估价格">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.evaluatePrice}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.evaluatePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="车辆行驶证">
@@ -162,8 +214,8 @@ export default {
 	data() {
 		const blank = {
 			debtor: new Debtor(),
-			Loan: new Loan(),
-			Car: new Car(),
+			loan: new Loan(),
+			car: new Car(),
 		}
 		return {
 			Enum,
@@ -181,17 +233,36 @@ export default {
 			},
 			loan: {
 				data: blank.loan,
-				isEditable: false,
+				isEditable: true,
 				isSubmitting: false,
 				isLoading: false,
 				labelWidth: 75,
-				form: {},
+				form: {
+					type: blank.loan.type,
+					amount: blank.loan.amount,
+					termType: blank.loan.termType,
+					interest: blank.loan.interest,
+					repaymentWay: blank.loan.repaymentWay,
+					remark: blank.loan.remark,
+				},
 				rules: {},
 				sub: {
 					car: {
 						data: blank.car,
+						isEditable: true,
 						labelWidth: 75,
-						form: {},
+						form: {
+							carBrand: blank.car.carBrand,
+							purchasePrice: blank.car.purchasePrice,
+							milage: blank.car.milage,
+							evaluatePrice: blank.car.evaluatePrice,
+							carFrontImageUrl: blank.car.carFrontImageUrl,
+							carBackImageUrl: blank.car.carBackImageUrl,
+							carMilageImageUrl: blank.car.carMilageImageUrl,
+							carInsideImageUrl: blank.car.carInsideImageUrl,
+							vehicleLicenseImageUrl: blank.car.vehicleLicenseImageUrl,
+							inspectionLicenseImageUrl: blank.car.inspectionLicenseImageUrl,
+						},
 						rules: {},
 					},
 				},
@@ -205,7 +276,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.debtor.data.profile.id = 1000000  // TODO for test
+		// this.debtor.data.profile.id = 1000000  // TODO for test
 	},
 	computed: {
 		isEditable() {
@@ -232,6 +303,9 @@ export default {
 			}
 			return arr
 		},
+		loanType() {
+			return util.getLoanType(this, this.loan.form.type)
+		}
 	},
 	methods: {
 		// debtor
@@ -375,14 +449,23 @@ export default {
 		loanUnsubmitting() {
 			this.loan.isSubmitting = false
 		},
+		loadLoan(id) {
+			this.$router.push({
+				name: 'loan_detail',
+				params: {
+					loan_id: id,
+				},
+			})
+		},
 		onClickSubmitLoan() {
-			const subMapping = ['', 'other', 'car']
-			const loanCheck = this.$refs.loanForm.validate((valid) => valid)
-			const subCheck = this.$refs[`${subMapping[this.loan.form.type]}Form`].validate((valid) => valid)
-			if (loanCheck && subCheck) {
-				let sub = {}
-				switch (this.loan.form.type) {
-					case Enum.Loan.Type.Car:
+			if (this.loan.form.type) {
+				const subMapping = ['', 'other', 'car']
+				const loanCheck = this.$refs.loanForm.validate((valid) => valid)
+				const subCheck = this.$refs[`${subMapping[this.loan.form.type]}Form`].validate((valid) => valid)
+				if (loanCheck && subCheck) {
+					let sub = {}
+					switch (this.loan.form.type) {
+						case Enum.Loan.Type.Car:
 						sub = {
 							carBrand: this.loan.sub.car.form.carBrand,
 							purchasePrice: this.loan.sub.car.form.purchasePrice,
@@ -396,26 +479,27 @@ export default {
 							inspectionLicenseImageUrl: this.loan.sub.car.form.inspectionLicenseImageUrl,
 						}
 						break
-					default: return null
+						default: return null
+					}
+					const loan = {
+						debtorId: this.debtor.data.profile.id,
+						type: this.loan.form.type,
+						amount: this.loan.form.amount,
+						termType: this.loan.form.termType,
+						interest: this.loan.form.interest,
+						repaymentWay: this.loan.form.repaymentWay,
+						remark: this.loan.form.remark,
+						sub,
+					}
+					this.loanSubmitting()
+					this.addLoan(loan)
 				}
-				const loan = {
-					type: this.loan.form.type,
-					amount: this.loan.form.amount,
-					termType: this.loan.form.termType,
-					interest: this.loan.form.interest,
-					repaymentWay: this.loan.form.repaymentWay,
-					remark: this.loan.form.remark,
-					sub,
-				}
-				this.loanSubmitting()
-				this.updateLoan(loan)
 			}
 		},
-		async updateLoan(loan) {
+		async addLoan(loan) {
 			try {
-				await api.loan.update(loan, this.debtor.loan.id)
-				this.uneditLoan()
-				this.loadLoan()
+				const res = await api.loan.add(loan)
+				this.loadLoan(res)
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
