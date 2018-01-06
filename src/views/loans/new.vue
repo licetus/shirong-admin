@@ -343,7 +343,7 @@ export default {
 						primaryNumber: this.debtor.form.primaryNumber
 					}
 					this.debtorSubmitting()
-					this.submitDebtor(debtor)
+					this.matchDebtor(debtor)
 				}
 			})
 		},
@@ -362,7 +362,10 @@ export default {
 			try {
 				const res = await api.debtor.profile.add(debtor)
 				this.debtor.data.profile.id = res
-				this.$Message.success('创建借款人成功, 即将打开详情页，请补全信息')
+				this.$Message.success({
+					content: '创建借款人成功, 正在打开详情页, 请补全信息',
+					duration: 5,
+				})
 				this.$router.push({
 					name: 'debtor_detail',
 					params: {
@@ -371,23 +374,17 @@ export default {
 				})
 			} catch(e) {
 				switch (e.code) {
-					case 'ACCOUNT_EXIST_ERROR':
-						this.$Message.info('该号码已存在, 正在搜索借款人信息')
-						this.matchDebtor(this.debtor.form.primaryNumber)
-						break
-					default:
-						this.$Message.error(e.message)
-				}
+				this.$Message.error(e.message)
 			} finally {
 				this.debtorUnsubmitting()
 			}
 		},
-		async matchDebtor(number) {
+		async matchDebtor(debtor) {
 			try {
 				const query = {
 					pagesize: 1,
 					page: 0,
-					filters: `primaryNumber='${number}'`,
+					filters: `primaryNumber='${debtor.primaryNumber}'`,
 					orderBy: '',
 				}
 				const res = await api.debtor.fetchList(
@@ -396,12 +393,12 @@ export default {
 					query.filters,
 					query.orderBy,
 				)
-				if (res.length < 1) this.$Message.info('无匹配结果, 请联系管理员')
+				if (res.length === 0) this.submitDebtor(debtor)
 				else {
 					this.debtor.data.profile.id = res[0].id
 					this.debtor.form.realName = res[0].realName
 					this.debtor.form.primaryNumber = res[0].primaryNumber
-					this.$Message.info('匹配成功，正在获取数据')
+					this.$Message.info('该号码已存在, 正在获取数据...')
 					this.loadDebtor()
 				}
 			} catch (e) {
