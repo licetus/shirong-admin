@@ -276,16 +276,14 @@ export default {
 		}
 	},
 	mounted() {
+		this.currentPageName = this.$route.name
 		this.initPage()
 	},
 	activated() {
-		const cacheData = util.getPageCache(this.$route.name)
-		if (!cacheData.path || this.$route.fullPath !== cacheData.path) {
+		const { path } = util.getPageCache(this.$route.name)
+		if (!path || this.$route.fullPath !== path) {
 			this.initPage()
 		}
-	},
-	deactivated() {
-		util.removePageCache(this.$route.name)
 	},
 	watch: {
 		// $route(to) {
@@ -324,18 +322,17 @@ export default {
 		},
 		loanType() {
 			return util.getLoanType(this, this.loan.form.type)
-		}
+		},
 	},
 	methods: {
 		// main
 		initPage() {
-			Cookies.set('newLoanPath', this.$route.fullPath)
+			util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 			this.uneditDebtor()
 			if (this.$route.query.debtor_id) {
 				this.debtor.data.profile.id = this.$route.query.debtor_id
 				this.loadDebtor()
-			}
-			else {
+			} else {
 				this.$Message.error('错误: 未知的借款人')
 			}
 		},

@@ -279,21 +279,20 @@ util.md5 = (string) => {
 	return jsmd5(string).toUpperCase()
 }
 
-util.setPageCache = (vm, key, val) => {
-	let data = util.getPageCache(vm)
-	if (!data) data = {}
+util.setPageCache = (pageName, key, val) => {
+	const data = util.getPageCache(pageName)
 	data[key] = val
-	Cookies.set(`${vm.name}_cache`, JSON.stringify(data))
+	Cookies.set(`${pageName}_cache`, JSON.stringify(data))
 }
 
-util.getPageCache = (vm) => {
-	const dataStr = Cookies.get(`${vm.name}_cache`)
+util.getPageCache = (pageName) => {
+	const dataStr = Cookies.get(`${pageName}_cache`)
 	if (dataStr) return JSON.parse(dataStr)
-	return null
+	return {}
 }
 
-util.removePageCache = (vm) => {
-	Cookies.remove(`${vm.name}_cache`)
+util.removePageCache = (pageName) => {
+	Cookies.remove(`${pageName}_cache`)
 }
 
 util.inputLengthCheck = (string, length, vm) => {
