@@ -26,7 +26,7 @@
 					</div>
 					<Form v-if="!loan.isFolded" ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
 						<Row>
-							<Col :span="12"><FormItem label="贷款类型">
+							<Col :span="8"><FormItem label="贷款类型">
 								<RadioGroup v-if="!loan.isEditable" :value="loan.form.type">
 									<Radio :label="Enum.Loan.Type.Car" :disabled="loan.form.type !== Enum.Loan.Type.Car">车辆抵押</Radio>
 									<Radio :label="Enum.Loan.Type.Other" disabled>其他</Radio>
@@ -36,13 +36,23 @@
 									<Radio :label="Enum.Loan.Type.Other" disabled>其他</Radio>
 								</RadioGroup>
 							</FormItem></Col>
+							<Col :span="8"><FormItem label="当前状态">
+								<p>{{loanStatus || '-'}}</p>
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="审核状态">
+								<p>{{loanApprovalStatus || '-'}}</p>
+							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="12"><FormItem label="贷款金额">
+							<Col :span="8"><FormItem label="标的名称">
+								<p v-if="!loan.isEditable">{{loan.form.object || '-'}}</p>
+								<Input v-else v-model="loan.form.object" />
+							</FormItem></Col>
+							<Col :span="8"><FormItem label="贷款金额">
 								<p v-if="!loan.isEditable">{{loan.form.amount || '-'}}</p>
 								<InputNumber v-else v-model="loan.form.amount" :min="0" :max="99999999" :step="10000"></InputNumber>
 							</FormItem></Col>
-							<Col :span="12"><FormItem label="贷款利率">
+							<Col :span="8"><FormItem label="贷款利率">
 								<p v-if="!loan.isEditable">{{loan.form.interest || '-'}}</p>
 								<InputNumber v-else v-model="loan.form.interest" :min="0" :max="1" :step="0.01"></InputNumber>
 							</FormItem></Col>
@@ -169,12 +179,32 @@
 			</Col>
 			<Col :span="8" class="padding-left-5">
 				<Card>
+					<p slot="title">业务员</p>
+					<Form label-position="left" :label-width="75" inline>
+						<Row>
+							<Col :span="24"><FormItem label="姓名"></FormItem></Col>
+							<Col :span="24"><FormItem label="工号"></FormItem></Col>
+							<Col :span="24"><FormItem label="签约时间"></FormItem></Col>
+						</Row>
+					</Form>
+				</Card>
+				<Card class="margin-top-10">
 					<p slot="title">放款账户</p>
 					<Form ref="bankForm" :model="bank.form" :rules="bank.rules" label-position="left" :label-width="bank.labelWidth" inline>
 						<Row>
 							<Col :span="24"><FormItem label="开户人姓名"></FormItem></Col>
 							<Col :span="24"><FormItem label="开户行名称"></FormItem></Col>
 							<Col :span="24"><FormItem label="银行卡号"></FormItem></Col>
+						</Row>
+					</Form>
+				</Card>
+				<Card class="margin-top-10">
+					<p slot="title">审核信息</p>
+					<Form ref="approvalForm" :model="approval.form" :rules="approval.rules" label-position="left" :label-width="approval.labelWidth" inline>
+						<Row class="border-bottom" v-for="(item, index) of 3" :key="index">
+							<Col :span="24"><FormItem label="审核员"></FormItem></Col>
+							<Col :span="24"><FormItem label="审核意见"></FormItem></Col>
+							<Col :span="24"><FormItem label="审核时间"></FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -247,6 +277,12 @@ export default {
 				form: {},
 				rules: {},
 			},
+			approval: {
+				data: blank.loan,
+				labelWidth: 75,
+				form: {},
+				rules: {},
+			},
 		}
 	},
 	mounted() {
@@ -269,7 +305,20 @@ export default {
 	},
 	computed: {
 		isEditable() {
-			return true
+			switch (this.loan.data.status) {
+				case Enum.Loan.Status.Prepared:
+					return true
+				default: return false
+			}
+		},
+		loanType() {
+			return util.getLoanType(this, this.loan.form.type)
+		},
+		loanStatus() {
+			return util.getLoanStatus(this, this.loan.data.status)
+		},
+		loanApprovalStatus() {
+			return util.getLoanApprovalStatus(this, this.loan.data.approvalStatus)
 		},
 		subPaneType() {
 			return (this.debtor.data.profile.id && this.loan.form.type === Enum.Loan.Type.Car)
@@ -290,9 +339,6 @@ export default {
 			}
 			/* eslint-enable */
 			return arr
-		},
-		loanType() {
-			return util.getLoanType(this, this.loan.form.type)
 		},
 	},
 	methods: {
@@ -412,7 +458,7 @@ export default {
 							inspectionLicenseImageUrl: res.sub.inspectionLicenseImageUrl,
 						}
 						break
-					default:
+					default: this.loan.data.sub = {}
 				}
 				this.initLoanForm()
 			} catch (e) {
