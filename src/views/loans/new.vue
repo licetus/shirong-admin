@@ -1,7 +1,7 @@
 <template>
 	<section>
 		<Row>
-			<Col :span="8" class="padding-right-5">
+			<Col :span="6" class="padding-right-5">
 				<Card>
 					<p slot="title">借款人</p>
 					<div slot="extra">
@@ -28,7 +28,7 @@
 					</Form>
 				</Card>
 			</Col>
-			<Col :span="16" class="padding-left-5">
+			<Col :span="15" class="padding-left-5">
 				<Card>
 					<Spin v-if="debtor.isLoading" size="large" fix></Spin>
 					<p slot="title">借款人信息</p>
@@ -60,6 +60,14 @@
 							</FormItem></Col>
 						</Row>
 					</Form>
+				</Card>
+			</Col>
+			<Col :span="3" class="padding-left-10">
+				<Card>
+					<p slot="title">操作</p>
+						<Row  type="flex" justify="center"><Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">保存</Button></Row>
+						<Row class="margin-top-10" type="flex" justify="center"><Button>取消</Button></Row>
+						<Row class="margin-top-10" type="flex" justify="center"><Button type="error">删除</Button></Row>
 				</Card>
 			</Col>
 		</Row>
@@ -142,7 +150,7 @@
 			</Col>
 		</Row>
 		<Row class="margin-top-10">
-			<Card v-if="isCarPaneVisible" class="margin-top-10">
+			<Card v-if="isCarPaneVisible">
 				<p slot="title">车辆详情</p>
 				<div v-if="isEditable" slot="extra">
 					<div v-if="!loan.sub.car.isEditable">
@@ -203,7 +211,6 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie'
 import { Debtor, Loan, Car } from '../../models/data'
 import Enum from '../../models/enum'
 import api from '../../libs/api'
@@ -220,6 +227,7 @@ export default {
 		return {
 			Enum,
 			debtor: {
+				blankDebtor: new Debtor(),
 				data: blank.debtor,
 				isEditable: false,
 				isSubmitting: false,
@@ -310,6 +318,7 @@ export default {
 			return util.getAge(this, this.debtor.data.profile.birthday)
 		},
 		identifyArray() {
+			console.log(this.debtor.data.identify)
 			const arr = []
 			/* eslint-disable */
 			for (const item in this.debtor.data.identify) {
@@ -356,6 +365,10 @@ export default {
 		debtorUnLoading() {
 			this.debtor.isLoading = false
 		},
+		clearDebtor() {
+			console.log(this.debtor.data, this.debtor.blankDebtor)
+			this.debtor.data = this.debtor.blankDebtor
+		},
 		initDebtor(id) {
 			this.debtor.data.profile.realName = this.debtor.form.realName
 			this.debtor.data.profile.primaryNumber = this.debtor.form.primaryNumber
@@ -365,6 +378,7 @@ export default {
 					debtor_id: id,
 				},
 			})
+			this.clearDebtor()
 			this.initPage()
 		},
 		initDebtorForm() {
@@ -396,7 +410,9 @@ export default {
 			}
 		},
 		onClickRefreshDebtor() {
+			this.clearDebtor()
 			this.loadDebtor()
+			console.log(this.debtor.data)
 		},
 		onClickDebtorDetail() {
 			this.$router.push({
@@ -482,7 +498,7 @@ export default {
 			} catch (e) {
 				switch (e.code) {
 					case 'D_B_GET_FAILED_ERROR':
-						this.$Notice.warning({
+						this.$Notice.info({
 							title: '贷款人实名信息缺失, 正在打开相关页面',
 							duration: 3,
 						})
