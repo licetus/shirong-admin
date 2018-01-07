@@ -4,18 +4,8 @@
 			<Col :span="16" class="padding-right-5">
 				<Card>
 					<Spin v-if="loan.isLoading" size="large" fix></Spin>
-					<p v-if="!loan.isFolded" slot="title">
-						<Button type="text" @click="onClickFoldLoan">贷款信息<Icon class="margin-left-5" type="arrow-down-b"></Icon></Button>
-					</p>
-					<p v-else slot="title">
-						<Button type="text" @click="onClickOpenLoan">贷款信息<Icon class="margin-left-5" type="arrow-right-b"></Icon></Button>
-						<span class="margin-left-10">车贷</span>
-						<span class="margin-left-10">200000</span>
-						<span class="margin-left-10">12%</span>
-						<span class="margin-left-10">1个月</span>
-						<span class="margin-left-10">先息后本</span>
-					</p>
-					<div v-if="isEditable && !loan.isFolded" slot="extra">
+					<p slot="title">贷款信息</p>
+					<div v-if="isEditable" slot="extra">
 						<div v-if="!loan.isEditable">
 							<Button type="text" @click="onClickEditLoan">编辑</Button>
 						</div>
@@ -202,7 +192,6 @@
 					<p slot="title">审核信息</p>
 					<Form ref="approvalForm" :model="approval.form" :rules="approval.rules" label-position="left" :label-width="approval.labelWidth" inline>
 						<Row class="border-bottom" v-for="(item, index) of 3" :key="index">
-							<Col :span="24"><FormItem label="审核员"></FormItem></Col>
 							<Col :span="24"><FormItem label="审核意见"></FormItem></Col>
 							<Col :span="24"><FormItem label="审核时间"></FormItem></Col>
 						</Row>
@@ -240,7 +229,7 @@ export default {
 					type: blank.loan.type,
 					amount: blank.loan.amount,
 					termType: blank.loan.termType,
-					interest: blank.loan.interest,
+					interestRate: blank.loan.interestRate,
 					repaymentWay: blank.loan.repaymentWay,
 					remark: blank.loan.remark,
 				},
@@ -405,7 +394,7 @@ export default {
 						type: this.loan.form.type,
 						amount: this.loan.form.amount,
 						termType: this.loan.form.termType,
-						interest: this.loan.form.interest,
+						interestRate: this.loan.form.interestRate,
 						repaymentWay: this.loan.form.repaymentWay,
 						remark: this.loan.form.remark,
 						sub,
@@ -434,7 +423,7 @@ export default {
 					agentId: res.agentId,
 					object: res.object,
 					amount: res.amount,
-					interest: res.interest,
+					interestRate: res.interestRate,
 					approvalStatus: res.approvalStatus,
 					repaymentWay: res.repaymentWay,
 					type: res.type,
@@ -481,7 +470,7 @@ export default {
 				agentId: this.loan.data.agentId,
 				object: this.loan.data.object,
 				amount: this.loan.data.amount,
-				interest: this.loan.data.interest,
+				interestRate: this.loan.data.interestRate,
 				approvalStatus: this.loan.data.approvalStatus,
 				repaymentWay: this.loan.data.repaymentWay,
 				type: this.loan.data.type,

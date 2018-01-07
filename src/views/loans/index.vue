@@ -78,9 +78,9 @@ export default {
 					key: 'amount',
 				},
 				{
-					name: 'interest', // TODO should be 'interestRate'
+					name: 'interestRate',
 					title: '利率',
-					key: 'interest',
+					key: 'interestRate',
 				},
 				{
 					name: 'termType',
