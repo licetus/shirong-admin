@@ -1,5 +1,6 @@
 import axios from 'axios'
 import jsmd5 from 'js-md5'
+import Cookies from 'js-cookie'
 import moment from 'moment'
 // import env from '../../build/env'
 import packjson from '../../package.json'
@@ -276,6 +277,23 @@ util.checkUpdate = function (vm) {
 util.md5 = (string) => {
 	if (!string) return ''
 	return jsmd5(string).toUpperCase()
+}
+
+util.setPageCache = (vm, key, val) => {
+	let data = util.getPageCache(vm)
+	if (!data) data = {}
+	data[key] = val
+	Cookies.set(`${vm.name}_cache`, JSON.stringify(data))
+}
+
+util.getPageCache = (vm) => {
+	const dataStr = Cookies.get(`${vm.name}_cache`)
+	if (dataStr) return JSON.parse(dataStr)
+	return null
+}
+
+util.removePageCache = (vm) => {
+	Cookies.remove(`${vm.name}_cache`)
 }
 
 util.inputLengthCheck = (string, length, vm) => {

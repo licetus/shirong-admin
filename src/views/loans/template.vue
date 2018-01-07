@@ -197,9 +197,124 @@ import util from '../../libs/util'
 
 export default {
 	name: 'loan_detail',
+	props: {
+		debtor: {
+			profile: {
+				realName: {
+					type: String,
+					default: '',
+				},
+				gender: {
+					type: Number,
+					default: null,
+				},
+				birthday: {
+					type: Number,
+					default: null,
+				},
+			},
+			identify: {
+				idNumber: {
+					type: String,
+					default: '',
+				},
+				location: {
+					type: String,
+					default: '',
+				},
+				frontImageUrl: {
+					type: String,
+					default: '',
+				},
+				frontBlurImageUrl: {
+					type: String,
+					default: '',
+				},
+				backImageUrl: {
+					type: String,
+					default: '',
+				},
+				backBlurImageUrl: {
+					type: String,
+					default: '',
+				},
+			},
+		},
+		loan: {
+			loanType: {
+				type: Number,
+				default: null,
+			},
+			amount: {
+				type: Number,
+				default: null,
+			},
+			termType: {
+				type: Number,
+				default: null,
+			},
+			interest: {
+				type: Number,
+				default: null,
+			},
+			repaymentWay: {
+				type: Number,
+				default: null,
+			},
+			remark: {
+				type: String,
+				default: '',
+			},
+		},
+		sub: {
+			car: {
+				carBrand: {
+					type: String,
+					default: null,
+				},
+				purchasePrice: {
+					type: Number,
+					default: null,
+				},
+				milage: {
+					type: Number,
+					default: null,
+				},
+				evaluatePrice: {
+					type: Number,
+					default: null,
+				},
+				carFrontImageUrl: {
+					type: String,
+					default: '',
+				},
+				carBackImageUrl: {
+					type: String,
+					default: '',
+				},
+				carMilageImageUrl: {
+					type: String,
+					default: '',
+				},
+				carInsideImageUrl: {
+					type: String,
+					default: '',
+				},
+				vehicleLicenseImageUrl: {
+					type: String,
+					default: '',
+				},
+				inspectionLicenseImageUrl: {
+					type: String,
+					default: '',
+				},
+
+			},
+		},
+	},
 	data() {
 		const blank = {
-			debtor: new Debtor(),
+		debtor: new Debtor(),
 			loan: new Loan(),
 			car: new Car(),
 		}

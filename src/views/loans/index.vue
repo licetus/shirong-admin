@@ -114,7 +114,7 @@ export default {
 			// add
 			add: {
 				isLoading: false,
-				number: '',
+				number: '15895959270',
 				debtorId: null,
 			},
 		}
@@ -158,9 +158,8 @@ export default {
 		},
 		addLoan(debtorId) {
 			this.$router.push({
-				name: 'loan_detail',
+				name: 'loan_new',
 				query: {
-					action: 'create',
 					debtor_id: debtorId,
 				},
 			})
@@ -170,7 +169,7 @@ export default {
 				const query = {
 					pagesize: 1,
 					page: 0,
-					filters: `primaryNumber='${this.add.number}'`,
+					filters: `primary_number='${this.add.number}'`,
 					orderBy: '',
 				}
 				const res = await api.debtor.fetchList(

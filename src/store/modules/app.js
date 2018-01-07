@@ -101,6 +101,7 @@ const app = {
 			state.cachePage.forEach((item, index) => {
 				if (item === name) {
 					state.cachePage.splice(index, 1)
+					Util.removePageCache(name)
 				}
 			})
 		},
