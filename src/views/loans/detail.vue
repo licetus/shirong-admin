@@ -1,81 +1,21 @@
 <template>
 	<section>
 		<Row>
-			<Col :span="6" class="padding-right-5">
-				<Card>
-					<p slot="title">借款人</p>
-					<div slot="extra">
-						<div v-if="!debtor.isEditable">
-							<Button type="text" @click="onClickRefreshDebtor" :loading="debtor.isLoading">刷新</Button>
-							<Button type="text" @click="onClickEditDebtor">编辑</Button>
-						</div>
-						<div v-else>
-							<Button type="text" @click="onClickCancelDebtor">取消</Button>
-							<Button type="text" @click="onClickSubmitDebtor" :loading="debtor.isSubmitting">提交</Button>
-						</div>
-					</div>
-					<Form ref="debtorForm" :model="debtor.form" :rules="debtor.rules" label-position="left" :label-width="debtor.labelWidth" inline>
-						<Row>
-							<Col :span="24"><FormItem label="借款人姓名" prop="realName">
-								<p v-if="!debtor.isEditable">{{debtor.data.profile.realName || '-'}}</p>
-								<Input v-else v-model="debtor.form.realName"/>
-							</FormItem></Col>
-							<Col :span="24"><FormItem label="借款人手机" prop="primaryNumber">
-								<p v-if="!debtor.isEditable">{{debtor.data.profile.primaryNumber || '-'}}</p>
-								<Input v-else v-model="debtor.form.primaryNumber"/>
-							</FormItem></Col>
-						</Row>
-					</Form>
-				</Card>
-			</Col>
-			<Col :span="15" class="padding-left-5">
-				<Card>
-					<Spin v-if="debtor.isLoading" size="large" fix></Spin>
-					<p slot="title">借款人信息</p>
-					<div slot="extra">
-						<Button type="text" @click="onClickDebtorDetail">详情</Button>
-					</div>
-					<Form label-position="left" :label-width="debtor.labelWidth" inline>
-						<Row>
-							<Col :span="8"><FormItem label="姓名">
-								<p>{{debtor.data.profile.realName || '-'}}</p>
-							</FormItem></Col>
-							<Col :span="8"><FormItem label="性别">
-								<p>{{debtorGender || '-'}}</p>
-							</FormItem></Col>
-							<Col :span="8"><FormItem label="年龄">
-								<p>{{debtorAge || '-'}}</p>
-							</FormItem></Col>
-						</Row>
-						<Row>
-							<Col :span="24"><FormItem label="身份认证">
-								<CheckboxGroup :value="identifyArray">
-									<Checkbox label="idNumber">身份号码</Checkbox>
-									<Checkbox label="location">户籍地址</Checkbox>
-									<Checkbox label="frontImageUrl">正面照片</Checkbox>
-									<Checkbox label="frontBlurImageUrl">正面打码</Checkbox>
-									<Checkbox label="backImageUrl">背面照片</Checkbox>
-									<Checkbox label="backBlurImageUrl">背面打码</Checkbox>
-								</CheckboxGroup>
-							</FormItem></Col>
-						</Row>
-					</Form>
-				</Card>
-			</Col>
-			<Col :span="3" class="padding-left-10">
-				<Card>
-					<p slot="title">操作</p>
-						<Row  type="flex" justify="center"><Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">保存</Button></Row>
-						<Row class="margin-top-10" type="flex" justify="center"><Button>取消</Button></Row>
-						<Row class="margin-top-10" type="flex" justify="center"><Button type="error">删除</Button></Row>
-				</Card>
-			</Col>
-		</Row>
-		<Row class="margin-top-10">
 			<Col :span="16" class="padding-right-5">
 				<Card>
-					<p slot="title">贷款信息</p>
-					<div v-if="isEditable" slot="extra">
+					<Spin v-if="loan.isLoading" size="large" fix></Spin>
+					<p v-if="!loan.isFolded" slot="title">
+						<Button type="text" @click="onClickFoldLoan">贷款信息<Icon class="margin-left-5" type="arrow-down-b"></Icon></Button>
+					</p>
+					<p v-else slot="title">
+						<Button type="text" @click="onClickOpenLoan">贷款信息<Icon class="margin-left-5" type="arrow-right-b"></Icon></Button>
+						<span class="margin-left-10">车贷</span>
+						<span class="margin-left-10">200000</span>
+						<span class="margin-left-10">12%</span>
+						<span class="margin-left-10">1个月</span>
+						<span class="margin-left-10">先息后本</span>
+					</p>
+					<div v-if="isEditable && !loan.isFolded" slot="extra">
 						<div v-if="!loan.isEditable">
 							<Button type="text" @click="onClickEditLoan">编辑</Button>
 						</div>
@@ -84,7 +24,7 @@
 							<Button type="text" @click="onClickSaveLoan">保存</Button>
 						</div>
 					</div>
-					<Form ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
+					<Form v-if="!loan.isFolded" ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
 						<Row>
 							<Col :span="12"><FormItem label="贷款类型">
 								<RadioGroup v-if="!loan.isEditable" :value="loan.form.type">
@@ -135,11 +75,102 @@
 						</Row>
 					</Form>
 				</Card>
+				<Card class="margin-top-10">
+					<Spin v-if="debtor.isLoading" size="large" fix></Spin>
+					<p slot="title">借款人信息</p>
+					<div slot="extra">
+						<Button type="text" @click="onClickDebtorDetail">详情</Button>
+					</div>
+					<Form label-position="left" :label-width="debtor.labelWidth" inline>
+						<Row>
+							<Col :span="6"><FormItem label="姓名">
+								<p>{{debtor.data.profile.realName || '-'}}</p>
+							</FormItem></Col>
+							<Col :span="6"><FormItem label="手机">
+								<p>{{debtor.data.profile.primaryNumber || '-'}}</p>
+							</FormItem></Col>
+							<Col :span="6"><FormItem label="性别">
+								<p>{{debtorGender || '-'}}</p>
+							</FormItem></Col>
+							<Col :span="6"><FormItem label="年龄">
+								<p>{{debtorAge || '-'}}</p>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="24"><FormItem label="身份认证">
+								<CheckboxGroup :value="identifyArray">
+									<Checkbox label="idNumber">身份号码</Checkbox>
+									<Checkbox label="location">户籍地址</Checkbox>
+									<Checkbox label="frontImageUrl">正面照片</Checkbox>
+									<Checkbox label="frontBlurImageUrl">正面打码</Checkbox>
+									<Checkbox label="backImageUrl">背面照片</Checkbox>
+									<Checkbox label="backBlurImageUrl">背面打码</Checkbox>
+								</CheckboxGroup>
+							</FormItem></Col>
+						</Row>
+					</Form>
+				</Card>
+				<Card v-if="loan.data.type === Enum.Loan.Type.Car" class="margin-top-10">
+					<p slot="title">车辆详情</p>
+					<div v-if="isEditable" slot="extra">
+						<div v-if="!loan.sub.car.isEditable">
+							<Button type="text" @click="onClickEditCar">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickResetCar">重置</Button>
+							<Button type="text" @click="onClickSaveCar">保存</Button>
+						</div>
+					</div>
+					<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
+						<Row>
+							<Col :span="12"><FormItem label="品牌型号">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.carBrand}}</p>
+								<Input v-else v-model="loan.sub.car.form.carBrand" />
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="购买价格">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.purchasePrice}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.purchasePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="行驶里程">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.milage}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.milage" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="评估价格">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.evaluatePrice}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.evaluatePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+						</Row>
+						<Row class="margin-top-20">
+							<Col :span="12"><FormItem label="车辆行驶证">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆检验证">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="正面照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="背面照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="里程照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="内饰照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
+					</Form>
+				</Card>
 			</Col>
 			<Col :span="8" class="padding-left-5">
 				<Card>
 					<p slot="title">放款账户</p>
-						<Form ref="bankForm" :model="bank.form" :rules="bank.rules" label-position="left" :label-width="bank.labelWidth" inline>
+					<Form ref="bankForm" :model="bank.form" :rules="bank.rules" label-position="left" :label-width="bank.labelWidth" inline>
 						<Row>
 							<Col :span="24"><FormItem label="开户人姓名"></FormItem></Col>
 							<Col :span="24"><FormItem label="开户行名称"></FormItem></Col>
@@ -148,64 +179,6 @@
 					</Form>
 				</Card>
 			</Col>
-		</Row>
-		<Row class="margin-top-10">
-			<Card v-if="isCarPaneVisible">
-				<p slot="title">车辆详情</p>
-				<div v-if="isEditable" slot="extra">
-					<div v-if="!loan.sub.car.isEditable">
-						<Button type="text" @click="onClickEditCar">编辑</Button>
-					</div>
-					<div v-else>
-						<Button type="text" @click="onClickResetCar">重置</Button>
-						<Button type="text" @click="onClickSaveCar">保存</Button>
-					</div>
-				</div>
-				<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
-					<Row>
-						<Col :span="6"><FormItem label="品牌型号">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.carBrand}}</p>
-							<Input v-else v-model="loan.sub.car.form.carBrand" />
-						</FormItem></Col>
-						<Col :span="6"><FormItem label="购买价格">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.purchasePrice}}</p>
-							<InputNumber v-else v-model="loan.sub.car.form.purchasePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
-						</FormItem></Col>
-						<Col :span="6"><FormItem label="行驶里程">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.milage}}</p>
-							<InputNumber v-else v-model="loan.sub.car.form.milage" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
-						</FormItem></Col>
-						<Col :span="6"><FormItem label="评估价格">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.evaluatePrice}}</p>
-							<InputNumber v-else v-model="loan.sub.car.form.evaluatePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
-						</FormItem></Col>
-					</Row>
-					<Row class="margin-top-20">
-						<Col :span="12"><FormItem label="车辆行驶证">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-						<Col :span="12"><FormItem label="车辆检验证">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-					</Row>
-					<Row>
-						<Col :span="12"><FormItem label="正面照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-						<Col :span="12"><FormItem label="背面照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-					</Row>
-					<Row>
-						<Col :span="12"><FormItem label="里程照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-						<Col :span="12"><FormItem label="内饰照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-					</Row>
-				</Form>
-			</Card>
 		</Row>
 	</section>
 </template>
@@ -226,22 +199,10 @@ export default {
 		}
 		return {
 			Enum,
-			debtor: {
-				blankDebtor: new Debtor(),
-				data: blank.debtor,
-				isEditable: false,
-				isSubmitting: false,
-				isLoading: false,
-				labelWidth: 75,
-				form: {
-					realName: blank.debtor.profile.realName,
-					primaryNumber: blank.debtor.profile.primaryNumber,
-				},
-				rules: {},
-			},
 			loan: {
 				data: blank.loan,
-				isEditable: true,
+				isFolded: false,
+				isEditable: false,
 				isSubmitting: false,
 				isLoading: false,
 				labelWidth: 75,
@@ -257,7 +218,7 @@ export default {
 				sub: {
 					car: {
 						data: blank.car,
-						isEditable: true,
+						isEditable: false,
 						labelWidth: 75,
 						form: {
 							carBrand: blank.car.carBrand,
@@ -274,6 +235,11 @@ export default {
 						rules: {},
 					},
 				},
+			},
+			debtor: {
+				data: blank.debtor,
+				isLoading: false,
+				labelWidth: 75,
 			},
 			bank: {
 				data: blank.loan,
@@ -302,13 +268,10 @@ export default {
 		// },
 	},
 	computed: {
-		isNew() {
-			return this.$route.name === 'loan_new'
-		},
 		isEditable() {
 			return true
 		},
-		isCarPaneVisible() {
+		subPaneType() {
 			return (this.debtor.data.profile.id && this.loan.form.type === Enum.Loan.Type.Car)
 		},
 		debtorGender() {
@@ -318,7 +281,6 @@ export default {
 			return util.getAge(this, this.debtor.data.profile.birthday)
 		},
 		identifyArray() {
-			console.log(this.debtor.data.identify)
 			const arr = []
 			/* eslint-disable */
 			for (const item in this.debtor.data.identify) {
@@ -336,197 +298,37 @@ export default {
 	methods: {
 		// main
 		initPage() {
-			util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
-			this.uneditDebtor()
-			if (this.$route.query.debtor_id) {
-				this.debtor.data.profile.id = this.$route.query.debtor_id
-				this.loadDebtor()
-			} else {
-				this.$Message.error('错误: 未知的借款人')
-			}
+			this.loadLoan()
 		},
 
-		// debtor
-		editDebtor() {
-			this.debtor.isEditable = true
-		},
-		uneditDebtor() {
-			this.debtor.isEditable = false
-		},
-		debtorSubmitting() {
-			this.debtor.isSubmitting = true
-		},
-		debtorUnsubmitting() {
-			this.debtor.isSubmitting = false
-		},
-		debtorLoading() {
-			this.debtor.isLoading = true
-		},
-		debtorUnLoading() {
-			this.debtor.isLoading = false
-		},
-		clearDebtor() {
-			console.log(this.debtor.data, this.debtor.blankDebtor)
-			this.debtor.data = this.debtor.blankDebtor
-		},
-		initDebtor(id) {
-			this.debtor.data.profile.realName = this.debtor.form.realName
-			this.debtor.data.profile.primaryNumber = this.debtor.form.primaryNumber
-			this.$router.replace({
-				name: 'loan_new',
-				query: {
-					debtor_id: id,
-				},
-			})
-			this.clearDebtor()
-			this.initPage()
-		},
-		initDebtorForm() {
-			this.debtor.form = {
-				realName: this.debtor.data.profile.realName,
-				primaryNumber: this.debtor.data.profile.primaryNumber,
-			}
-		},
-		loadDebtor() {
-			this.debtorLoading()
-			this.fetchDebtorProfile()
-		},
-		onClickEditDebtor() {
-			this.editDebtor()
-		},
-		onClickCancelDebtor() {
-			this.initDebtorForm()
-			this.uneditDebtor()
-		},
-		onClickSubmitDebtor() {
-			if (this.debtor.form.primaryNumber === this.debtor.data.profile.primaryNumber) this.uneditDebtor()
-			else {
-				this.$refs.debtorForm.validate((valid) => {
-					if (valid) {
-						this.debtorSubmitting()
-						this.matchDebtor(this.debtor.form.primaryNumber)
-					}
-				})
-			}
-		},
-		onClickRefreshDebtor() {
-			this.clearDebtor()
-			this.loadDebtor()
-			console.log(this.debtor.data)
-		},
-		onClickDebtorDetail() {
-			this.$router.push({
-				name: 'debtor_detail',
-				params: {
-					debtor_id: this.debtor.data.profile.id,
-				},
-			})
-		},
-		async matchDebtor(number) {
-			try {
-				const query = {
-					pagesize: 1,
-					page: 0,
-					filters: `primary_number='${number}'`,
-					orderBy: '',
-				}
-				const res = await api.debtor.fetchList(
-					query.pagesize,
-					query.page,
-					query.filters,
-					query.orderBy,
-				)
-				if (res.length === 0) {
-					this.$Modal.confirm({
-						content: '未能匹配对应借款人, 是否新建借款人？',
-						onOk: async () => {
-							const id = await api.debtor.profile.add({
-								realName: this.debtor.form.realName || '临时姓名 - 待修改',
-								primaryNumber: number,
-							})
-							this.$Notice.success({
-								title: '新建借款人成功',
-								duration: 3,
-							})
-							this.initDebtor(id)
-						},
-					})
-				} else {
-					this.$Notice.success({
-						title: '匹配成功',
-						duration: 3,
-					})
-					this.initDebtor(res[0].id)
-				}
-			} catch (e) {
-				this.$Message.error(e.message)
-			} finally {
-				this.debtorUnsubmitting()
-			}
-		},
-		async fetchDebtorProfile() {
-			try {
-				const res = await api.debtor.profile.fetch(this.debtor.data.profile.id)
-				this.debtor.data.profile = {
-					id: res.id,
-					realName: res.realName,
-					gender: res.gender,
-					birthday: res.birthday,
-					primaryNumber: res.primaryNumber,
-					alternativeNumber: res.alternativeNumber,
-					remark: res.remark,
-				}
-				this.initDebtorForm()
-			} catch (e) {
-				this.$Message.error(e.message)
-			} finally {
-				this.debtorUnLoading()
-				this.fetchDebtorIdentify()
-			}
-		},
-		async fetchDebtorIdentify() {
-			try {
-				const res = await api.debtor.identify.fetch(this.debtor.data.profile.id)
-				this.debtor.data.identify = {
-					idNumber: res.idNumber,
-					location: res.location,
-					frontImageUrl: res.frontImageUrl,
-					frontBlurImageUrl: res.frontBlurImageUrl,
-					backImageUrl: res.backImageUrl,
-					backBlurImageUrl: res.backBlurImageUrl,
-				}
-			} catch (e) {
-				switch (e.code) {
-					case 'D_B_GET_FAILED_ERROR':
-						this.$Notice.info({
-							title: '贷款人实名信息缺失, 正在打开相关页面',
-							duration: 3,
-						})
-						this.$router.push({
-							name: 'debtor_detail',
-							params: {
-								debtor_id: this.debtor.data.profile.id,
-							},
-						})
-						break
-					default: this.$Message.error(e.message)
-				}
-			}
-		},
 		// loan
+		foldLoan() {
+			this.loan.isFolded = true
+		},
+		openLoan() {
+			this.loan.isFolded = false
+		},
+		loanLoading() {
+			this.loan.isLoading = true
+		},
+		loanUnloading() {
+			this.loan.isLoading = false
+		},
 		loanSubmitting() {
 			this.loan.isSubmitting = true
 		},
 		loanUnsubmitting() {
 			this.loan.isSubmitting = false
 		},
-		loadLoan(id) {
-			this.$router.push({
-				name: 'loan_detail',
-				params: {
-					loan_id: id,
-				},
-			})
+		loadLoan() {
+			this.loanLoading()
+			this.fetchLoan()
+		},
+		onClickFoldLoan() {
+			this.foldLoan()
+		},
+		onClickOpenLoan() {
+			this.openLoan()
 		},
 		onClickSubmitLoan() {
 			if (this.loan.form.type) {
@@ -577,6 +379,48 @@ export default {
 				this.loanUnsubmitting()
 			}
 		},
+		async fetchLoan() {
+			try {
+				const res = await api.loan.fetch(this.$route.params.loan_id)
+				this.loan.data = {
+					id: res.id,
+					debtorId: res.debtorId,
+					agentId: res.agentId,
+					object: res.object,
+					amount: res.amount,
+					interest: res.interest,
+					approvalStatus: res.approvalStatus,
+					repaymentWay: res.repaymentWay,
+					type: res.type,
+					remark: res.remark,
+					termType: res.termType,
+					status: res.status,
+				}
+				this.loadDebtor()
+				switch (res.type) {
+					case Enum.Loan.Type.Car:
+						this.loan.data.sub = {
+							carBrand: res.sub.carBrand,
+							purchasePrice: res.sub.purchasePrice,
+							milage: res.sub.milage,
+							evaluatePrice: res.sub.evaluatePrice,
+							carFrontImageUrl: res.sub.carFrontImageUrl,
+							carBackImageUrl: res.sub.carBackImageUrl,
+							carMilageImageUrl: res.sub.carMilageImageUrl,
+							carInsideImageUrl: res.sub.carInsideImageUrl,
+							vehicleLicenseImageUrl: res.sub.vehicleLicenseImageUrl,
+							inspectionLicenseImageUrl: res.sub.inspectionLicenseImageUrl,
+						}
+						break
+					default:
+				}
+				this.initLoanForm()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUnloading()
+			}
+		},
 
 		// loan_main
 		editLoan() {
@@ -587,12 +431,23 @@ export default {
 		},
 		initLoanForm() {
 			this.loan.form = {
-				type: this.loan.data.type,
+				debtorId: this.loan.data.debtorId,
+				agentId: this.loan.data.agentId,
+				object: this.loan.data.object,
 				amount: this.loan.data.amount,
-				termType: this.loan.data.termType,
 				interest: this.loan.data.interest,
+				approvalStatus: this.loan.data.approvalStatus,
 				repaymentWay: this.loan.data.repaymentWay,
+				type: this.loan.data.type,
 				remark: this.loan.data.remark,
+				termType: this.loan.data.termType,
+				status: this.loan.data.status,
+			}
+			switch (this.loan.data.type) {
+				case Enum.Loan.Type.Car:
+					this.initCarForm()
+					break
+				default:
 			}
 		},
 		onClickEditLoan() {
@@ -614,16 +469,16 @@ export default {
 		},
 		initCarForm() {
 			this.loan.sub.car.form = {
-				carBrand: this.loan.sub.car.data.carBrand,
-				purchasePrice: this.loan.sub.car.data.purchasePrice,
-				milage: this.loan.sub.car.data.milage,
-				evaluatePrice: this.loan.sub.car.data.evaluatePrice,
-				carFrontImageUrl: this.loan.sub.car.data.carFrontImageUrl,
-				carBackImageUrl: this.loan.sub.car.data.carBackImageUrl,
-				carMilageImageUrl: this.loan.sub.car.data.carMilageImageUrl,
-				carInsideImageUrl: this.loan.sub.car.data.carInsideImageUrl,
-				vehicleLicenseImageUrl: this.loan.sub.car.data.vehicleLicenseImageUrl,
-				inspectionLicenseImageUrl: this.loan.sub.car.data.inspectionLicenseImageUrl,
+				carBrand: this.loan.data.sub.carBrand,
+				purchasePrice: this.loan.data.sub.purchasePrice,
+				milage: this.loan.data.sub.milage,
+				evaluatePrice: this.loan.data.sub.evaluatePrice,
+				carFrontImageUrl: this.loan.data.sub.carFrontImageUrl,
+				carBackImageUrl: this.loan.data.sub.carBackImageUrl,
+				carMilageImageUrl: this.loan.data.sub.carMilageImageUrl,
+				carInsideImageUrl: this.loan.data.sub.carInsideImageUrl,
+				vehicleLicenseImageUrl: this.loan.data.sub.vehicleLicenseImageUrl,
+				inspectionLicenseImageUrl: this.loan.data.sub.inspectionLicenseImageUrl,
 			}
 		},
 		onClickEditCar() {
@@ -635,6 +490,74 @@ export default {
 		},
 		onClickSaveCar() {
 			this.uneditCar()
+		},
+
+		// debtor
+		debtorLoading() {
+			this.debtor.isLoading = true
+		},
+		debtorUnLoading() {
+			this.debtor.isLoading = false
+		},
+		loadDebtor() {
+			this.debtorLoading()
+			this.fetchDebtorProfile()
+		},
+		onClickDebtorDetail() {
+			this.$router.push({
+				name: 'debtor_detail',
+				params: {
+					debtor_id: this.debtor.data.profile.id,
+				},
+			})
+		},
+		async fetchDebtorProfile() {
+			try {
+				const res = await api.debtor.profile.fetch(this.loan.data.debtorId)
+				this.debtor.data.profile = {
+					id: res.id,
+					realName: res.realName,
+					gender: res.gender,
+					birthday: res.birthday,
+					primaryNumber: res.primaryNumber,
+					alternativeNumber: res.alternativeNumber,
+					remark: res.remark,
+				}
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.debtorUnLoading()
+				this.fetchDebtorIdentify()
+			}
+		},
+		async fetchDebtorIdentify() {
+			try {
+				const res = await api.debtor.identify.fetch(this.loan.data.debtorId)
+				this.debtor.data.identify = {
+					idNumber: res.idNumber,
+					location: res.location,
+					frontImageUrl: res.frontImageUrl,
+					frontBlurImageUrl: res.frontBlurImageUrl,
+					backImageUrl: res.backImageUrl,
+					backBlurImageUrl: res.backBlurImageUrl,
+				}
+			} catch (e) {
+				switch (e.code) {
+					case 'D_B_GET_FAILED_ERROR':
+						this.$Notice.info({
+							title: '贷款人实名信息缺失, 正在打开相关页面',
+							duration: 3,
+						})
+						this.$router.push({
+							name: 'debtor_detail',
+							params: {
+								debtor_id: this.loan.data.debtorId,
+							},
+						})
+						break
+					default: this.$Message.error(e.message)
+				}
+			}
 		},
 
 		onClickImage() {
