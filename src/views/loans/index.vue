@@ -4,7 +4,7 @@
 			<Row class="margin-bottom-20" type="flex">
 				<Col :span="6">
 					<Input v-model="search.input" placeholder="请输入搜索内容...">
-						<Select v-model="search.column" slot="prepend" style="width: 60px">
+						<Select v-model="search.column" slot="prepend" style="width: 75px">
 							<template v-for="(item, index) of searchOptions">
 								<Option :value="item.title">{{item.title}}</Option>
 							</template>
@@ -21,8 +21,8 @@
 			</Row>
 			<Table
 			:loading="list.isLoading"
-			:data="products"
-			:columns="productColumns"
+			:data="loans"
+			:columns="loanColumns"
 			@on-sort-change="onClickSort"
 			stripe
 			border>
@@ -49,16 +49,16 @@ export default {
 			},
 			search: {
 				isSearching: false,
-				column: 'ID',
+				column: '编号',
 				input: '',
 				maxLength: 10,
 			},
-			products: [],
-			productColumns: [ // TODO: columns detail needing
+			loans: [],
+			loanColumns: [ // TODO: columns detail needing
 				{
 					name: 'loanId',
 					title: '编号',
-					key: 'loanId',
+					key: 'id',
 					searchable: true,
 				},
 				{
@@ -109,6 +109,18 @@ export default {
 					title: '审核状态',
 					key: 'approvalStatus',
 				},
+				{
+					title: '操作',
+					align: 'center',
+					render: (h, params) =>
+						h('div', [
+							h('Button', {
+								props: { type: 'primary',	size: 'small', loading: this.loans[params.index].isViewing },
+								style: { marginRight: '5px' },
+								on: {	click: () => this.onClickViewLoan(params.index) },
+							}, '查看'),
+						]),
+				},
 			],
 
 			// add
@@ -119,16 +131,64 @@ export default {
 			},
 		}
 	},
+	mounted() {
+		this.initPage()
+	},
 	computed: {
 		searchOptions() {
 			const list = []
-			this.productColumns.forEach((item) => {
+			this.loanColumns.forEach((item) => {
 				if (item.searchable) list.push({ name: item.name, title: item.title })
 			})
 			return list
 		},
 	},
 	methods: {
+		// main
+		initPage() {
+			this.listLoading()
+			this.fetchLoanList()
+		},
+		// list
+		listLoading() {
+			this.list.isLoading = true
+		},
+		listUnloading() {
+			this.list.isLoading = false
+		},
+		loanViewing(index) {
+			this.loans[index].isViewing = true
+		},
+		loanUnviewing(index) {
+			this.loans[index].isViewing = false
+		},
+		onClickViewLoan(index) {
+			this.loanViewing(index)
+			this.viewLoan(index)
+		},
+		viewLoan(index) {
+			this.$router.push({
+				name: 'loan_detail',
+				params: {
+					loan_id: this.loans[index].id,
+				},
+			})
+		},
+		async fetchLoanList() {
+			try {
+				const list = await api.loan.fetchList(
+					this.list.pagesize,
+					this.list.page,
+					this.list.filters,
+					this.list.orderBy,
+				)
+				this.loans = list
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.listUnloading()
+			}
+		},
 		// search / sort
 		onClickSearchOption(name) {
 			this.search.column = name
