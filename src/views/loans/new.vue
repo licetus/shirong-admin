@@ -424,17 +424,22 @@ export default {
 					this.$Modal.confirm({
 						content: '未能匹配对应借款人, 是否新建借款人？',
 						onOk: async () => {
-							const res = await api.debtor.profile.add({
-								realName: this.debtor.form.realName || '',
+							const id = await api.debtor.profile.add({
+								realName: this.debtor.form.realName || '临时姓名 - 待修改',
 								primaryNumber: number,
 							})
-							this.$Message.info('新建借款人成功')
+							this.$Notice.success({
+								title: '新建借款人成功',
+								duration: 3,
+							})
 							this.initDebtor(id)
 						},
 					})
-				}
-				else {
-					this.$Message.info('该号码已存在, 正在获取数据...')
+				} else {
+					this.$Notice.success({
+						title: '匹配成功',
+						duration: 3,
+					})
 					this.initDebtor(res[0].id)
 				}
 			} catch (e) {
@@ -477,7 +482,10 @@ export default {
 			} catch (e) {
 				switch (e.code) {
 					case 'D_B_GET_FAILED_ERROR':
-						this.$Message.error('错误: 借款人身份认证信息缺失, 即将打开相关页面')
+						this.$Notice.warning({
+							title: '贷款人实名信息缺失, 正在打开相关页面',
+							duration: 3,
+						})
 						this.$router.push({
 							name: 'debtor_detail',
 							params: {
@@ -487,7 +495,6 @@ export default {
 						break
 					default: this.$Message.error(e.message)
 				}
-			} finally {
 			}
 		},
 		// loan
@@ -508,26 +515,26 @@ export default {
 		onClickSubmitLoan() {
 			if (this.loan.form.type) {
 				const subMapping = ['', 'other', 'car']
-				const loanCheck = this.$refs.loanForm.validate((valid) => valid)
-				const subCheck = this.$refs[`${subMapping[this.loan.form.type]}Form`].validate((valid) => valid)
+				const loanCheck = this.$refs.loanForm.validate(valid => valid)
+				const subCheck = this.$refs[`${subMapping[this.loan.form.type]}Form`].validate(valid => valid)
 				if (loanCheck && subCheck) {
 					let sub = {}
 					switch (this.loan.form.type) {
 						case Enum.Loan.Type.Car:
-						sub = {
-							carBrand: this.loan.sub.car.form.carBrand,
-							purchasePrice: this.loan.sub.car.form.purchasePrice,
-							milage: this.loan.sub.car.form.milage,
-							evaluatePrice: this.loan.sub.car.form.evaluatePrice,
-							carFrontImageUrl: this.loan.sub.car.form.carFrontImageUrl,
-							carBackImageUrl: this.loan.sub.car.form.carBackImageUrl,
-							carMilageImageUrl: this.loan.sub.car.form.carMilageImageUrl,
-							carInsideImageUrl: this.loan.sub.car.form.carInsideImageUrl,
-							vehicleLicenseImageUrl: this.loan.sub.car.form.vehicleLicenseImageUrl,
-							inspectionLicenseImageUrl: this.loan.sub.car.form.inspectionLicenseImageUrl,
-						}
-						break
-						default: return null
+							sub = {
+								carBrand: this.loan.sub.car.form.carBrand,
+								purchasePrice: this.loan.sub.car.form.purchasePrice,
+								milage: this.loan.sub.car.form.milage,
+								evaluatePrice: this.loan.sub.car.form.evaluatePrice,
+								carFrontImageUrl: this.loan.sub.car.form.carFrontImageUrl,
+								carBackImageUrl: this.loan.sub.car.form.carBackImageUrl,
+								carMilageImageUrl: this.loan.sub.car.form.carMilageImageUrl,
+								carInsideImageUrl: this.loan.sub.car.form.carInsideImageUrl,
+								vehicleLicenseImageUrl: this.loan.sub.car.form.vehicleLicenseImageUrl,
+								inspectionLicenseImageUrl: this.loan.sub.car.form.inspectionLicenseImageUrl,
+							}
+							break
+						default:
 					}
 					const loan = {
 						debtorId: this.debtor.data.profile.id,

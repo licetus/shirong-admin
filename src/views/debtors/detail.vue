@@ -280,7 +280,7 @@ export default {
 				this.loadCredit()
 			} catch (e) {
 				switch (e.code) {
-					case 'D_B_GET_FAILED_ERROR': {}
+					case 'D_B_GET_FAILED_ERROR':
 						this.$Message.error('错误: 未知的借款人ID')
 						this.closePage()
 						this.$router.go(-1)
@@ -448,8 +448,11 @@ export default {
 				this.initIdentifyForm()
 			} catch (e) {
 				switch (e.code) {
-					case 'D_B_GET_FAILED_ERROR': {}
-						this.$Message.info('未创建实名信息')
+					case 'D_B_GET_FAILED_ERROR':
+						this.$Notice.warning({
+							title: '实名信息缺失, 请补全',
+							duration: 3,
+						})
 						break
 					default:
 						this.$Message.error(e.message)
@@ -542,8 +545,11 @@ export default {
 				this.initCreditForm()
 			} catch (e) {
 				switch (e.code) {
-					case 'D_B_GET_FAILED_ERROR': {}
-						this.$Message.info('未创建信用信息')
+					case 'D_B_GET_FAILED_ERROR':
+						this.$Notice.warning({
+							title: '信用信息缺失, 请补全',
+							duration: 3,
+						})
 						break
 					default:
 						this.$Message.error(e.message)

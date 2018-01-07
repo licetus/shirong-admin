@@ -135,7 +135,10 @@ export default {
 		},
 		onClickSearch() {
 			if (util.inputLengthCheck(this.search.input, this.search.maxLength, this)) {
-				this.$Message.info(`搜索: [${this.search.column}] - [${this.search.input}]`)
+				this.$Notice.open({
+					title: `搜索: [${this.search.column}] - [${this.search.input}]`,
+					duration: 3,
+				})
 			}
 		},
 		onClickSort() {
@@ -172,25 +175,43 @@ export default {
 					filters: `primary_number='${this.add.number}'`,
 					orderBy: '',
 				}
-				const res = await api.debtor.fetchList(
+				const list = await api.debtor.fetchList(
 					query.pagesize,
 					query.page,
 					query.filters,
 					query.orderBy,
 				)
 				let debtorId = null
-				if (res.length === 0) {
-					const res = await api.debtor.profile.add({
-						realName: '',
-						primaryNumber: this.add.number,
+				if (list.length === 0) {
+					this.$Modal.confirm({
+						content: '未能匹配对应借款人, 是否新建借款人？',
+						onOk: async () => {
+							try {
+								const id = await api.debtor.profile.add({
+									realName: '临时姓名 - 待修改',
+									primaryNumber: this.add.number,
+								})
+								this.$Notice.success({
+									title: '新建借款人成功',
+									duration: 3,
+								})
+								debtorId = id
+							} catch (e) {
+								this.$Message.error(e.message)
+							}
+						},
 					})
-					debtorId = res
-					this.$Message.info('新建借款人成功')
+				} else {
+					debtorId = list[0].id
+					this.$Notice.success({
+						title: '匹配成功',
+						duration: 3,
+					})
 				}
-				else {
-					debtorId = res[0].id
-					this.$Message.info('该号码已存在, 正在获取数据...')
-				}
+				this.$Notice.info({
+					title: '正在前往新增贷款页面...',
+					duration: 3,
+				})
 				this.addLoan(debtorId)
 			} catch (e) {
 				this.$Message.error(e.message)
