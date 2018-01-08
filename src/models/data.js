@@ -5,7 +5,7 @@ export function Loan() {
 	this.debtorId = null
 	this.agentId = null
 	this.amount = 0
-	this.interest = 0
+	this.interestRate = 0
 	this.termType = null
 	this.repaymentWay = null
 	this.remark = ''
