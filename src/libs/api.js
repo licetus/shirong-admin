@@ -171,8 +171,8 @@ api.product = {
 		fetch: async id =>
 			createAuthInstance().get(`product/tag/${id}`).then(res => res.data),
 	},
-	add: async params =>
-		createAuthInstance().post('product', params).then(res => res.data),
+	add: async (params, id) =>
+		createAuthInstance().post(`product/${id}`, params).then(res => res.data),
 	delete: async id =>
 		createAuthInstance().delete(`product/${id}`).then(res => res.data),
 	update: async (params, id) =>

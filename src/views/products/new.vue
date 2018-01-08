@@ -5,54 +5,50 @@
 				<Card>
 					<Spin v-if="product.profile.isLoading" size="large" fix></Spin>
 					<p slot="title">
-						Profile
+						基础信息
 					</p>
-					<div v-if="isEditVisible" slot="extra">
+					<div slot="extra">
 						<div v-if="!product.profile.isEditable">
+							<Button type="text" @click="onClickOpenLoanList">贷款列表</Button>
 							<Button type="text" @click="onClickEditProfile">编辑</Button>
 						</div>
 						<div v-else>
+							<Button type="text" @click="onClickOpenLoanList">贷款列表</Button>
 							<Button type="text" @click="onClickCancelProfile">取消</Button>
 							<Button type="text" @click="onClickSaveProfile" :loading="product.profile.isSaving">保存</Button>
 						</div>
 					</div>
 					<Form ref="profileForm" :model="product.profile.form" :rules="product.profile.rules" label-position="left" :label-width="product.profile.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="项目状态">
-								<p>{{util.getProductStatus(product.data.status)}}</p>
-							</FormItem></Col>
-							<Col :span="8"><FormItem label="项目类型">
-								<p>{{util.getLoanType(loan.data.main.type)}}</p>
-							</FormItem></Col>
-						</Row>
-						<Row>
-							<Col :span="8"><FormItem label="项目名称">
+							<Col :span="12"><FormItem label="项目名称">
 								<p v-if="!product.profile.isEditable">{{product.profile.form.name}}</p>
 								<Input v-else v-model="product.profile.form.name" />
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="项目标签">测试数据</FormItem></Col>
-							<Col :span="8"><FormItem label="排名参数">
+							<Col :span="12"><FormItem label="项目类型">
+								<p>{{util.getLoanType(this, loan.data.main.type)}}</p>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="项目标签">测试数据</FormItem></Col>
+							<Col :span="12"><FormItem label="排名参数">
 								<p v-if="!product.profile.isEditable">{{product.profile.form.rankingScore}}</p>
 								<InputNumber v-else v-model="product.profile.form.rankingScore" :min="0" :max="9.99" :step="0.1"></InputNumber>
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="项目备注">
-								<p>{{product.profile.form.remark}}</p>
+							<Col :span="24"><FormItem label="项目备注">
+								<p v-if="!product.profile.isEditable">{{product.profile.form.remark}}</p>
+								<Input v-else v-model="product.profile.form.remark" type="textarea" :rows="1"/>
 							</FormItem></Col>
-						</Row>
-						<Row>
-							<Col :span="8"><FormItem label="创建时间">{{util.formatTime(product.data.createTime)}}</FormItem></Col>
-							<Col :span="8"><FormItem label="修改时间">{{util.formatTime(product.data.lastUpdateTime)}}</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
 					<Spin v-if="product.finance.isLoading" size="large" fix></Spin>
 					<p slot="title">
-						Finance
+						详细信息
 					</p>
-					<div v-if="isEditVisible" slot="extra">
+					<div slot="extra">
 						<div v-if="!product.finance.isEditable">
 							<Button type="text" @click="onClickEditFinance">编辑</Button>
 						</div>
@@ -61,11 +57,10 @@
 							<Button type="text" @click="onClickSaveFinance" :loading="product.finance.isSaving">保存</Button>
 						</div>
 					</div>
-					<Form :model="product.finance.form" :rules="product.finance.rules" label-position="left" :label-width="product.finance.labelWidth" inline>
+					<Form ref="financeForm" :model="product.finance.form" :rules="product.finance.rules" label-position="left" :label-width="product.finance.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="项目总额"><p>{{product.data.amount}}</p></FormItem></Col>
-							<Col :span="8"><FormItem label="项目周期"><p>{{util.getProductTermType(product.data.termType)}}</p></FormItem></Col>
-							<Col :span="8"><FormItem label="项目进度"><p>{{product.data.currentInvestment}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="项目总额"><p>{{product.finance.form.amount}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="项目周期"><p>{{util.getLoanTermType(this, loan.data.main.termType)}}</p></FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="8"><FormItem label="基础利率">
@@ -82,15 +77,20 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="还款方式"><p>{{util.getLoanRepaymentWay(loan.data.main.repaymentWay)}}</p></FormItem></Col>
-							<Col :span="8"><FormItem label="计息方式"><p>{{util.getProductInterestWay(product.data.interestWay)}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="还款方式"><p>{{util.getLoanRepaymentWay(this, loan.data.main.repaymentWay)}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="计息方式">
+								<p v-if="!product.finance.isEditable">{{util.getProductInterestWay(this, product.finance.form.interestWay) || '-'}}</p>
+								<RadioGroup v-else v-model="product.finance.form.interestWay">
+									<Radio :label="Enum.Product.InterestWay.ObjectCompleted">{{util.getProductInterestWay(this, Enum.Product.InterestWay.ObjectCompleted)}}</Radio>
+								</RadioGroup>
+							</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
-				<Card class="margin-top-10">
+				<Card v-if="product.data.id" class="margin-top-10">
 					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">
-						Loan Information
+						借款人
 					</p>
 					<div slot="extra">
 						<Button type="text" @click="onClickLoanDetail">详情</Button>
@@ -115,48 +115,6 @@
 								<Row><Col :span="18"><SafeImg :src="loan.data.debtor.identify.backImageUrl" type="certificate-md"></SafeImg></Col></Row>
 							</FormItem></Col>
 						</Row>
-						<div v-if="loan.data.main.type === Enum.Loan.Type.Car">
-							<Row>
-								<Col :span="12"><FormItem label="车辆型号">
-									<p>{{loan.data.sub.car.carBrand}}</p>
-								</FormItem></Col>
-								<Col :span="12"><FormItem label="购买价格">
-									<p>{{loan.data.sub.car.purchasePrice}}</p>
-								</FormItem></Col>
-							</Row>
-							<Row>
-								<Col :span="12"><FormItem label="行驶里程">
-									<p>{{loan.data.sub.car.milage}}</p>
-								</FormItem></Col>
-								<Col :span="12"><FormItem label="评估价格">
-									<p>{{loan.data.sub.car.evaluatePrice}}</p>
-								</FormItem></Col>
-							</Row>
-							<Row>
-								<Col :span="12"><FormItem label="车辆行驶证">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.vehicleLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
-								</FormItem></Col>
-								<Col :span="12"><FormItem label="车辆检验证">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.inspectionLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
-								</FormItem></Col>
-							</Row>
-							<Row>
-								<Col :span="12"><FormItem label="车辆正面照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carFrontImageUrl" type="photo-sm"></SafeImg></Col></Row>
-								</FormItem></Col>
-								<Col :span="12"><FormItem label="车辆背面照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carBackImageUrl" type="photo-sm"></SafeImg></Col></Row>
-								</FormItem></Col>
-							</Row>
-							<Row>
-								<Col :span="12"><FormItem label="车辆里程照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carMilageImageUrl" type="photo-sm"></SafeImg></Col></Row>
-								</FormItem></Col>
-								<Col :span="12"><FormItem label="车辆内饰照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carInsideImageUrl" type="photo-sm"></SafeImg></Col></Row>
-								</FormItem></Col>
-							</Row>
-						</div>
 					</Form>
 				</Card>
 			</Col>
@@ -164,53 +122,114 @@
 				<!-- TODO need add auth check -->
 				<Card class="margin-bottom-10">
 					<p slot="title">
-						Control
+						操作
 					</p>
-					<Row>
-						<Col :span="4">
-							<Button long>暂停</Button>
-						</Col>
-						<Col :span="4" :offset="1">
-							<Button type="error" long>停止</Button>
-						</Col>
-					</Row>
-				</Card>
-				<Card>
-					<p slot="title">
-						Sale
-					</p>
-					<Form label-position="left" :label-width="sale.labelWidth">
-						<FormItem label="上架状态">{{util.getProductSaleStatus(product.isOnSale)}}</FormItem>
-						<FormItem label="上架时间">{{util.formatTime(product.data.publishTime)}}</FormItem>
+					<Form>
+						<FormItem>
+							<Button type="text" @click="onClickOpenLoanList">打开贷款列表</Button>
+						</FormItem>
+						<FormItem>
+							<Row>
+								<Col :span="4">
+									<!-- TODO need to handle reset -->
+									<Button type="ghost">重置</Button>
+								</Col>
+								<Col :span="4" :offset="2">
+									<Button type="primary" @click="onClickSubmitProduct" :loading="isSubmitting" :disabled="!this.product.data.id">提交</Button>
+								</Col>
+							</Row>
+						</FormItem>
 					</Form>
 				</Card>
-				<Card class="margin-top-10">
+				<Card class="margin-top-10" v-if="loan.data.main.type === Enum.Loan.Type.Car">
+					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">
-						Investment Record
+						车辆信息
 					</p>
-					<Table :data="investmentRecord.data" :columns="investmentRecord.columns"></Table>
-				</Card>
-				<Card class="margin-top-10">
-					<p slot="title">
-						Approval
-					</p>
-					<Form :model="approval.form" label-position="left" :label-width="approval.labelWidth">
-						<FormItem label="业务员">测试数据</FormItem>
-						<FormItem label="评估内容">测试数据</FormItem>
-						<FormItem label="审核员">测试数据</FormItem>
-						<FormItem label="审核意见">测试数据</FormItem>
-						<FormItem label="提交时间">测试数据</FormItem>
-						<FormItem label="修改时间">测试数据</FormItem>
+					<div slot="extra">
+						<Button type="text" @click="onClickLoanDetail">详情</Button>
+					</div>
+					<Form :model="loan" label-position="left" :label-width="loan.labelWidth" inline>
+						<Row>
+							<Col :span="12"><FormItem label="车辆型号">
+								<p>{{loan.data.sub.car.carBrand}}</p>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="购买价格">
+								<p>{{loan.data.sub.car.purchasePrice}}</p>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="行驶里程">
+								<p>{{loan.data.sub.car.milage}}</p>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="评估价格">
+								<p>{{loan.data.sub.car.evaluatePrice}}</p>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="24"><FormItem label="备注">
+								<p>{{loan.data.remark}}</p>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="车辆行驶证">
+								<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.vehicleLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆检验证">
+								<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.inspectionLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="车辆正面照">
+								<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carFrontImageUrl" type="photo-sm"></SafeImg></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆背面照">
+								<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carBackImageUrl" type="photo-sm"></SafeImg></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="车辆里程照">
+								<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carMilageImageUrl" type="photo-sm"></SafeImg></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆内饰照">
+								<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carInsideImageUrl" type="photo-sm"></SafeImg></Col></Row>
+							</FormItem></Col>
+						</Row>
 					</Form>
 				</Card>
 			</Col>
 		</Row>
+
+		<Modal v-model="loans.isModalVisible" class="table-modal" width="75">
+			<Row class="modal-header-row">
+				<Col :span="16">
+					<Input v-model="loans.search.val" placeholder="请输入搜索内容...">
+						<Select v-model="loans.search.key" slot="prepend" style="width: 75px">
+							<template v-for="(item, index) of searchOptions">
+								<Option :value="item.key" :label="item.title"></Option>
+							</template>
+						</Select>
+						<Button slot="append" icon="ios-search" @click="onClickSearchDebtor" :loading="loans.list.isLoading"></Button>
+					</Input>
+				</Col>
+				<Col :span="8">
+					<Button type="text" @click="onClickNewLoan">新增贷款<Icon class="margin-left-10" type="plus-round"></Icon></Button>
+				</Col>
+			</Row>
+			<Table
+				:loading="loans.list.isLoading"
+				:data="loans.data"
+				:columns="loans.columns"
+				@on-row-click="onClickRow">
+			</Table>
+			<div slot="footer"></div>
+		</Modal>
 	</section>
 </template>
 
 <script>
 import Cookies from 'js-cookie'
-import { Loan, Car, LoanComment, Product, Debtor } from '../../models/data'
+import { Loan, Car, Product, Debtor } from '../../models/data'
 import util from '../../libs/util'
 import api from '../../libs/api'
 import Enum from '../../models/enum'
@@ -223,19 +242,18 @@ export default {
 			debtor: new Debtor(),
 			loan: new Loan(),
 			car: new Car(),
-			loanComment: new LoanComment(),
 		}
 		return {
 			Enum,
 			util,
 			access: parseInt(Cookies.get('access'), 10),
-			loanComment: blank.loanComment,
+			isSubmitting: false,
 			product: {
 				data: blank.product,
 				profile: {
 					labelWidth: 75,
 					isLoading: false,
-					isEditable: false,
+					isEditable: true,
 					isSaving: false,
 					form: {
 						name: blank.product.name,
@@ -248,7 +266,7 @@ export default {
 				finance: {
 					labelWidth: 75,
 					isLoading: false,
-					isEditable: false,
+					isEditable: true,
 					isSaving: false,
 					form: {
 						amount: blank.product.amount,
@@ -262,6 +280,64 @@ export default {
 					},
 					rules: {},
 				},
+			},
+			loans: {
+				isModalVisible: false,
+				search: {
+					key: 'object',
+					val: '',
+				},
+				list: {
+					isLoading: false,
+					pagesize: 10,
+					page: 0,
+					filters: '',
+					orderBy: '',
+				},
+				data: [],
+				columns: [
+					{
+						name: 'type',
+						title: '类型',
+						key: 'type',
+						searchable: true,
+					},
+					{
+						name: 'object',
+						title: '标的',
+						key: 'object',
+						searchable: true,
+					},
+					{
+						name: 'amount',
+						title: '金额',
+						key: 'amount',
+						searchable: true,
+					},
+					{
+						name: 'interestRate',
+						title: '利率',
+						key: 'interestRate',
+					},
+					{
+						name: 'debtorName',
+						title: '借款人',
+						key: 'debtorName',
+						searchable: true,
+					},
+					{
+						name: 'debtorNumber',
+						title: '手机',
+						key: 'debtorNumber',
+						searchable: true,
+					},
+					{
+						name: 'remark',
+						title: '备注',
+						key: 'remark',
+						searchable: true,
+					},
+				],
 			},
 			loan: {
 				labelWidth: 75,
@@ -318,14 +394,12 @@ export default {
 		}
 	},
 	computed: {
-		isControlVisible() {
-			return this.access === Enum.Role.SuperAdmin
-		},
-		isEditVisible() {
-			return this.access <= Enum.Role.Admin
-		},
-		isOnSale() {
-			return this.product.data.isOnSale ? '已上架' : '未上架'
+		searchOptions() {
+			const list = []
+			this.loans.columns.forEach((item) => {
+				if (item.searchable) list.push({ key: item.key, title: item.title })
+			})
+			return list
 		},
 	},
 	mounted() {
@@ -334,46 +408,104 @@ export default {
 	methods: {
 		// main
 		initPage() {
-			this.loadProduct()
+			this.onClickOpenLoanList()
 		},
-		loadProduct() {
-			this.profileLoading()
-			this.financeLoading()
-			this.loanLoading()
-			this.fetchProduct()
+		productSubmit() {
+			this.isSubmitting = true
 		},
-		async fetchProduct() {
-			try {
-				const product = await api.product.fetch(this.$route.params.product_id)
-				this.product.data = {
-					id: product.id,
-					loanId: product.loanId,
-					amount: product.amount,
-					status: product.status,
-					isOnSale: product.isOnSale,
-					startInterestTime: product.startInterestTime,
-					publishTime: product.publishTime,
-					termType: product.termType,
-					name: product.name,
-					remark: product.remark,
-					rankingScore: product.rankingScore,
-					tagId: product.tagId,
-					interestRateBase: product.interestRateBase,
-					interestRateDelta: product.interestRateDelta,
-					minInvestment: product.minInvestment,
-					interestWay: product.interestWay,
-					currentInvestment: product.currentInvestment,
+		productUnsubmit() {
+			this.isSubmitting = false
+		},
+		onClickSubmitProduct() {
+			const profile = this.$refs.profileForm.validate(valid => valid)
+			const finance = this.$refs.profileForm.validate(valid => valid)
+			if (profile && finance) {
+				const product = {
+					id: this.product.data.id,
+					amount: this.product.finance.form.amount,
+					termType: this.loan.data.main.termType,
+					name: this.product.profile.form.name,
+					remark: this.product.profile.form.remark,
+					tagId: this.product.profile.form.tagId,
+					interestRateBase: this.product.finance.form.interestRateBase,
+					interestRateDelta: this.product.finance.form.interestRateDelta,
+					minInvestment: this.product.finance.form.minInvestment,
+					interestWay: this.product.finance.form.interestWay,
 				}
-				this.loanLoan()
-				this.initProfileForm()
-				this.initFinanceForm()
+				this.productSubmit()
+				this.addProduct(product)
+			}
+		},
+		async addProduct(product) {
+			try {
+				const res = await api.product.add(product, this.product.data.id)
+				this.$router.replace({
+					name: 'product_detail',
+					params: {
+						product_id: res,
+					},
+				})
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
-				this.profileUnloading()
-				this.financeUnloading()
+				this.productUnsubmit()
 			}
 		},
+		// loans
+		showLoansModal() {
+			this.loans.isModalVisible = true
+		},
+		hideLoansModal() {
+			this.loans.isModalVisible = false
+		},
+		listLoading() {
+			this.loans.list.isLoading = true
+		},
+		listUnloading() {
+			this.loans.list.isLoading = false
+		},
+		generateSearchFilters() {
+			this.loans.list.filters = `${this.loans.search.key} LIKE '%${this.loans.search.val}%'`
+		},
+		onClickOpenLoanList() {
+			this.showLoansModal()
+			this.listLoading()
+			this.fetchLoanList()
+		},
+		onClickSearchDebtor() {
+			if (this.loans.search.val && util.inputLengthCheck(this.loans.search.val, 20, this)) {
+				this.generateSearchFilters()
+				this.listLoading()
+				this.fetchLoanList()
+			}
+		},
+		onClickNewLoan() {
+			this.$router.push({
+				name: 'loan_new',
+			})
+			this.hideLoansModal()
+		},
+		onClickRow(params) {
+			this.hideLoansModal()
+			this.initLoan(params.id)
+			this.loadLoan()
+		},
+		async fetchLoanList() {
+			try {
+				const res = await api.loan.fetchAvailableList(
+					this.loans.list.pagesize,
+					this.loans.list.page,
+					this.loans.list.filters,
+					this.loans.list.orderBy,
+				)
+				this.loans.data = res
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.listUnloading()
+			}
+		},
+
 		// profile
 		onClickEditProfile() {
 			this.editProfile()
@@ -399,11 +531,17 @@ export default {
 		},
 		initProfileForm() {
 			this.product.profile.form = {
-				name: this.product.data.name,
+				name: this.loan.data.main.object,
 				tagId: this.product.data.tagId,
 				rankingScore: this.product.data.rankingScore,
 				remark: this.product.data.remark,
 			}
+		},
+		updateProduct() {
+			this.initProfileForm()
+			this.profileUnloading()
+			this.initFinanceForm()
+			this.financeUnloading()
 		},
 		// finance
 		onClickEditFinance() {
@@ -430,6 +568,8 @@ export default {
 		},
 		initFinanceForm() {
 			this.product.finance.form = {
+				amount: this.loan.data.main.amount,
+				termType: this.loan.data.main.termType,
 				interestRateBase: this.product.data.interestRateBase,
 				interestRateDelta: this.product.data.interestRateDelta,
 				minInvestment: this.product.data.minInvestment,
@@ -442,13 +582,18 @@ export default {
 		loanUnloading() {
 			this.loan.isLoading = false
 		},
-		loanLoan() {
+		initLoan(id) {
+			this.product.data.id = id
+		},
+		loadLoan() {
 			this.loanLoading()
+			this.profileLoading()
+			this.financeLoading()
 			this.fetchLoan()
 		},
 		async fetchLoan() {
 			try {
-				const loan = await api.loan.fetch(this.product.data.loanId)
+				const loan = await api.loan.fetch(this.product.data.id)
 				this.loan.data.main = {
 					id: loan.id,
 					debtorId: loan.debtorId,
@@ -481,6 +626,7 @@ export default {
 						break
 					default:
 				}
+				this.updateProduct()
 				try {
 					const debtorProfile = await api.debtor.profile.fetch(loan.debtorId)
 					this.loan.data.debtor.profile = {
@@ -503,7 +649,6 @@ export default {
 						backBlurImageUrl: debtorIdentify.backBlurImageUrl,
 						location: debtorIdentify.location,
 					}
-					console.log('here')
 				} catch (e) {
 					this.$Message.error(e.message)
 				}
@@ -515,9 +660,9 @@ export default {
 		},
 		onClickLoanDetail() {
 			this.$router.push({
-				name: 'customer_detail',
+				name: 'loan_detail',
 				params: {
-					customer_id: 1,
+					loan_id: this.product.data.id,
 				},
 			})
 		},
@@ -531,4 +676,5 @@ export default {
 
 <style lang="less">
 @import '../../styles/common.less';
+@import '../../styles/public.less';
 </style>

@@ -5,7 +5,7 @@
 				<Card>
 					<Spin v-if="product.profile.isLoading" size="large" fix></Spin>
 					<p slot="title">
-						Profile
+						基本信息
 					</p>
 					<div v-if="isEditVisible" slot="extra">
 						<div v-if="!product.profile.isEditable">
@@ -19,10 +19,10 @@
 					<Form ref="profileForm" :model="product.profile.form" :rules="product.profile.rules" label-position="left" :label-width="product.profile.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="项目状态">
-								<p>{{util.getProductStatus(product.data.status)}}</p>
+								<p>{{util.getProductStatus(this, product.data.status)}}</p>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目类型">
-								<p>{{util.getLoanType(loan.data.main.type)}}</p>
+								<p>{{util.getLoanType(this, loan.data.main.type)}}</p>
 							</FormItem></Col>
 						</Row>
 						<Row>
@@ -42,15 +42,15 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="创建时间">{{util.formatTime(product.data.createTime)}}</FormItem></Col>
-							<Col :span="8"><FormItem label="修改时间">{{util.formatTime(product.data.lastUpdateTime)}}</FormItem></Col>
+							<Col :span="8"><FormItem label="创建时间">{{util.formatTime(this, product.data.createTime)}}</FormItem></Col>
+							<Col :span="8"><FormItem label="修改时间">{{util.formatTime(this, product.data.lastUpdateTime)}}</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
 					<Spin v-if="product.finance.isLoading" size="large" fix></Spin>
 					<p slot="title">
-						Finance
+						详细信息
 					</p>
 					<div v-if="isEditVisible" slot="extra">
 						<div v-if="!product.finance.isEditable">
@@ -64,7 +64,7 @@
 					<Form :model="product.finance.form" :rules="product.finance.rules" label-position="left" :label-width="product.finance.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="项目总额"><p>{{product.data.amount}}</p></FormItem></Col>
-							<Col :span="8"><FormItem label="项目周期"><p>{{util.getProductTermType(product.data.termType)}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="项目周期"><p>{{util.getProductTermType(this, product.data.termType)}}</p></FormItem></Col>
 							<Col :span="8"><FormItem label="项目进度"><p>{{product.data.currentInvestment}}</p></FormItem></Col>
 						</Row>
 						<Row>
@@ -82,15 +82,15 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="还款方式"><p>{{util.getLoanRepaymentWay(loan.data.main.repaymentWay)}}</p></FormItem></Col>
-							<Col :span="8"><FormItem label="计息方式"><p>{{util.getProductInterestWay(product.data.interestWay)}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="还款方式"><p>{{util.getLoanRepaymentWay(this, loan.data.main.repaymentWay)}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="计息方式"><p>{{util.getProductInterestWay(this, product.data.interestWay)}}</p></FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
 					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">
-						Loan Information
+						贷款信息
 					</p>
 					<div slot="extra">
 						<Button type="text" @click="onClickLoanDetail">详情</Button>
@@ -164,7 +164,7 @@
 				<!-- TODO need add auth check -->
 				<Card class="margin-bottom-10">
 					<p slot="title">
-						Control
+						控制台
 					</p>
 					<Row>
 						<Col :span="4">
@@ -177,7 +177,7 @@
 				</Card>
 				<Card>
 					<p slot="title">
-						Sale
+						上架状态
 					</p>
 					<Form label-position="left" :label-width="sale.labelWidth">
 						<FormItem label="上架状态">{{util.getProductSaleStatus(product.isOnSale)}}</FormItem>
@@ -186,13 +186,13 @@
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">
-						Investment Record
+						投资记录
 					</p>
 					<Table :data="investmentRecord.data" :columns="investmentRecord.columns"></Table>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">
-						Approval
+						审核信息
 					</p>
 					<Form :model="approval.form" label-position="left" :label-width="approval.labelWidth">
 						<FormItem label="业务员">测试数据</FormItem>
@@ -347,7 +347,6 @@ export default {
 				const product = await api.product.fetch(this.$route.params.product_id)
 				this.product.data = {
 					id: product.id,
-					loanId: product.loanId,
 					amount: product.amount,
 					status: product.status,
 					isOnSale: product.isOnSale,
@@ -448,7 +447,7 @@ export default {
 		},
 		async fetchLoan() {
 			try {
-				const loan = await api.loan.fetch(this.product.data.loanId)
+				const loan = await api.loan.fetch(this.product.data.id)
 				this.loan.data.main = {
 					id: loan.id,
 					debtorId: loan.debtorId,
