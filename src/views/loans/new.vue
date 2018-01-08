@@ -4,7 +4,8 @@
 			<Col :span="16" class="padding-right-5">
 				<Card>
 					<Spin v-if="debtor.isLoading" size="large" fix></Spin>
-					<p slot="title">借款人信息</p>
+					<p v-if="debtor.data.profile.id" slot="title">借款人: {{debtor.data.profile.id}}</p>
+					<p v-else slot="title">借款人信息</p>
 					<div slot="extra">
 						<Button type="text" @click="onClickOpenDebtorList">列表</Button>
 						<Button type="text" @click="onClickRefreshDebtor" :loading="debtor.isLoading">刷新</Button>
@@ -39,19 +40,7 @@
 						</Row>
 					</Form>
 				</Card>
-			</Col>
-			<Col :span="8" class="padding-left-5">
-				<Card>
-					<p slot="title">操作</p>
-						<Row  type="flex" justify="center"><Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">保存</Button></Row>
-						<Row class="margin-top-10" type="flex" justify="center"><Button>取消</Button></Row>
-						<Row class="margin-top-10" type="flex" justify="center"><Button type="error">删除</Button></Row>
-				</Card>
-			</Col>
-		</Row>
-		<Row class="margin-top-10">
-			<Col :span="16" class="padding-right-5">
-				<Card>
+				<Card class="margin-top-10">
 					<p slot="title">贷款信息</p>
 					<div v-if="isEditable" slot="extra">
 						<div v-if="!loan.isEditable">
@@ -113,9 +102,73 @@
 						</Row>
 					</Form>
 				</Card>
+				<Card v-if="isCarPaneVisible" class="margin-top-10">
+					<p slot="title">车辆详情</p>
+					<div v-if="isEditable" slot="extra">
+						<div v-if="!loan.sub.car.isEditable">
+							<Button type="text" @click="onClickEditCar">编辑</Button>
+						</div>
+						<div v-else>
+							<Button type="text" @click="onClickResetCar">重置</Button>
+							<Button type="text" @click="onClickSaveCar">保存</Button>
+						</div>
+					</div>
+					<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
+						<Row>
+							<Col :span="12"><FormItem label="品牌型号">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.carBrand}}</p>
+								<Input v-else v-model="loan.sub.car.form.carBrand" />
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="购买价格">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.purchasePrice}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.purchasePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="行驶里程">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.milage}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.milage" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="评估价格">
+								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.evaluatePrice}}</p>
+								<InputNumber v-else v-model="loan.sub.car.form.evaluatePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+							</FormItem></Col>
+						</Row>
+						<Row class="margin-top-20">
+							<Col :span="12"><FormItem label="车辆行驶证">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="车辆检验证">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="正面照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="背面照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="12"><FormItem label="里程照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+							<Col :span="12"><FormItem label="内饰照片">
+								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							</FormItem></Col>
+						</Row>
+					</Form>
+				</Card>
 			</Col>
 			<Col :span="8" class="padding-left-5">
 				<Card>
+					<p slot="title">操作</p>
+						<Row  type="flex" justify="space-between">
+							<Button type="error">删除</Button>
+							<Button>取消</Button>
+							<Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">保存</Button>
+						</Row>
+				</Card>
+				<Card class="margin-top-10">
 					<p slot="title">放款账户</p>
 						<Form ref="bankForm" :model="bank.form" :rules="bank.rules" label-position="left" :label-width="bank.labelWidth" inline>
 						<Row>
@@ -126,64 +179,6 @@
 					</Form>
 				</Card>
 			</Col>
-		</Row>
-		<Row class="margin-top-10">
-			<Card v-if="isCarPaneVisible">
-				<p slot="title">车辆详情</p>
-				<div v-if="isEditable" slot="extra">
-					<div v-if="!loan.sub.car.isEditable">
-						<Button type="text" @click="onClickEditCar">编辑</Button>
-					</div>
-					<div v-else>
-						<Button type="text" @click="onClickResetCar">重置</Button>
-						<Button type="text" @click="onClickSaveCar">保存</Button>
-					</div>
-				</div>
-				<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
-					<Row>
-						<Col :span="6"><FormItem label="品牌型号">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.carBrand}}</p>
-							<Input v-else v-model="loan.sub.car.form.carBrand" />
-						</FormItem></Col>
-						<Col :span="6"><FormItem label="购买价格">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.purchasePrice}}</p>
-							<InputNumber v-else v-model="loan.sub.car.form.purchasePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
-						</FormItem></Col>
-						<Col :span="6"><FormItem label="行驶里程">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.milage}}</p>
-							<InputNumber v-else v-model="loan.sub.car.form.milage" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
-						</FormItem></Col>
-						<Col :span="6"><FormItem label="评估价格">
-							<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.evaluatePrice}}</p>
-							<InputNumber v-else v-model="loan.sub.car.form.evaluatePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
-						</FormItem></Col>
-					</Row>
-					<Row class="margin-top-20">
-						<Col :span="12"><FormItem label="车辆行驶证">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-						<Col :span="12"><FormItem label="车辆检验证">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-					</Row>
-					<Row>
-						<Col :span="12"><FormItem label="正面照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-						<Col :span="12"><FormItem label="背面照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-					</Row>
-					<Row>
-						<Col :span="12"><FormItem label="里程照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-						<Col :span="12"><FormItem label="内饰照片">
-							<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
-						</FormItem></Col>
-					</Row>
-				</Form>
-			</Card>
 		</Row>
 		<Modal v-model="debtors.isModalVisible" class="table-modal">
 			<Row class="modal-header-row">
@@ -371,13 +366,7 @@ export default {
 	methods: {
 		// main
 		initPage() {
-			util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
-			if (this.$route.query.debtor_id) {
-				this.debtor.data.profile.id = this.$route.query.debtor_id
-				this.loadDebtor()
-			} else {
-				this.$Message.error('错误: 未知的借款人')
-			}
+			this.onClickOpenDebtorList()
 		},
 		// debtors
 		showDebtorsModal() {
@@ -440,13 +429,9 @@ export default {
 			this.debtor.isLoading = false
 		},
 		initDebtor(id) {
-			this.$router.replace({
-				name: 'loan_new',
-				query: {
-					debtor_id: id,
-				},
-			})
-			this.initPage()
+			this.debtor.data.profile.id = id
+			this.debtorLoading()
+			this.fetchDebtorProfile()
 		},
 		loadDebtor() {
 			this.debtorLoading()
