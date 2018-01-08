@@ -198,7 +198,7 @@
 					</Input>
 				</Col>
 				<Col :span="8">
-					<Button type="text">新建借款人<Icon class="margin-left-10" type="plus-round"></Icon></Button>
+					<Button type="text" @click="onClickNewDebtor">新建借款人<Icon class="margin-left-10" type="plus-round"></Icon></Button>
 				</Col>
 			</Row>
 			<Table
@@ -406,6 +406,11 @@ export default {
 				this.listLoading()
 				this.fetchDebtorList()
 			}
+		},
+		onClickNewDebtor() {
+			this.$router.push({
+				name: 'debtor_new',
+			})
 		},
 		onClickRow(params) {
 			this.hideDebtorsModal()
