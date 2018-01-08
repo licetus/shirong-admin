@@ -63,6 +63,7 @@ export const otherRouter = {
 		{ path: 'message', title: '消息中心', name: 'message_index', component: (resolve) => { require(['@/views/message/message.vue'], resolve) } },
 		{ path: '/customers/:customer_id(\\d+)', title: '客户详情', name: 'customer_detail', component: (resolve) => { require(['@/views/customers/detail.vue'], resolve) } },
 		{ path: '/debtors/:debtor_id(\\d+)', title: '借款人详情', name: 'debtor_detail', component: (resolve) => { require(['@/views/debtors/detail.vue'], resolve) } },
+		{ path: '/debtors/new', title: '新借款人', name: 'debtor_new', component: (resolve) => { require(['@/views/debtors/new.vue'], resolve) } },
 		{ path: '/products/:product_id(\\d+)', title: '项目详情', name: 'product_detail', component: (resolve) => { require(['@/views/products/detail.vue'], resolve) } },
 		{ path: '/products/new', title: '新增项目', name: 'product_new', component: (resolve) => { require(['@/views/products/new.vue'], resolve) } },
 		{ path: '/loans/:loan_id(\\d+)', title: '贷款详情', name: 'loan_detail', component: (resolve) => { require(['@/views/loans/detail.vue'], resolve) } },

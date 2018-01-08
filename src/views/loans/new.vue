@@ -411,6 +411,7 @@ export default {
 			this.$router.push({
 				name: 'debtor_new',
 			})
+			this.hideDebtorsModal()
 		},
 		onClickRow(params) {
 			this.hideDebtorsModal()
