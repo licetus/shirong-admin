@@ -98,6 +98,16 @@ api.loan = {
 		const str = `?${util.generateQueryString(query)}`
 		return createAuthInstance().get(`loan/${str}`).then(res => res.data)
 	},
+	fetchAvailableList: async (pagesize, page, filters, orderBy) => {
+		const query = {
+			pagesize,
+			page,
+			filters,
+			orderBy,
+		}
+		const str = `?${util.generateQueryString(query)}&hasProduct=true`
+		return createAuthInstance().get(`loan/${str}`).then(res => res.data)
+	},
 	add: async params =>
 		createAuthInstance().post('loan', params).then(res => res.data),
 	delete: async id =>

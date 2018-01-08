@@ -1,49 +1,27 @@
 <template>
 	<section>
 		<Row>
-			<Col :span="6" class="padding-right-5">
-				<Card>
-					<p slot="title">借款人</p>
-					<div slot="extra">
-						<div v-if="!debtor.isEditable">
-							<Button type="text" @click="onClickRefreshDebtor" :loading="debtor.isLoading">刷新</Button>
-							<Button type="text" @click="onClickEditDebtor">编辑</Button>
-						</div>
-						<div v-else>
-							<Button type="text" @click="onClickCancelDebtor">取消</Button>
-							<Button type="text" @click="onClickSubmitDebtor" :loading="debtor.isSubmitting">提交</Button>
-						</div>
-					</div>
-					<Form ref="debtorForm" :model="debtor.form" :rules="debtor.rules" label-position="left" :label-width="debtor.labelWidth" inline>
-						<Row>
-							<Col :span="24"><FormItem label="借款人姓名" prop="realName">
-								<p v-if="!debtor.isEditable">{{debtor.data.profile.realName || '-'}}</p>
-								<Input v-else v-model="debtor.form.realName"/>
-							</FormItem></Col>
-							<Col :span="24"><FormItem label="借款人手机" prop="primaryNumber">
-								<p v-if="!debtor.isEditable">{{debtor.data.profile.primaryNumber || '-'}}</p>
-								<Input v-else v-model="debtor.form.primaryNumber"/>
-							</FormItem></Col>
-						</Row>
-					</Form>
-				</Card>
-			</Col>
-			<Col :span="15" class="padding-left-5">
+			<Col :span="16" class="padding-right-5">
 				<Card>
 					<Spin v-if="debtor.isLoading" size="large" fix></Spin>
 					<p slot="title">借款人信息</p>
 					<div slot="extra">
+						<Button type="text" @click="onClickOpenDebtorList">列表</Button>
+						<Button type="text" @click="onClickRefreshDebtor" :loading="debtor.isLoading">刷新</Button>
 						<Button type="text" @click="onClickDebtorDetail">详情</Button>
 					</div>
 					<Form label-position="left" :label-width="debtor.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="姓名">
+							<Col :span="6"><FormItem label="姓名">
 								<p>{{debtor.data.profile.realName || '-'}}</p>
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="性别">
+							<Col :span="6"><FormItem label="手机">
+								<p>{{debtor.data.profile.primaryNumber || '-'}}</p>
+							</FormItem></Col>
+							<Col :span="6"><FormItem label="性别">
 								<p>{{debtorGender || '-'}}</p>
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="年龄">
+							<Col :span="6"><FormItem label="年龄">
 								<p>{{debtorAge || '-'}}</p>
 							</FormItem></Col>
 						</Row>
@@ -62,7 +40,7 @@
 					</Form>
 				</Card>
 			</Col>
-			<Col :span="3" class="padding-left-10">
+			<Col :span="8" class="padding-left-5">
 				<Card>
 					<p slot="title">操作</p>
 						<Row  type="flex" justify="center"><Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">保存</Button></Row>
@@ -207,6 +185,30 @@
 				</Form>
 			</Card>
 		</Row>
+		<Modal v-model="debtors.isModalVisible" class="table-modal">
+			<Row class="modal-header-row">
+				<Col :span="16">
+					<Input v-model="debtors.search.val" placeholder="请输入搜索内容...">
+						<Select v-model="debtors.search.key" slot="prepend" style="width: 75px">
+							<template v-for="(item, index) of searchOptions">
+								<Option :value="item.key" :label="item.title"></Option>
+							</template>
+						</Select>
+						<Button slot="append" icon="ios-search" @click="onClickSearchDebtor" :loading="debtors.list.isLoading"></Button>
+					</Input>
+				</Col>
+				<Col :span="8">
+					<Button type="text">新建借款人<Icon class="margin-left-10" type="plus-round"></Icon></Button>
+				</Col>
+			</Row>
+			<Table
+				:loading="debtors.list.isLoading"
+				:data="debtors.data"
+				:columns="debtors.columns"
+				@on-row-click="onClickRow">
+			</Table>
+			<div slot="footer"></div>
+		</Modal>
 	</section>
 </template>
 
@@ -226,6 +228,41 @@ export default {
 		}
 		return {
 			Enum,
+			debtors: {
+				isModalVisible: false,
+				search: {
+					key: 'realName',
+					val: '',
+				},
+				list: {
+					isLoading: false,
+					pagesize: 10,
+					page: 0,
+					filters: '',
+					orderBy: '',
+				},
+				data: [],
+				columns: [
+					{
+						name: 'realName',
+						title: '姓名',
+						key: 'realName',
+						searchable: true,
+					},
+					{
+						name: 'primaryNumber',
+						title: '手机',
+						key: 'primaryNumber',
+						searchable: true,
+					},
+					{
+						name: 'remark',
+						title: '备注',
+						key: 'remark',
+						searchable: true,
+					},
+				],
+			},
 			debtor: {
 				blankDebtor: new Debtor(),
 				data: blank.debtor,
@@ -294,16 +331,14 @@ export default {
 		}
 	},
 	watch: {
-		// $route(to) {
-		// 	if (to.id && to.path !== Cookies.get('newLoanPath')) {
-		// 		console.log(to.path, Cookies.get('newLoanPath'))
-		// 		this.initPage()
-		// 	}
-		// },
 	},
 	computed: {
-		isNew() {
-			return this.$route.name === 'loan_new'
+		searchOptions() {
+			const list = []
+			this.debtors.columns.forEach((item) => {
+				if (item.searchable) list.push({ key: item.key, title: item.title })
+			})
+			return list
 		},
 		isEditable() {
 			return true
@@ -337,7 +372,6 @@ export default {
 		// main
 		initPage() {
 			util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
-			this.uneditDebtor()
 			if (this.$route.query.debtor_id) {
 				this.debtor.data.profile.id = this.$route.query.debtor_id
 				this.loadDebtor()
@@ -345,74 +379,75 @@ export default {
 				this.$Message.error('错误: 未知的借款人')
 			}
 		},
-
+		// debtors
+		showDebtorsModal() {
+			this.debtors.isModalVisible = true
+		},
+		hideDebtorsModal() {
+			this.debtors.isModalVisible = false
+		},
+		listLoading() {
+			this.debtors.list.isLoading = true
+		},
+		listUnloading() {
+			this.debtors.list.isLoading = false
+		},
+		generateSearchFilters() {
+			this.debtors.list.filters = `${this.debtors.search.key} LIKE '%${this.debtors.search.val}%'`
+		},
+		onClickOpenDebtorList() {
+			this.showDebtorsModal()
+			this.listLoading()
+			this.fetchDebtorList()
+		},
+		onClickSearchDebtor() {
+			if (this.debtors.search.val && util.inputLengthCheck(this.debtors.search.val, 20, this)) {
+				this.generateSearchFilters()
+				this.listLoading()
+				this.fetchDebtorList()
+			}
+		},
+		onClickRow(params) {
+			this.hideDebtorsModal()
+			this.initDebtor(params.id)
+		},
+		async fetchDebtorList() {
+			try {
+				const res = await api.debtor.fetchList(
+					this.debtors.list.pagesize,
+					this.debtors.list.page,
+					this.debtors.list.filters,
+					this.debtors.list.orderBy,
+				)
+				this.debtors.data = res
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.listUnloading()
+			}
+		},
 		// debtor
-		editDebtor() {
-			this.debtor.isEditable = true
-		},
-		uneditDebtor() {
-			this.debtor.isEditable = false
-		},
-		debtorSubmitting() {
-			this.debtor.isSubmitting = true
-		},
-		debtorUnsubmitting() {
-			this.debtor.isSubmitting = false
-		},
 		debtorLoading() {
 			this.debtor.isLoading = true
 		},
 		debtorUnLoading() {
 			this.debtor.isLoading = false
 		},
-		clearDebtor() {
-			console.log(this.debtor.data, this.debtor.blankDebtor)
-			this.debtor.data = this.debtor.blankDebtor
-		},
 		initDebtor(id) {
-			this.debtor.data.profile.realName = this.debtor.form.realName
-			this.debtor.data.profile.primaryNumber = this.debtor.form.primaryNumber
 			this.$router.replace({
 				name: 'loan_new',
 				query: {
 					debtor_id: id,
 				},
 			})
-			this.clearDebtor()
 			this.initPage()
-		},
-		initDebtorForm() {
-			this.debtor.form = {
-				realName: this.debtor.data.profile.realName,
-				primaryNumber: this.debtor.data.profile.primaryNumber,
-			}
 		},
 		loadDebtor() {
 			this.debtorLoading()
 			this.fetchDebtorProfile()
 		},
-		onClickEditDebtor() {
-			this.editDebtor()
-		},
-		onClickCancelDebtor() {
-			this.initDebtorForm()
-			this.uneditDebtor()
-		},
-		onClickSubmitDebtor() {
-			if (this.debtor.form.primaryNumber === this.debtor.data.profile.primaryNumber) this.uneditDebtor()
-			else {
-				this.$refs.debtorForm.validate((valid) => {
-					if (valid) {
-						this.debtorSubmitting()
-						this.matchDebtor(this.debtor.form.primaryNumber)
-					}
-				})
-			}
-		},
 		onClickRefreshDebtor() {
-			this.clearDebtor()
 			this.loadDebtor()
-			console.log(this.debtor.data)
 		},
 		onClickDebtorDetail() {
 			this.$router.push({
@@ -421,48 +456,6 @@ export default {
 					debtor_id: this.debtor.data.profile.id,
 				},
 			})
-		},
-		async matchDebtor(number) {
-			try {
-				const query = {
-					pagesize: 1,
-					page: 0,
-					filters: `primary_number='${number}'`,
-					orderBy: '',
-				}
-				const res = await api.debtor.fetchList(
-					query.pagesize,
-					query.page,
-					query.filters,
-					query.orderBy,
-				)
-				if (res.length === 0) {
-					this.$Modal.confirm({
-						content: '未能匹配对应借款人, 是否新建借款人？',
-						onOk: async () => {
-							const id = await api.debtor.profile.add({
-								realName: this.debtor.form.realName || '临时姓名 - 待修改',
-								primaryNumber: number,
-							})
-							this.$Notice.success({
-								title: '新建借款人成功',
-								duration: 3,
-							})
-							this.initDebtor(id)
-						},
-					})
-				} else {
-					this.$Notice.success({
-						title: '匹配成功',
-						duration: 3,
-					})
-					this.initDebtor(res[0].id)
-				}
-			} catch (e) {
-				this.$Message.error(e.message)
-			} finally {
-				this.debtorUnsubmitting()
-			}
 		},
 		async fetchDebtorProfile() {
 			try {
@@ -476,7 +469,6 @@ export default {
 					alternativeNumber: res.alternativeNumber,
 					remark: res.remark,
 				}
-				this.initDebtorForm()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
@@ -499,14 +491,8 @@ export default {
 				switch (e.code) {
 					case 'D_B_GET_FAILED_ERROR':
 						this.$Notice.info({
-							title: '贷款人实名信息缺失, 正在打开相关页面',
+							title: '贷款人实名信息缺失',
 							duration: 3,
-						})
-						this.$router.push({
-							name: 'debtor_detail',
-							params: {
-								debtor_id: this.debtor.data.profile.id,
-							},
 						})
 						break
 					default: this.$Message.error(e.message)
@@ -646,4 +632,6 @@ export default {
 
 <style lang="less">
 @import '../../styles/common.less';
+@import '../../styles/public.less';
+
 </style>

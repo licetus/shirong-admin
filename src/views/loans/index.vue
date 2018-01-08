@@ -3,6 +3,9 @@
 		<Card class="table-card">
 			<Row class="margin-bottom-20" type="flex">
 				<Col :span="6">
+					<Button type="primary" @click="onClickNewLoan">新增贷款</Button>
+				</Col>
+				<Col :span="6" :offset="3">
 					<Input v-model="search.input" placeholder="请输入搜索内容...">
 						<Select v-model="search.column" slot="prepend" style="width: 75px">
 							<template v-for="(item, index) of searchOptions">
@@ -10,12 +13,6 @@
 							</template>
 						</Select>
 						<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="search.isSearching"></Button>
-					</Input>
-				</Col>
-				<Col :span="6" :offset="3">
-					<Input v-model="add.number" placeholder="请输入借款人手机号码...">
-						<p class="padding-5" slot="prepend">新增贷款</p>
-						<Button slot="append" icon="plus-round" @click="onClickAdd" :loading="add.isLoading"></Button>
 					</Input>
 				</Col>
 			</Row>
@@ -204,80 +201,10 @@ export default {
 		onClickSort() {
 		},
 		// add
-		adding() {
-			this.add.isLoading = true
-		},
-		unadding() {
-			this.add.isLoading = false
-		},
-		checkNumber() { // TODO should check phone number
-			return true
-		},
-		onClickAdd() {
-			if (this.checkNumber()) {
-				this.adding()
-				this.matchNumber()
-			}
-		},
-		addLoan(debtorId) {
+		onClickNewLoan() {
 			this.$router.push({
 				name: 'loan_new',
-				query: {
-					debtor_id: debtorId,
-				},
 			})
-		},
-		async matchNumber() {
-			try {
-				const query = {
-					pagesize: 1,
-					page: 0,
-					filters: `primary_number='${this.add.number}'`,
-					orderBy: '',
-				}
-				const list = await api.debtor.fetchList(
-					query.pagesize,
-					query.page,
-					query.filters,
-					query.orderBy,
-				)
-				let debtorId = null
-				if (list.length === 0) {
-					this.$Modal.confirm({
-						content: '未能匹配对应借款人, 是否新建借款人？',
-						onOk: async () => {
-							try {
-								const id = await api.debtor.profile.add({
-									realName: '临时姓名 - 待修改',
-									primaryNumber: this.add.number,
-								})
-								this.$Notice.success({
-									title: '新建借款人成功',
-									duration: 3,
-								})
-								debtorId = id
-							} catch (e) {
-								this.$Message.error(e.message)
-							}
-						},
-					})
-				} else {
-					debtorId = list[0].id
-					this.$Notice.success({
-						title: '匹配成功',
-						duration: 3,
-					})
-				}
-				this.$Notice.info({
-					title: '正在前往新增贷款页面...',
-					duration: 3,
-				})
-				this.addLoan(debtorId)
-			} catch (e) {
-				this.$Message.error(e.message)
-			} finally {
-				this.unadding()
-			}
 		},
 	},
 }
@@ -285,4 +212,5 @@ export default {
 
 <style lang="less">
 @import '../../styles/common.less';
+@import '../../styles/public.less';
 </style>
