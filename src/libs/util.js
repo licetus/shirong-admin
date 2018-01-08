@@ -475,7 +475,8 @@ util.getProductStatus = (vm, status) => {
 }
 
 util.getProductSaleStatus = (vm, status) => {
-	return status ? '已上架' : '已下架'
+	if (status) return '已上架'
+	return '已下架'
 }
 
 util.getProductTermType = (vm, type) => {
