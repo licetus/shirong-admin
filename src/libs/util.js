@@ -315,6 +315,13 @@ util.timestampToDate = (vm, timestamp) => {
 	}
 	return moment(timestamp).toDate()
 }
+util.formatTime = (vm, timestamp) => {
+	if (!timestamp) {
+		// vm.$Message.error('错误: Date缺失')
+		return null
+	}
+	return moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
+}
 util.formatBirthday = (vm, date) => {
 	if (!date) {
 		// vm.$Message.error('错误: Date缺失')
@@ -465,6 +472,10 @@ util.getProductStatus = (vm, status) => {
 			return null
 		}
 	}
+}
+
+util.getProductSaleStatus = (vm, status) => {
+	return status ? '已上架' : '已下架'
 }
 
 util.getProductTermType = (vm, type) => {

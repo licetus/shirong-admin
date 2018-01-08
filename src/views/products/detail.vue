@@ -3,6 +3,7 @@
 		<Row>
 			<Col :span="16">
 				<Card>
+					<Spin v-if="product.profile.isLoading" size="large" fix></Spin>
 					<p slot="title">
 						Profile
 					</p>
@@ -18,10 +19,10 @@
 					<Form ref="profileForm" :model="product.profile.form" :rules="product.profile.rules" label-position="left" :label-width="product.profile.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="项目状态">
-								<p>{{productStatus}}</p>
+								<p>{{util.getProductStatus(product.data.status)}}</p>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目类型">
-								<p>{{productType}}</p>
+								<p>{{util.getLoanType(loan.data.main.type)}}</p>
 							</FormItem></Col>
 						</Row>
 						<Row>
@@ -41,12 +42,13 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="创建时间">{{productCreateTime}}</FormItem></Col>
-							<Col :span="8"><FormItem label="修改时间">{{productLastUpdateTime}}</FormItem></Col>
+							<Col :span="8"><FormItem label="创建时间">{{util.formatTime(product.data.createTime)}}</FormItem></Col>
+							<Col :span="8"><FormItem label="修改时间">{{util.formatTime(product.data.lastUpdateTime)}}</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
+					<Spin v-if="product.finance.isLoading" size="large" fix></Spin>
 					<p slot="title">
 						Finance
 					</p>
@@ -62,7 +64,7 @@
 					<Form :model="product.finance.form" :rules="product.finance.rules" label-position="left" :label-width="product.finance.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="项目总额"><p>{{product.data.amount}}</p></FormItem></Col>
-							<Col :span="8"><FormItem label="项目周期"><p>{{productTerm}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="项目周期"><p>{{util.getProductTermType(product.data.termType)}}</p></FormItem></Col>
 							<Col :span="8"><FormItem label="项目进度"><p>{{product.data.currentInvestment}}</p></FormItem></Col>
 						</Row>
 						<Row>
@@ -80,77 +82,78 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="还款方式"><p>{{productRepayType}}</p></FormItem></Col>
-							<Col :span="8"><FormItem label="计息方式"><p>{{productInterestWay}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="还款方式"><p>{{util.getLoanRepaymentWay(loan.data.main.repaymentWay)}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="计息方式"><p>{{util.getProductInterestWay(product.data.interestWay)}}</p></FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
+					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">
 						Loan Information
 					</p>
 					<div slot="extra">
 						<Button type="text" @click="onClickLoanDetail">详情</Button>
 					</div>
-					<Form :model="loan.form" label-position="left" :label-width="loan.labelWidth" inline>
+					<Form :model="loan" label-position="left" :label-width="loan.labelWidth" inline>
 						<Row>
 							<Col :span="12"><FormItem label="借款人姓名">
-								<p>{{loan.form.debtor.realName}}</p>
+								<p>{{loan.data.debtor.profile.realName}}</p>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证号码">
-								<p>{{loan.form.debtor.idNumber}}</p>
+								<p>{{loan.data.debtor.identify.idNumber}}</p>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证住址">
-								<p>{{loan.form.debtor.location}}</p>
+								<p>{{loan.data.debtor.identify.location}}</p>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="身份证正面">
-								<Row><Col :span="18"><SafeImg :src="loan.form.debtor.frontImageUrl" type="certificate-md"></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="loan.data.debtor.identify.frontImageUrl" type="certificate-md"></SafeImg></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证背面">
-								<Row><Col :span="18"><SafeImg :src="loan.form.debtor.backImageUrl" type="certificate-md"></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="loan.data.debtor.identify.backImageUrl" type="certificate-md"></SafeImg></Col></Row>
 							</FormItem></Col>
 						</Row>
-						<div v-if="loan.form.type === Enum.Loan.Type.Car">
+						<div v-if="loan.data.main.type === Enum.Loan.Type.Car">
 							<Row>
 								<Col :span="12"><FormItem label="车辆型号">
-									<p>{{loan.form.sub.car.carBrand}}</p>
+									<p>{{loan.data.sub.car.carBrand}}</p>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="购买价格">
-									<p>{{loan.form.sub.car.purchasePrice}}</p>
+									<p>{{loan.data.sub.car.purchasePrice}}</p>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="行驶里程">
-									<p>{{loan.form.sub.car.milage}}</p>
+									<p>{{loan.data.sub.car.milage}}</p>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="评估价格">
-									<p>{{loan.form.sub.car.evaluatePrice}}</p>
+									<p>{{loan.data.sub.car.evaluatePrice}}</p>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆行驶证">
-									<Row><Col :span="18"><SafeImg :src="loan.form.sub.car.vehicleLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.vehicleLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆检验证">
-									<Row><Col :span="18"><SafeImg :src="loan.form.sub.car.inspectionLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.inspectionLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆正面照">
-									<Row><Col :span="18"><SafeImg :src="loan.form.sub.car.carFrontImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carFrontImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆背面照">
-									<Row><Col :span="18"><SafeImg :src="loan.form.sub.car.carBackImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carBackImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆里程照">
-									<Row><Col :span="18"><SafeImg :src="loan.form.sub.car.carMilageImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carMilageImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆内饰照">
-									<Row><Col :span="18"><SafeImg :src="loan.form.sub.car.carInsideImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carInsideImageUrl" type="photo-sm"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 						</div>
@@ -177,8 +180,8 @@
 						Sale
 					</p>
 					<Form label-position="left" :label-width="sale.labelWidth">
-						<FormItem label="上架状态">{{isOnSale}}</FormItem>
-						<FormItem label="上架时间">{{publishTime}}</FormItem>
+						<FormItem label="上架状态">{{util.getProductSaleStatus(product.isOnSale)}}</FormItem>
+						<FormItem label="上架时间">{{util.formatTime(product.data.publishTime)}}</FormItem>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
@@ -209,6 +212,7 @@
 import Cookies from 'js-cookie'
 import { Loan, Car, LoanComment, Product, Debtor } from '../../models/data'
 import util from '../../libs/util'
+import api from '../../libs/api'
 import Enum from '../../models/enum'
 
 export default {
@@ -223,6 +227,7 @@ export default {
 		}
 		return {
 			Enum,
+			util,
 			access: parseInt(Cookies.get('access'), 10),
 			loanComment: blank.loanComment,
 			product: {
@@ -233,14 +238,10 @@ export default {
 					isEditable: false,
 					isSaving: false,
 					form: {
-						status: blank.product.status,
-						type: blank.product.type,
 						name: blank.product.name,
 						tagId: blank.product.tagId,
 						rankingScore: blank.product.rankingScore,
 						remark: blank.product.remark,
-						createTime: blank.product.createTime,
-						lastUpdateTime: blank.product.lastUpdateTime,
 					},
 					rules: {},
 				},
@@ -263,36 +264,13 @@ export default {
 				},
 			},
 			loan: {
-				data: blank.loan,
-				debtor: blank.debtor,
 				labelWidth: 75,
-				form: {
-					debtor: {
-						realName: blank.debtor.realName,
-						idNumber: blank.debtor.idNumber,
-						location: blank.debtor.location,
-						frontImageUrl: blank.debtor.frontImageUrlBlur,
-						backImageUrl: blank.debtor.backImageUrlBlur,
-					},
-					type: blank.loan.type,
-					amount: blank.loan.amount,
-					interestRate: blank.loan.interestRate,
-					termType: blank.loan.termType,
-					repaymentWay: blank.loan.repaymentWay,
-					remark: blank.loan.remark,
+				isLoading: false,
+				data: {
+					debtor: blank.debtor,
+					main: blank.loan,
 					sub: {
-						car: {
-							carBrand: blank.car.carBrand,
-							purchasePrice: blank.car.purchasePrice,
-							milage: blank.car.milage,
-							evaluatePrice: blank.car.evaluatePrice,
-							vehicleLicenseImageUrl: blank.car.vehicleLicenseImageUrl,
-							inspectionLicenseImageUrl: blank.car.inspectionLicenseImageUrl,
-							carFrontImageUrl: blank.car.carFrontImageUrl,
-							carBackImageUrl: blank.car.carBackImageUrl,
-							carMilageImageUrl: blank.car.carMilageImageUrl,
-							carInsideImageUrl: blank.car.carInsideImageUrl,
-						},
+						car: blank.car,
 					},
 				},
 			},
@@ -347,32 +325,11 @@ export default {
 			return this.access <= Enum.Role.Admin
 		},
 		isOnSale() {
-			return this.product.isOnSale ? '已上架' : '未上架'
+			return this.product.data.isOnSale ? '已上架' : '未上架'
 		},
-		publishTime() {
-			return this.product.publishTime // TODO for test
-		},
-		productStatus() {
-			return util.getProductStatus(this, this.product.status)
-		},
-		productType() {
-			return util.getLoanType(this, this.loan.type)
-		},
-		productCreateTime() {
-			return this.product.createTime // TODO for test
-		},
-		productLastUpdateTime() {
-			return this.product.lastUpdateTime // TODO for test
-		},
-		productTerm() {
-			return util.getProductTermType(this, this.product.termType)
-		},
-		productRepayType() {
-			return util.getLoanRepaymentWay(this, this.loan.repaymentWay)
-		},
-		productInterestWay() {
-			return util.getProductInterestWay(this, this.product.interestWay)
-		},
+	},
+	mounted() {
+		this.initPage()
 	},
 	methods: {
 		// main
@@ -383,6 +340,39 @@ export default {
 			this.profileLoading()
 			this.financeLoading()
 			this.loanLoading()
+			this.fetchProduct()
+		},
+		async fetchProduct() {
+			try {
+				const product = await api.product.fetch(this.$route.params.product_id)
+				this.product.data = {
+					id: product.id,
+					loanId: product.loanId,
+					amount: product.amount,
+					status: product.status,
+					isOnSale: product.isOnSale,
+					startInterestTime: product.startInterestTime,
+					publishTime: product.publishTime,
+					termType: product.termType,
+					name: product.name,
+					remark: product.remark,
+					rankingScore: product.rankingScore,
+					tagId: product.tagId,
+					interestRateBase: product.interestRateBase,
+					interestRateDelta: product.interestRateDelta,
+					minInvestment: product.minInvestment,
+					interestWay: product.interestWay,
+					currentInvestment: product.currentInvestment,
+				}
+				this.loanLoan()
+				this.initProfileForm()
+				this.initFinanceForm()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.profileUnloading()
+				this.financeUnloading()
+			}
 		},
 		// profile
 		onClickEditProfile() {
@@ -396,27 +386,23 @@ export default {
 			this.uneditProfile()
 		},
 		editProfile() {
-			this.profile.isEditable = true
+			this.product.profile.isEditable = true
 		},
 		uneditProfile() {
-			this.profile.isEditable = false
+			this.product.profile.isEditable = false
 		},
 		profileLoading() {
-			this.profile.isLoading = true
+			this.product.profile.isLoading = true
 		},
 		profileUnloading() {
-			this.profile.isLoading = false
+			this.product.profile.isLoading = false
 		},
 		initProfileForm() {
-			this.profile.form = {
-				status: this.product.status,
-				type: this.product.type,
-				name: this.product.name,
-				tagId: this.product.tagId,
-				rankingScore: this.product.rankingScore,
-				remark: this.product.remark,
-				createTime: this.product.createTime,
-				lastUpdateTime: this.product.lastUpdateTime,
+			this.product.profile.form = {
+				name: this.product.data.name,
+				tagId: this.product.data.tagId,
+				rankingScore: this.product.data.rankingScore,
+				remark: this.product.data.remark,
 			}
 		},
 		// finance
@@ -431,32 +417,101 @@ export default {
 			this.uneditFinance()
 		},
 		editFinance() {
-			this.finance.isEditable = true
+			this.product.finance.isEditable = true
 		},
 		uneditFinance() {
-			this.finance.isEditable = false
+			this.product.finance.isEditable = false
 		},
 		financeLoading() {
-			this.finance.isLoading = true
+			this.product.finance.isLoading = true
 		},
 		financeUnloading() {
-			this.finance.isLoading = false
+			this.product.finance.isLoading = false
 		},
 		initFinanceForm() {
-			this.finance.form = {
-				amount: this.product.amount,
-				termType: this.product.termType,
-				interestRateBase: this.product.interestRateBase,
-				interestRateDelta: this.product.interestRateDelta,
-				minInvestment: this.product.minInvestment,
-				currentInvestment: this.product.currentInvestment,
-				repaymentWay: this.loan.repaymentWay,
-				interestWay: this.product.interestWay,
+			this.product.finance.form = {
+				interestRateBase: this.product.data.interestRateBase,
+				interestRateDelta: this.product.data.interestRateDelta,
+				minInvestment: this.product.data.minInvestment,
 			}
 		},
 		// loan
 		loanLoading() {
-			this.loan
+			this.loan.isLoading = true
+		},
+		loanUnloading() {
+			this.loan.isLoading = false
+		},
+		loanLoan() {
+			this.loanLoading()
+			this.fetchLoan()
+		},
+		async fetchLoan() {
+			try {
+				const loan = await api.loan.fetch(this.product.data.loanId)
+				this.loan.data.main = {
+					id: loan.id,
+					debtorId: loan.debtorId,
+					agentId: loan.agentId,
+					object: loan.object,
+					amount: loan.amount,
+					interest: loan.interest,
+					approvalStatus: loan.approvalStatus,
+					repaymentWay: loan.repaymentWay,
+					type: loan.type,
+					remark: loan.remark,
+					termType: loan.termType,
+					status: loan.status,
+				}
+				switch (loan.type) {
+					case Enum.Loan.Type.Car:
+						this.loan.data.sub.car = {
+							id: loan.sub.id,
+							carBrand: loan.sub.carBrand,
+							purchasePrice: loan.sub.purchasePrice,
+							milage: loan.sub.milage,
+							evaluatePrice: loan.sub.evaluatePrice,
+							carFrontImageUrl: loan.sub.carFrontImageUrl,
+							carBackImageUrl: loan.sub.carBackImageUrl,
+							carMilageImageUrl: loan.sub.carMilageImageUrl,
+							carInsideImageUrl: loan.sub.carInsideImageUrl,
+							vehicleLicenseImageUrl: loan.sub.vehicleLicenseImageUrl,
+							inspectionLicenseImageUrl: loan.sub.inspectionLicenseImageUrl,
+						}
+						break
+					default:
+				}
+				try {
+					const debtorProfile = await api.debtor.profile.fetch(loan.debtorId)
+					this.loan.data.debtor.profile = {
+						id: debtorProfile.id,
+						birthday: debtorProfile.birthday,
+						creatorId: debtorProfile.creatorId,
+						realName: debtorProfile.realName,
+						gender: debtorProfile.gender,
+						primaryNumber: debtorProfile.primaryNumber,
+						alternativeNumber: debtorProfile.alternativeNumber,
+						remark: debtorProfile.remark,
+					}
+					const debtorIdentify = await api.debtor.identify.fetch(loan.debtorId)
+					this.loan.data.debtor.identify = {
+						id: debtorIdentify.id,
+						idNumber: debtorIdentify.idNumber,
+						frontImageUrl: debtorIdentify.frontImageUrl,
+						frontBlurImageUrl: debtorIdentify.frontBlurImageUrl,
+						backImageUrl: debtorIdentify.backImageUrl,
+						backBlurImageUrl: debtorIdentify.backBlurImageUrl,
+						location: debtorIdentify.location,
+					}
+					console.log('here')
+				} catch (e) {
+					this.$Message.error(e.message)
+				}
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUnloading()
+			}
 		},
 		onClickLoanDetail() {
 			this.$router.push({
