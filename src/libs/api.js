@@ -129,5 +129,56 @@ api.loan = {
 			createAuthInstance().post(`loan/${id}/comment`, params).then(res => res.data),
 	},
 }
+// product
+api.product = {
+	fetchList: async (pagesize, page, filters, orderBy) => {
+		const query = {
+			pagesize,
+			page,
+			filters,
+			orderBy,
+		}
+		const str = `?${util.generateQueryString(query)}`
+		return createAuthInstance().get(`product/${str}`).then(res => res.data)
+	},
+	tag: {
+		fetchList: async (pagesize, page, filters, orderBy) => {
+			const query = {
+				pagesize,
+				page,
+				filters,
+				orderBy,
+			}
+			const str = `?${util.generateQueryString(query)}`
+			return createAuthInstance().get(`product/tag${str}`).then(res => res.data)
+		},
+		add: async params =>
+			createAuthInstance().post('product/tag', params).then(res => res.data),
+		delete: async id =>
+			createAuthInstance().delete(`product/tag/${id}`).then(res => res.data),
+		update: async (params, id) =>
+			createAuthInstance().patch(`product/tag/${id}`, params).then(res => res.data),
+		fetch: async id =>
+			createAuthInstance().get(`product/tag/${id}`).then(res => res.data),
+	},
+	add: async params =>
+		createAuthInstance().post('product', params).then(res => res.data),
+	delete: async id =>
+		createAuthInstance().delete(`product/${id}`).then(res => res.data),
+	update: async (params, id) =>
+		createAuthInstance().patch(`product/${id}`, params).then(res => res.data),
+	fetch: async id =>
+		createAuthInstance().get(`product/${id}`).then(res => res.data),
+	publish: async id =>
+		createAuthInstance().put(`product/${id}/publish`).then(res => res.data),
+	pause: async id =>
+		createAuthInstance().put(`product/${id}/pause`).then(res => res.data),
+	resume: async id =>
+		createAuthInstance().put(`product/${id}/resume`).then(res => res.data),
+	cancel: async id =>
+		createAuthInstance().put(`product/${id}/cancel`).then(res => res.data),
+	switchSale: async id =>
+		createAuthInstance().put(`product/${id}/changeOnSale`).then(res => res.data),
+}
 
 export default api
