@@ -1,13 +1,13 @@
 <template>
 	<section>
 		<Card class="table-card">
-			<Row class="margin-bottom-10" type="flex">
+			<Row class="margin-bottom-20" type="flex">
 			<Col :span="6">
 				<Button type="primary" @click="onClickNewProduct">新增项目</Button>
 			</Col>
 				<Col :span="6" :offset="3">
 					<Input v-model="search.input" placeholder="请输入搜索内容...">
-						<Select v-model="search.column" slot="prepend" style="width: 60px">
+						<Select v-model="search.column" slot="prepend" style="width: 75px">
 							<template v-for="(item, index) of searchOptions">
 								<Option :value="item.title">{{item.title}}</Option>
 							</template>
@@ -139,6 +139,9 @@ export default {
 			this.viewProduct(index)
 		},
 		onClickNewProduct() {
+			this.$router.push({
+				name: 'product_new',
+			})
 		},
 		viewProduct(index) {
 			this.$router.push({

@@ -316,14 +316,9 @@ export default {
 		}
 	},
 	mounted() {
-		this.currentPageName = this.$route.name
 		this.initPage()
 	},
 	activated() {
-		const { path } = util.getPageCache(this.$route.name)
-		if (!path || this.$route.fullPath !== path) {
-			this.initPage()
-		}
 	},
 	watch: {
 	},
