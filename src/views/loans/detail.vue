@@ -168,26 +168,34 @@
 				</Card>
 			</Col>
 			<Col :span="8" class="padding-left-5">
-				<Card v-if="isEditable" class="margin-bottom-10">
+				<Card class="margin-bottom-10">
 					<p slot="title">操作</p>
-					<div>
-						<div v-if="!isLockVisible">
-							<Button class="margin-right-10">刷新</Button>
-							<Button class="margin-right-10" type="primary" @click="onClickEdit">编辑</Button>
-							<Button class="margin-right-10" type="error" @click="onClickDelete" :loading="loan.isDeleting">删除</Button>
-							<div v-if="isStartable" class="margin-top-20">
-								<Button class="margin-right-10" type="success" @click="onClickStart" :loading="loan.isStarting">开始计息</Button>
+					<Row type="flex" justify="space-bewtween">
+						<Col :span="16">
+							<div v-if="isEditable">
+								<div v-if="!isLockVisible">
+									<Button class="margin-right-10" type="primary" @click="onClickEditLoan">编辑</Button>
+									<Button class="margin-right-10" type="error" @click="onClickDeleteLoan" :loading="loan.isDeleting">删除</Button>
+									<div v-if="isStartable" class="margin-top-20">
+										<Button class="margin-right-10" type="success" @click="onClickStartLoan" :loading="loan.isStarting">开始计息</Button>
+									</div>
+									<div v-if="isApprovable" class="margin-top-20">
+										<Button class="margin-right-10" type="success" @click="onClickStartApproval">开始审核</Button>
+									</div>
+								</div>
+								<div v-else>
+									<Button class="margin-right-10" @click="onClickCancel">取消</Button>
+									<Button class="margin-right-10" type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">提交</Button>
+								</div>
+								<Button v-else-if="isCompleteable" class="margin-right-10" type="primary" @click="onClickCompleteLoan">完成</Button>
 							</div>
-							<div v-if="isApprovable" class="margin-top-20">
-								<Button class="margin-right-10" type="success" @click="onClickApprove" :loading="loan.isApproving">开始审核</Button>
-							</div>
-						</div>
-						<div v-else>
-							<Button class="margin-right-10" @click="onClickCancel">取消</Button>
-							<Button class="margin-right-10" type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">提交</Button>
-						</div>
-						<Button v-if="isCompleteable" class="margin-right-10" type="primary">完成</Button>
-					</div>
+						</Col>
+						<Col :span="8">
+							<Row type="flex" justify="end">
+								<Button class="margin-right-10" @click="onClickRefreshLoan" :loading="loan.isLoading">刷新</Button>
+							</Row>
+						</Col>
+					</Row>
 				</Card>
 				<Card>
 					<p slot="title">业务员</p>
@@ -212,7 +220,8 @@
 				<Card class="margin-top-10">
 					<Spin v-if="approval.list.isLoading" size="large" fix></Spin>
 					<p slot="title">审核信息</p>
-					<Form ref="approvalForm" :model="approval.form" :rules="approval.rules" label-position="left" :label-width="approval.labelWidth" inline>
+					<p v-if="approval.data.length < 1">无</p>
+					<Form label-position="left" :label-width="approval.labelWidth" inline>
 						<Row class="border-bottom" v-for="(item, index) of approval.data" :key="index">
 							<Col :span="24"><FormItem label="审核意见">
 								<p>{{item.content}}</p>
@@ -225,6 +234,20 @@
 				</Card>
 			</Col>
 		</Row>
+
+		<Modal v-model="approval.isModalVisible">
+			<p slot="header">填写审核意见</p>
+			<Form class="margin-top-20" ref="approvalForm" :model="approval.form" :rules="approval.rules" :label-width="0">
+				<FormItem label="">
+					<Input v-model="approval.form.content" type="textarea" :rows="5" />
+				</FormItem>
+			</Form>
+			<div slot="footer">
+				<Button @click="onClickCancelApprove">取消</Button>
+				<Button type="error" @click="onClickDisapprove" :loading="approval.isDisapproving" :disabled="approval.isApproving">驳回</Button>
+				<Button type="success" @click="onClickApprove" :loading="approval.isApproving" :disabled="approval.isDisapproving">通过</Button>
+			</div>
+		</Modal>
 	</section>
 </template>
 
@@ -254,6 +277,7 @@ export default {
 				isSubmitting: false,
 				isDeleting: false,
 				isStarting: false,
+				isCompleting: false,
 				isLoading: false,
 				labelWidth: 75,
 				form: {
@@ -299,17 +323,22 @@ export default {
 			},
 			approval: {
 				labelWidth: 75,
+				isModalVisible: false,
+				isDisapproving: false,
+				isApproving: false,
 				list: {
 					isLoading: false,
 					pagesize: 10,
 					page: 0,
 					filters: '',
-					sortBy: '',
+					sortBy: 'create_time desc',
 				},
 				data: [
 					blank.loan,
 				],
-				form: {},
+				form: {
+					content: '',
+				},
 				rules: {},
 			},
 		}
@@ -372,11 +401,14 @@ export default {
 		hideLock() {
 			this.isLockVisible = false
 		},
-		onClickEdit() {
+		onClickEditLoan() {
 			this.showLock()
 		},
 		onClickCancel() {
 			this.hideLock()
+		},
+		onClickRefreshLoan() {
+			this.initPage()
 		},
 		// loan
 		loanLoading() {
@@ -402,6 +434,12 @@ export default {
 		},
 		loanUnstarting() {
 			this.loan.isStarting = false
+		},
+		loanCompleting() {
+			this.loan.isCompleting = true
+		},
+		loanUncompleting() {
+			this.loan.isCompleting = false
 		},
 		loadLoan() {
 			this.loanLoading()
@@ -446,15 +484,20 @@ export default {
 				}
 			}
 		},
-		onClickDelete() {
+		onClickDeleteLoan() {
 			this.loanDeleting()
 			this.deleteLoan()
 		},
-		onClickApprove() {
+		onClickStartApproval() {
+			this.showApprovalModal()
 		},
-		onClickStart() {
+		onClickStartLoan() {
 			this.loanStarting()
 			this.startLoan()
+		},
+		onClickCompleteLoan() {
+			this.loanCompleting()
+			this.completeLoan()
 		},
 		async deleteLoan() {
 			try {
@@ -474,6 +517,16 @@ export default {
 				this.$Message.error(e.message)
 			} finally {
 				this.loanUnstarting()
+			}
+		},
+		async completeLoan() {
+			try {
+				await api.loan.complete(this.$route.params.loan_id)
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUncompleting()
 			}
 		},
 		async updateLoan(loan) {
@@ -694,6 +747,75 @@ export default {
 				this.$Message.error(e.message)
 			} finally {
 				this.approvalUnloading()
+			}
+		},
+
+		// approval
+		showApprovalModal() {
+			this.approval.isModalVisible = true
+		},
+		hideApprovalModal() {
+			this.approval.isModalVisible = false
+		},
+		loanApproving() {
+			this.approval.isApproving = true
+		},
+		loanUnapproving() {
+			this.approval.isApproving = false
+		},
+		loanDisapproving() {
+			this.approval.isDisapproving = true
+		},
+		loanUndisapproving() {
+			this.approval.isDisapproving = false
+		},
+		onClickCancelApprove() {
+			this.hideApprovalModal()
+		},
+		onClickDisapprove() {
+			const comment = {
+				content: this.approval.form.content,
+			}
+			this.loanDisapproving()
+			this.disapproveLoan(comment)
+			// this.$refs.approvalForm.validate((valid) => { // BUG validate not work
+			// 	if (valid) {
+			// 	}
+			// })
+		},
+		onClickApprove() {
+			const comment = {
+				content: this.approval.form.content,
+			}
+			this.loanApproving()
+			this.approveLoan(comment)
+			// this.$refs.approvalForm.validate((valid) => { // BUG validate not work
+			// 	if (valid) {
+			// 	}
+			// })
+		},
+		async disapproveLoan(comment) {
+			try {
+				await api.loan.comment.add(comment, this.$route.params.loan_id)
+				await api.loan.disapprove(this.$route.params.loan_id)
+				this.hideApprovalModal()
+				this.loadApprovalComments()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUndisapproving()
+			}
+		},
+		async approveLoan(comment) {
+			try {
+				await api.loan.comment.add(comment, this.$route.params.loan_id)
+				await api.loan.approve(this.$route.params.loan_id)
+				this.hideApprovalModal()
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUnapproving()
 			}
 		},
 

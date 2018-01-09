@@ -1,11 +1,11 @@
 <template>
 	<section>
 		<Card class="table-card">
-			<Row class="margin-bottom-20" type="flex">
-				<Col :span="6">
+			<Row class="margin-bottom-20" type="flex" justify="space-between">
+				<Col>
 					<Button type="primary" @click="onClickNewLoan">新增贷款</Button>
 				</Col>
-				<Col :span="6" :offset="3">
+				<Col>
 					<Input v-model="search.input" placeholder="请输入搜索内容...">
 						<Select v-model="search.column" slot="prepend" style="width: 75px">
 							<template v-for="(item, index) of searchOptions">
@@ -14,6 +14,11 @@
 						</Select>
 						<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="search.isSearching"></Button>
 					</Input>
+				</Col>
+				<Col>
+					<Row type="flex" justify="end">
+						<Button type="text" @click="onClickRefresh" :disabled="list.isLoading"><Icon class="margin-right-10" type="refresh"></Icon>刷新</Button>
+					</Row>
 				</Col>
 			</Row>
 			<Table
@@ -171,6 +176,9 @@ export default {
 		initPage() {
 			this.listLoading()
 			this.fetchLoanList()
+		},
+		onClickRefresh() {
+			this.initPage()
 		},
 		// list
 		listLoading() {
