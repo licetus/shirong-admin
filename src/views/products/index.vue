@@ -1,11 +1,11 @@
 <template>
 	<section>
 		<Card class="table-card">
-			<Row class="margin-bottom-20" type="flex">
-			<Col :span="6">
+			<Row class="margin-bottom-20" type="flex" justify="space-between">
+			<Col>
 				<Button type="primary" @click="onClickNewProduct">新增项目</Button>
 			</Col>
-				<Col :span="6" :offset="3">
+				<Col>
 					<Input v-model="search.input" placeholder="请输入搜索内容...">
 						<Select v-model="search.column" slot="prepend" style="width: 75px">
 							<template v-for="(item, index) of searchOptions">
@@ -14,6 +14,11 @@
 						</Select>
 						<Button slot="append" icon="ios-search" @click="onClickSearch"></Button>
 					</Input>
+				</Col>
+				<Col>
+					<Row type="flex" justify="end">
+						<Button type="text" @click="onClickRefresh" :disabled="list.isLoading"><Icon class="margin-right-10" type="refresh"></Icon>刷新</Button>
+					</Row>
 				</Col>
 			</Row>
 			<Table
@@ -55,38 +60,76 @@ export default {
 					name: 'id',
 					title: '编号',
 					key: 'id',
+					align: 'center',
 					searchable: true,
 				},
 				{
 					name: 'name',
 					title: '名称',
 					key: 'name',
+					align: 'center',
 					searchable: true,
+				},
+				{
+					name: 'status',
+					title: '状态',
+					key: 'status',
+					align: 'center',
+					render: (h, params) => {
+						const tag = util.getProductStatusTag(this, params.row.status)
+						return h('Tag', {
+							props: {
+								color: tag.color,
+							},
+						}, tag.text || '')
+					},
 				},
 				{
 					name: 'amount',
 					title: '金额',
 					key: 'amount',
+					align: 'center',
 				},
 				{
 					name: 'termType',
 					title: '周期',
 					key: 'termType',
+					align: 'center',
+					render: (h, params) => h('p', util.getLoanTermType(this, params.row.termType) || '-'),
 				},
 				{
 					name: 'currentAmount',
 					title: '进度',
 					key: 'currentAmount',
+					align: 'center',
+					render: (h, params) => h('Row', {
+						props: { type: 'flex', justify: 'space-between' },
+					}, [
+						h('Col', `${params.row.currentInvestment || '-'}`),
+						h('span', '-'),
+						h('Col', `${util.formatPercent((params.row.currentInvestment / params.row.amount).toFixed(2, 10)) || '-'}`),
+					]),
 				},
 				{
 					name: 'interestRate',
 					title: '利率',
-					render: (h, params) => h('p', `${params.row.interestRateBase || '-'} + ${params.row.interestRateDelta || '-'}`),
+					align: 'center',
+					render: (h, params) => h('Row', {
+						props: { type: 'flex', justify: 'space-between' },
+					}, [
+						h('Col', `${params.row.interestRateBase || '-'}`),
+						h('span', '+'),
+						h('Col', `${params.row.interestRateDelta || '-'}`),
+					]),
 				},
 				{
 					name: 'publishTime',
 					title: '发布时间',
 					key: 'publishTime',
+					align: 'center',
+					render: (h, params) => h('p', {
+						style: 'word-break:keep-all',
+					}, `${util.formatTime(this, params.row.publishTime) || '-'}`),
 				},
 				{
 					title: '操作',
@@ -120,6 +163,9 @@ export default {
 		initPage() {
 			this.listLoading()
 			this.fetchProductList()
+		},
+		onClickRefresh() {
+			this.initPage()
 		},
 		// list
 		listLoading() {

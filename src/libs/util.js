@@ -284,6 +284,9 @@ util.md5 = (string) => {
 	return jsmd5(string).toUpperCase()
 }
 
+util.formatPercent = percent =>
+	`${Math.round(percent * 100)}%`
+
 util.closeCurrentPage = (store, pageName, router, linkTo) => {
 	store.commit('removeTag', pageName)
 	store.commit('closePage', pageName)
@@ -543,6 +546,48 @@ util.getProductStatus = (vm, status) => {
 			return '已取消'
 		case Enum.Product.Status.Completed:
 			return '已完成'
+		default: {
+			vm.$Message.error('错误: 未知的项目状态')
+			return null
+		}
+	}
+}
+util.getProductStatusTag = (vm, status) => {
+	if (!status) {
+		// vm.$Message.error('错误: 项目状态缺失')
+		return null
+	}
+	switch (status) {
+		case Enum.Product.Status.Prepared:
+			return {
+				text: '已审核',
+				color: 'yellow',
+			}
+		case Enum.Product.Status.Selling:
+			return {
+				text: '销售中',
+				color: 'blue',
+			}
+		case Enum.Product.Status.Running:
+			return {
+				text: '运行中',
+				color: 'green',
+			}
+		case Enum.Product.Status.Paused:
+			return {
+				text: '暂停中',
+				color: 'red',
+			}
+		case Enum.Product.Status.Canceled:
+			return {
+				text: '已取消',
+				color: 'default',
+			}
+		case Enum.Product.Status.Completed:
+			return {
+				text: '已完成',
+				color: 'default',
+			}
 		default: {
 			vm.$Message.error('错误: 未知的项目状态')
 			return null

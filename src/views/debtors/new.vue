@@ -430,6 +430,10 @@ export default {
 					backImageUrl: res.backImageUrl,
 					backBlurImageUrl: res.backBlurImaegUrl,
 				}
+				this.$Notice.info({
+					title: '更新实名信息成功',
+					duration: 3,
+				})
 				this.initIdentifyForm()
 			} catch (e) {
 				switch (e.code) {
@@ -527,6 +531,10 @@ export default {
 					hasCar: res.hasCar,
 					hasHouse: res.hasHouse,
 				}
+				this.$Notice.info({
+					title: '更新信用信息成功',
+					duration: 3,
+				})
 				this.initCreditForm()
 			} catch (e) {
 				switch (e.code) {

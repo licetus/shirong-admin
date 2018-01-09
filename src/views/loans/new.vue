@@ -70,8 +70,8 @@
 								<InputNumber v-else v-model="loan.form.amount" :min="0" :max="99999999" :step="10000"></InputNumber>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="贷款利率">
-								<p v-if="!loan.isEditable">{{loan.form.interest || '-'}}</p>
-								<InputNumber v-else v-model="loan.form.interest" :min="0" :max="1" :step="0.01"></InputNumber>
+								<p v-if="!loan.isEditable">{{loan.form.interestRate || '-'}}</p>
+								<InputNumber v-else v-model="loan.form.interestRate" :min="0" :max="1" :step="0.01"></InputNumber>
 							</FormItem></Col>
 						</Row>
 						<Row>
