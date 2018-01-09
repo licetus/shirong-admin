@@ -537,10 +537,14 @@ util.getProductStatus = (vm, status) => {
 			return '已审核'
 		case Enum.Product.Status.Selling:
 			return '销售中'
+		case Enum.Product.Status.SoldOut:
+			return '已售罄'
 		case Enum.Product.Status.Running:
 			return '运行中'
-		case Enum.Product.Status.Paused:
-			return '暂停中'
+		case Enum.Product.Status.SellingPaused:
+			return '暂停销售'
+		case Enum.Product.Status.RunningPaused:
+			return '暂停计息'
 		case Enum.Product.Status.Canceled:
 			return '已取消'
 		case Enum.Product.Status.Completed:
@@ -567,14 +571,24 @@ util.getProductStatusTag = (vm, status) => {
 				text: '销售中',
 				color: 'blue',
 			}
+		case Enum.Product.Status.SoldOut:
+			return {
+				text: '已售罄',
+				color: 'green',
+			}
 		case Enum.Product.Status.Running:
 			return {
 				text: '运行中',
 				color: 'green',
 			}
-		case Enum.Product.Status.Paused:
+		case Enum.Product.Status.SellingPaused:
 			return {
-				text: '暂停中',
+				text: '暂停销售',
+				color: 'red',
+			}
+		case Enum.Product.Status.RunningPaused:
+			return {
+				text: '暂停计息',
 				color: 'red',
 			}
 		case Enum.Product.Status.Canceled:

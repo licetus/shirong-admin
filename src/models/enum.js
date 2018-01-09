@@ -43,9 +43,10 @@ const Enum = {
 			Selling: 2,
 			SoldOut: 3,
 			Running: 4,
-			Paused: 5,
-			Canceled: 6,
-			Completed: 7,
+			SellingPaused: 5,
+			RunningPaused: 6,
+			Canceled: 7,
+			Completed: 8,
 		},
 		TermType: {
 			SevenDays: 1,

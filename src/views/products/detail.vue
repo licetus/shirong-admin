@@ -166,12 +166,19 @@
 					<p slot="title">
 						控制台
 					</p>
-					<Row>
-						<Col :span="4">
-							<Button long>暂停</Button>
+					<Row type="flex" justify="space-between">
+						<Col :span="16">
+							<div v-if="!product.isLoading">
+								<Button v-if="isPublishable" class="margin-right-10" type="primary" @click="onClickPublishProduct" :loading="product.isPublishing">发布</Button>
+								<Button v-if="isPauseable" class="margin-right-10" type="warning" @click="onClickPauseProduct" :loading="product.isPausing">暂停</Button>
+								<Button v-if="isResumeable" class="margin-right-10" type="success" @click="onClickResumeProduct" :loading="product.isResuming">恢复</Button>
+								<Button v-if="isCancelable" class="margin-right-10" type="error" @click="onClickCancelProduct" :loading="product.isCanceling">取消</Button>
+							</div>
 						</Col>
-						<Col :span="4" :offset="1">
-							<Button type="error" long>停止</Button>
+						<Col :span="8">
+							<Row type="flex" justify="end">
+								<Button @click="onClickRefreshProduct" :loading="product.isLoading">刷新</Button>
+							</Row>
 						</Col>
 					</Row>
 				</Card>
@@ -231,6 +238,11 @@ export default {
 			access: parseInt(Cookies.get('access'), 10),
 			loanComment: blank.loanComment,
 			product: {
+				isLoading: false,
+				isPublishing: false,
+				isPausing: false,
+				isResuming: false,
+				isCanceling: false,
 				data: blank.product,
 				profile: {
 					labelWidth: 75,
@@ -318,11 +330,29 @@ export default {
 		}
 	},
 	computed: {
-		isControlVisible() {
-			return this.access === Enum.Role.SuperAdmin
+		isControlable() {
+			return this.access <= Enum.Role.Admin
+		},
+		isPublishable() {
+			return (this.access <= Enum.Role.Admin) && (this.product.data.status === Enum.Product.Status.Prepared)
+		},
+		isPauseable() {
+			return (this.access <= Enum.Role.Admin) && ((this.product.data.status === Enum.Product.Status.Selling) || (this.product.data.status === Enum.Product.Status.Running))
+		},
+		isResumeable() {
+			return (this.access <= Enum.Role.Admin) && ((this.product.data.status === Enum.Product.Status.SellingPaused) || (this.product.data.status === Enum.Product.Status.RunningPaused))
+		},
+		isCancelable() {
+			return (this.access <= Enum.Role.Admin) && (
+				(this.product.data.status === Enum.Product.Status.Selling) ||
+				(this.product.data.status === Enum.Product.Status.SoldOut) ||
+				(this.product.data.status === Enum.Product.Status.Running) ||
+				(this.product.data.status === Enum.Product.Status.SellingPaused) ||
+				(this.product.data.status === Enum.Product.Status.RunningPaused)
+			)
 		},
 		isEditVisible() {
-			return this.access <= Enum.Role.Admin
+			return this.access <= Enum.Role.Operator
 		},
 		isOnSale() {
 			return this.product.data.isOnSale ? '已上架' : '未上架'
@@ -336,11 +366,21 @@ export default {
 		initPage() {
 			this.loadProduct()
 		},
+		productLoading() {
+			this.product.isLoading = true
+		},
+		productUnloading() {
+			this.product.isLoading = false
+		},
 		loadProduct() {
+			this.productLoading()
 			this.profileLoading()
 			this.financeLoading()
 			this.loanLoading()
 			this.fetchProduct()
+		},
+		onClickRefreshProduct() {
+			this.loadProduct()
 		},
 		async fetchProduct() {
 			try {
@@ -363,7 +403,7 @@ export default {
 					interestWay: product.interestWay,
 					currentInvestment: product.currentInvestment,
 				}
-				this.loanLoan()
+				this.loadLoan()
 				this.initProfileForm()
 				this.initFinanceForm()
 			} catch (e) {
@@ -371,6 +411,91 @@ export default {
 			} finally {
 				this.profileUnloading()
 				this.financeUnloading()
+				this.productUnloading()
+			}
+		},
+		// publish
+		productPublishing() {
+			this.product.isPublishing = true
+		},
+		productUnpublishing() {
+			this.product.isPublishing = false
+		},
+		onClickPublishProduct() {
+			this.productPublishing()
+			this.publishProduct()
+		},
+		async publishProduct() {
+			try {
+				await api.product.publish(this.$route.params.product_id)
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.productUnpublishing()
+			}
+		},
+		// pause
+		productPausing() {
+			this.product.isPausing = true
+		},
+		productUnpausing() {
+			this.product.isPausing = false
+		},
+		onClickPauseProduct() {
+			this.productPausing()
+			this.pauseProduct()
+		},
+		async pauseProduct() {
+			try {
+				await api.product.pause(this.$route.params.product_id)
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.productUnpausing()
+			}
+		},
+		// resume
+		productResuming() {
+			this.product.isResuming = true
+		},
+		productUnresuming() {
+			this.product.isResuming = false
+		},
+		onClickResumeProduct() {
+			this.productResuming()
+			this.resumeProduct()
+		},
+		async resumeProduct() {
+			try {
+				await api.product.resume(this.$route.params.product_id)
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.productUnresuming()
+			}
+		},
+		// cancel
+		productCanceling() {
+			this.product.isCanceling = true
+		},
+		productUncanceling() {
+			this.product.isCanceling = false
+		},
+		onClickCancelProduct() {
+			this.productCanceling()
+			this.cancelProduct()
+		},
+		async cancelProduct() {
+			try {
+				await api.product.cancel(this.$route.params.product_id)
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.productUncanceling()
 			}
 		},
 		// profile
@@ -441,7 +566,7 @@ export default {
 		loanUnloading() {
 			this.loan.isLoading = false
 		},
-		loanLoan() {
+		loadLoan() {
 			this.loanLoading()
 			this.fetchLoan()
 		},
