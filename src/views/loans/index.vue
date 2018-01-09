@@ -62,6 +62,14 @@ export default {
 					name: 'status',
 					title: '状态',
 					key: 'status',
+					render: (h, params) => {
+						const tag = util.getLoanStatusTag(this, params.row.status)
+						return h('Tag', {
+							props: {
+								color: tag.color,
+							},
+						}, tag.text || '')
+					},
 				},
 				{
 					name: 'object',
@@ -83,11 +91,13 @@ export default {
 					name: 'termType',
 					title: '周期',
 					key: 'termType',
+					render: (h, params) => h('p', util.getLoanTermType(this, params.row.termType) || '-'),
 				},
 				{
 					name: 'repaymentWay',
 					title: '还款方式',
 					key: 'repaymentWay',
+					render: (h, params) => h('p', util.getLoanRepaymentWay(this, params.row.repaymentWay) || '-'),
 				},
 				{
 					name: 'debtorId',
@@ -105,6 +115,15 @@ export default {
 					name: 'approvalStatus',
 					title: '审核状态',
 					key: 'approvalStatus',
+					align: 'center',
+					render: (h, params) => {
+						const tag = util.getLoanApprovalStatusTag(this, params.row.approvalStatus)
+						return h('Tag', {
+							props: {
+								color: tag.color,
+							},
+						}, tag.text || '')
+					},
 				},
 				{
 					title: '操作',
@@ -112,8 +131,7 @@ export default {
 					render: (h, params) =>
 						h('div', [
 							h('Button', {
-								props: { type: 'primary',	size: 'small', loading: this.loans[params.index].isViewing },
-								style: { marginRight: '5px' },
+								props: { type: 'text', loading: this.loans[params.index].isViewing },
 								on: {	click: () => this.onClickViewLoan(params.index) },
 							}, '查看'),
 						]),
@@ -130,6 +148,14 @@ export default {
 	},
 	mounted() {
 		this.initPage()
+	},
+	activated() {
+		if (this.$route.query.action === 'refresh') {
+			this.initPage()
+			this.$router.push({
+				name: 'loans_index',
+			})
+		}
 	},
 	computed: {
 		searchOptions() {

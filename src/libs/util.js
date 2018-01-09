@@ -265,10 +265,15 @@ util.checkUpdate = function (vm) {
 			duration: 0
 		})
 		if (semver.lt(packjson.version, version)) {
-			vm.$Notice.info({
-				title: 'iview-admin更新啦',
-				desc: '<p>iView-admin更新到了' + version + '了，去看看有哪些变化吧</p><a style="font-size:13px" href="https://github.com/iview/iview-admin/releases" target="_blank">前往github查看</a>'
+			Cookies.set('admin-version', version, {
+				expires: 1,
 			})
+			if (!Cookies.get('admin-version')) {
+				vm.$Notice.info({
+					title: 'iview-admin更新啦',
+					desc: '<p>iView-admin更新到了' + version + '了，去看看有哪些变化吧</p><a style="font-size:13px" href="https://github.com/iview/iview-admin/releases" target="_blank">前往github查看</a>'
+				})
+			}
 		}
 	})
 }
@@ -277,6 +282,18 @@ util.checkUpdate = function (vm) {
 util.md5 = (string) => {
 	if (!string) return ''
 	return jsmd5(string).toUpperCase()
+}
+
+util.closeCurrentPage = (store, pageName, router, linkTo) => {
+	store.commit('removeTag', pageName)
+	store.commit('closePage', pageName)
+	localStorage.pageOpenedList = JSON.stringify(store.state.app.pageOpenedList)
+	router.push({
+		name: linkTo,
+		query: {
+			action: 'refresh',
+		},
+	})
 }
 
 util.setPageCache = (pageName, key, val) => {
@@ -362,12 +379,44 @@ util.getLoanStatus = (vm, status) => {
 	switch (status) {
 		case Enum.Loan.Status.Prepared:
 			return '已签约'
-		case Enum.Product.Status.Canceled:
+		case Enum.Loan.Status.Canceled:
 			return '已取消'
-		case Enum.Product.Status.Running:
+		case Enum.Loan.Status.Running:
 			return '计息中'
-		case Enum.Product.Status.Completed:
+		case Enum.Loan.Status.Completed:
 			return '已完成'
+		default: {
+			vm.$Message.error('错误: 未知的贷款状态')
+			return null
+		}
+	}
+}
+util.getLoanStatusTag = (vm, status) => {
+	if (!status) {
+		// vm.$Message.error('错误: 贷款状态缺失')
+		return null
+	}
+	switch (status) {
+		case Enum.Loan.Status.Prepared:
+			return {
+				text: '已签约',
+				color: 'yellow',
+			}
+		case Enum.Loan.Status.Canceled:
+			return {
+				text: '已取消',
+				color: 'default',
+			}
+		case Enum.Loan.Status.Running:
+			return {
+				text: '计息中',
+				color: 'green',
+			}
+		case Enum.Loan.Status.Completed:
+			return {
+				text: '已完成',
+				color: 'blue',
+			}
 		default: {
 			vm.$Message.error('错误: 未知的贷款状态')
 			return null
@@ -382,14 +431,41 @@ util.getLoanApprovalStatus = (vm, status) => {
 	}
 	switch (status) {
 		case Enum.Loan.ApprovalStatus.Submitted:
-			return '审核中'
-		case Enum.Product.ApprovalStatus.Disapproved:
+			return '待审核'
+		case Enum.Loan.ApprovalStatus.Disapproved:
 			return '未通过'
-		case Enum.Product.ApprovalStatus.Approved:
+		case Enum.Loan.ApprovalStatus.Approved:
 			return '已通过'
 		default: {
 			vm.$Message.error('错误: 未知的审核状态')
 			return null
+		}
+	}
+}
+util.getLoanApprovalStatusTag = (vm, status) => {
+	if (!status) {
+		// vm.$Message.error('错误: 审核状态缺失')
+		return null
+	}
+	switch (status) {
+		case Enum.Loan.ApprovalStatus.Submitted:
+			return {
+				text: '待审核',
+				color: 'yellow',
+			}
+		case Enum.Loan.ApprovalStatus.Disapproved:
+			return {
+				text: '未通过',
+				color: 'red',
+			}
+		case Enum.Loan.ApprovalStatus.Approved:
+			return {
+				text: '已通过',
+				color: 'green',
+			}
+		default: {
+			vm.$Message.error('错误: 未知的审核状态')
+			return {}
 		}
 	}
 }
@@ -518,7 +594,7 @@ util.getProductInterestWay = (vm, type) => {
 
 util.generateQueryString = (params) => {
 	const urlEncode = (param, key, encode) => {
-		if (param == null) return ''
+		if (!param) return ''
 		let paramStr = ''
 		const t = typeof (param)
 		if (t === 'string' || t === 'number' || t === 'boolean') {

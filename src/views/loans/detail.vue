@@ -5,16 +5,16 @@
 				<Card>
 					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">贷款信息</p>
-					<div v-if="isEditable" slot="extra">
-						<div v-if="!loan.isEditable">
-							<Button type="text" @click="onClickEditLoan">编辑</Button>
+					<div v-show="isEditable && isLockVisible" slot="extra">
+						<div v-show="!loan.isEditable">
+							<Button type="text" @click="onClickUnlockLoan">解锁</Button>
 						</div>
-						<div v-else>
+						<div v-show="loan.isEditable">
 							<Button type="text" @click="onClickResetLoan">重置</Button>
-							<Button type="text" @click="onClickSaveLoan">保存</Button>
+							<Button type="text" @click="onClickLockLoan">锁定</Button>
 						</div>
 					</div>
-					<Form v-if="!loan.isFolded" ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
+					<Form ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
 						<Row>
 							<Col :span="8"><FormItem label="贷款类型">
 								<RadioGroup v-if="!loan.isEditable" :value="loan.form.type">
@@ -27,10 +27,10 @@
 								</RadioGroup>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="当前状态">
-								<p>{{loanStatus || '-'}}</p>
+								<p>{{util.getLoanStatus(this, loan.data.status) || '-'}}</p>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="审核状态">
-								<p>{{loanApprovalStatus || '-'}}</p>
+								<p>{{util.getLoanApprovalStatus(this, loan.data.approvalStatus) || '-'}}</p>
 							</FormItem></Col>
 						</Row>
 						<Row>
@@ -43,8 +43,8 @@
 								<InputNumber v-else v-model="loan.form.amount" :min="0" :max="99999999" :step="10000"></InputNumber>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="贷款利率">
-								<p v-if="!loan.isEditable">{{loan.form.interest || '-'}}</p>
-								<InputNumber v-else v-model="loan.form.interest" :min="0" :max="1" :step="0.01"></InputNumber>
+								<p v-if="!loan.isEditable">{{loan.form.interestRate || '-'}}</p>
+								<InputNumber v-else v-model="loan.form.interestRate" :min="0" :max="1" :step="0.01"></InputNumber>
 							</FormItem></Col>
 						</Row>
 						<Row>
@@ -90,10 +90,10 @@
 								<p>{{debtor.data.profile.primaryNumber || '-'}}</p>
 							</FormItem></Col>
 							<Col :span="6"><FormItem label="性别">
-								<p>{{debtorGender || '-'}}</p>
+								<p>{{util.getGender(this, debtor.data.profile.gender) || '-'}}</p>
 							</FormItem></Col>
 							<Col :span="6"><FormItem label="年龄">
-								<p>{{debtorAge || '-'}}</p>
+								<p>{{util.getAge(this, this.debtor.data.profile.birthday) || '-'}}</p>
 							</FormItem></Col>
 						</Row>
 						<Row>
@@ -112,13 +112,13 @@
 				</Card>
 				<Card v-if="loan.data.type === Enum.Loan.Type.Car" class="margin-top-10">
 					<p slot="title">车辆详情</p>
-					<div v-if="isEditable" slot="extra">
-						<div v-if="!loan.sub.car.isEditable">
-							<Button type="text" @click="onClickEditCar">编辑</Button>
+					<div v-show="isEditable && isLockVisible" slot="extra">
+						<div v-show="!loan.sub.car.isEditable">
+							<Button type="text" @click="onClickUnlockCar">解锁</Button>
 						</div>
-						<div v-else>
+						<div v-show="loan.sub.car.isEditable">
 							<Button type="text" @click="onClickResetCar">重置</Button>
-							<Button type="text" @click="onClickSaveCar">保存</Button>
+							<Button type="text" @click="onClickLockCar">锁定</Button>
 						</div>
 					</div>
 					<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
@@ -168,6 +168,27 @@
 				</Card>
 			</Col>
 			<Col :span="8" class="padding-left-5">
+				<Card v-if="isEditable" class="margin-bottom-10">
+					<p slot="title">操作</p>
+					<div>
+						<div v-if="!isLockVisible">
+							<Button class="margin-right-10">刷新</Button>
+							<Button class="margin-right-10" type="primary" @click="onClickEdit">编辑</Button>
+							<Button class="margin-right-10" type="error" @click="onClickDelete" :loading="loan.isDeleting">删除</Button>
+							<div v-if="isStartable" class="margin-top-20">
+								<Button class="margin-right-10" type="success" @click="onClickStart" :loading="loan.isStarting">开始计息</Button>
+							</div>
+							<div v-if="isApprovable" class="margin-top-20">
+								<Button class="margin-right-10" type="success" @click="onClickApprove" :loading="loan.isApproving">开始审核</Button>
+							</div>
+						</div>
+						<div v-else>
+							<Button class="margin-right-10" @click="onClickCancel">取消</Button>
+							<Button class="margin-right-10" type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">提交</Button>
+						</div>
+						<Button v-if="isCompleteable" class="margin-right-10" type="primary">完成</Button>
+					</div>
+				</Card>
 				<Card>
 					<p slot="title">业务员</p>
 					<Form label-position="left" :label-width="75" inline>
@@ -189,11 +210,16 @@
 					</Form>
 				</Card>
 				<Card class="margin-top-10">
+					<Spin v-if="approval.list.isLoading" size="large" fix></Spin>
 					<p slot="title">审核信息</p>
 					<Form ref="approvalForm" :model="approval.form" :rules="approval.rules" label-position="left" :label-width="approval.labelWidth" inline>
-						<Row class="border-bottom" v-for="(item, index) of 3" :key="index">
-							<Col :span="24"><FormItem label="审核意见"></FormItem></Col>
-							<Col :span="24"><FormItem label="审核时间"></FormItem></Col>
+						<Row class="border-bottom" v-for="(item, index) of approval.data" :key="index">
+							<Col :span="24"><FormItem label="审核意见">
+								<p>{{item.content}}</p>
+							</FormItem></Col>
+							<Col :span="24"><FormItem label="审核时间">
+								<p>{{util.formatTime(this, item.createTime)}}</p>
+							</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -203,6 +229,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { Debtor, Loan, Car } from '../../models/data'
 import Enum from '../../models/enum'
 import api from '../../libs/api'
@@ -217,12 +244,16 @@ export default {
 			car: new Car(),
 		}
 		return {
+			access: parseInt(Cookies.get('access'), 10),
 			Enum,
+			util,
+			isLockVisible: false,
 			loan: {
 				data: blank.loan,
-				isFolded: false,
 				isEditable: false,
 				isSubmitting: false,
+				isDeleting: false,
+				isStarting: false,
 				isLoading: false,
 				labelWidth: 75,
 				form: {
@@ -267,8 +298,17 @@ export default {
 				rules: {},
 			},
 			approval: {
-				data: blank.loan,
 				labelWidth: 75,
+				list: {
+					isLoading: false,
+					pagesize: 10,
+					page: 0,
+					filters: '',
+					sortBy: '',
+				},
+				data: [
+					blank.loan,
+				],
 				form: {},
 				rules: {},
 			},
@@ -294,29 +334,19 @@ export default {
 	},
 	computed: {
 		isEditable() {
-			switch (this.loan.data.status) {
-				case Enum.Loan.Status.Prepared:
-					return true
-				default: return false
-			}
+			return this.loan.data.status === Enum.Loan.Status.Prepared
 		},
-		loanType() {
-			return util.getLoanType(this, this.loan.form.type)
+		isStartable() {
+			return this.loan.data.approvalStatus === Enum.Loan.ApprovalStatus.Approved
 		},
-		loanStatus() {
-			return util.getLoanStatus(this, this.loan.data.status)
+		isApprovable() {
+			return (this.loan.data.approvalStatus === Enum.Loan.ApprovalStatus.Submitted) || (this.loan.data.approvalStatus === Enum.Loan.ApprovalStatus.Disapproved)
 		},
-		loanApprovalStatus() {
-			return util.getLoanApprovalStatus(this, this.loan.data.approvalStatus)
+		isCompleteable() {
+			return this.loan.data.status === Enum.Loan.Status.Running
 		},
 		subPaneType() {
 			return (this.debtor.data.profile.id && this.loan.form.type === Enum.Loan.Type.Car)
-		},
-		debtorGender() {
-			return util.getGender(this, this.debtor.data.profile.gender)
-		},
-		debtorAge() {
-			return util.getAge(this, this.debtor.data.profile.birthday)
 		},
 		identifyArray() {
 			const arr = []
@@ -334,15 +364,21 @@ export default {
 		// main
 		initPage() {
 			this.loadLoan()
+			this.loadApprovalComments()
 		},
-
+		showLock() {
+			this.isLockVisible = true
+		},
+		hideLock() {
+			this.isLockVisible = false
+		},
+		onClickEdit() {
+			this.showLock()
+		},
+		onClickCancel() {
+			this.hideLock()
+		},
 		// loan
-		foldLoan() {
-			this.loan.isFolded = true
-		},
-		openLoan() {
-			this.loan.isFolded = false
-		},
 		loanLoading() {
 			this.loan.isLoading = true
 		},
@@ -355,15 +391,21 @@ export default {
 		loanUnsubmitting() {
 			this.loan.isSubmitting = false
 		},
+		loanDeleting() {
+			this.loan.isDeleting = true
+		},
+		loanUndeleting() {
+			this.loan.isDeleting = false
+		},
+		loanStarting() {
+			this.loan.isStarting = true
+		},
+		loanUnstarting() {
+			this.loan.isStarting = false
+		},
 		loadLoan() {
 			this.loanLoading()
 			this.fetchLoan()
-		},
-		onClickFoldLoan() {
-			this.foldLoan()
-		},
-		onClickOpenLoan() {
-			this.openLoan()
 		},
 		onClickSubmitLoan() {
 			if (this.loan.form.type) {
@@ -400,13 +442,47 @@ export default {
 						sub,
 					}
 					this.loanSubmitting()
-					this.addLoan(loan)
+					this.updateLoan(loan)
 				}
 			}
 		},
-		async addLoan(loan) {
+		onClickDelete() {
+			this.loanDeleting()
+			this.deleteLoan()
+		},
+		onClickApprove() {
+		},
+		onClickStart() {
+			this.loanStarting()
+			this.startLoan()
+		},
+		async deleteLoan() {
 			try {
-				const res = await api.loan.add(loan)
+				await api.loan.delete(this.$route.params.loan_id)
+				util.closeCurrentPage(this.$store, this.$route.name, this.$router, 'loans_index')
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUndeleting()
+			}
+		},
+		async startLoan() {
+			try {
+				await api.loan.start(this.$route.params.loan_id)
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUnstarting()
+			}
+		},
+		async updateLoan(loan) {
+			try {
+				const res = await api.loan.update(loan, this.$route.params.loan_id)
+				this.$Notice.success({
+					title: '更新成功, 正在刷新...',
+					duration: 3,
+				})
 				this.loadLoan(res)
 			} catch (e) {
 				this.$Message.error(e.message)
@@ -485,14 +561,14 @@ export default {
 				default:
 			}
 		},
-		onClickEditLoan() {
+		onClickUnlockLoan() {
 			this.editLoan()
 		},
 		onClickResetLoan() {
 			this.initLoanForm()
 			this.uneditLoan()
 		},
-		onClickSaveLoan() {
+		onClickLockLoan() {
 			this.uneditLoan()
 		},
 		// loan_sub_car
@@ -516,14 +592,14 @@ export default {
 				inspectionLicenseImageUrl: this.loan.data.sub.inspectionLicenseImageUrl,
 			}
 		},
-		onClickEditCar() {
+		onClickUnlockCar() {
 			this.editCar()
 		},
 		onClickResetCar() {
 			this.initCarForm()
 			this.uneditCar()
 		},
-		onClickSaveCar() {
+		onClickLockCar() {
 			this.uneditCar()
 		},
 
@@ -592,6 +668,32 @@ export default {
 						break
 					default: this.$Message.error(e.message)
 				}
+			}
+		},
+		// approval
+		approvalLoading() {
+			this.approval.list.isLoading = true
+		},
+		approvalUnloading() {
+			this.approval.list.isLoading = false
+		},
+		loadApprovalComments() {
+			this.approvalLoading()
+			this.fetchApprovalComments()
+		},
+		async fetchApprovalComments() {
+			try {
+				this.approval.data = await api.loan.comment.fetchList(
+					this.approval.list.pagesize,
+					this.approval.list.page,
+					this.approval.list.filters,
+					this.approval.list.sortBy,
+					this.$route.params.loan_id,
+				)
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.approvalUnloading()
 			}
 		},
 
