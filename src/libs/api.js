@@ -105,7 +105,7 @@ api.loan = {
 			filters,
 			orderBy,
 		}
-		const str = `?${util.generateQueryString(query)}&hasProduct=true`
+		const str = `?${util.generateQueryString(query)}&productable=true`
 		return createAuthInstance().get(`loan/${str}`).then(res => res.data)
 	},
 	add: async params =>

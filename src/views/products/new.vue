@@ -61,6 +61,7 @@
 						<Row>
 							<Col :span="8"><FormItem label="项目总额"><p>{{product.finance.form.amount}}</p></FormItem></Col>
 							<Col :span="8"><FormItem label="项目周期"><p>{{util.getLoanTermType(this, loan.data.main.termType)}}</p></FormItem></Col>
+							<Col :span="8"><FormItem label="贷款利率"><p>{{loan.data.main.interestRate}}</p></FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="8"><FormItem label="基础利率">
@@ -297,10 +298,17 @@ export default {
 				data: [],
 				columns: [
 					{
+						name: 'id',
+						title: '编号',
+						key: 'id',
+						searchable: true,
+					},
+					{
 						name: 'type',
 						title: '类型',
 						key: 'type',
 						searchable: true,
+						render: (h, params) => h('p', util.getLoanType(this, params.row.type) || '-'),
 					},
 					{
 						name: 'object',
@@ -439,7 +447,7 @@ export default {
 		async addProduct(product) {
 			try {
 				const res = await api.product.add(product, this.product.data.id)
-				this.$router.replace({
+				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
 					name: 'product_detail',
 					params: {
 						product_id: res,
@@ -600,7 +608,7 @@ export default {
 					agentId: loan.agentId,
 					object: loan.object,
 					amount: loan.amount,
-					interest: loan.interest,
+					interestRate: loan.interestRate,
 					approvalStatus: loan.approvalStatus,
 					repaymentWay: loan.repaymentWay,
 					type: loan.type,

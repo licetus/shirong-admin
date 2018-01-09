@@ -287,15 +287,14 @@ util.md5 = (string) => {
 util.formatPercent = percent =>
 	`${Math.round(percent * 100)}%`
 
-util.closeCurrentPage = (store, pageName, router, linkTo) => {
+util.closeCurrentPage = (store, pageName, router, pushTo) => {
 	store.commit('removeTag', pageName)
 	store.commit('closePage', pageName)
 	localStorage.pageOpenedList = JSON.stringify(store.state.app.pageOpenedList)
 	router.push({
-		name: linkTo,
-		query: {
-			action: 'refresh',
-		},
+		name: pushTo.name,
+		params: pushTo.params || null,
+		query: pushTo.query || null,
 	})
 }
 

@@ -492,14 +492,6 @@ export default {
 		loanUnsubmitting() {
 			this.loan.isSubmitting = false
 		},
-		loadLoan(id) {
-			this.$router.push({
-				name: 'loan_detail',
-				params: {
-					loan_id: id,
-				},
-			})
-		},
 		onClickSubmitLoan() {
 			if (this.loan.form.type) {
 				const subMapping = ['', 'other', 'car']
@@ -542,7 +534,12 @@ export default {
 		async addLoan(loan) {
 			try {
 				const res = await api.loan.add(loan)
-				this.loadLoan(res)
+				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
+					name: 'loan_detail',
+					params: {
+						loan_id: res,
+					},
+				})
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {

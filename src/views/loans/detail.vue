@@ -502,7 +502,12 @@ export default {
 		async deleteLoan() {
 			try {
 				await api.loan.delete(this.$route.params.loan_id)
-				util.closeCurrentPage(this.$store, this.$route.name, this.$router, 'loans_index')
+				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
+					name: 'loans_index',
+					query: {
+						action: 'refresh',
+					},
+				})
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
