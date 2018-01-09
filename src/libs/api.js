@@ -187,8 +187,8 @@ api.product = {
 		createAuthInstance().put(`product/${id}/resume`).then(res => res.data),
 	cancel: async id =>
 		createAuthInstance().put(`product/${id}/cancel`).then(res => res.data),
-	switchSale: async id =>
-		createAuthInstance().put(`product/${id}/changeOnSale`).then(res => res.data),
+	switchSaleStatus: async (status, id) =>
+		createAuthInstance().put(`product/${id}/changeOnSale?isOnSale=${status}`).then(res => res.data),
 }
 
 export default api

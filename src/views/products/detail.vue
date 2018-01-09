@@ -167,17 +167,15 @@
 						控制台
 					</p>
 					<Row type="flex" justify="space-between">
-						<Col :span="16">
-							<div v-if="!product.isLoading">
-								<Button v-if="isPublishable" class="margin-right-10" type="primary" @click="onClickPublishProduct" :loading="product.isPublishing">发布</Button>
-								<Button v-if="isPauseable" class="margin-right-10" type="warning" @click="onClickPauseProduct" :loading="product.isPausing">暂停</Button>
-								<Button v-if="isResumeable" class="margin-right-10" type="success" @click="onClickResumeProduct" :loading="product.isResuming">恢复</Button>
-								<Button v-if="isCancelable" class="margin-right-10" type="error" @click="onClickCancelProduct" :loading="product.isCanceling">取消</Button>
-							</div>
+						<Col>
+							<Button @click="onClickRefreshProduct" :loading="product.isLoading">刷新</Button>
 						</Col>
-						<Col :span="8">
-							<Row type="flex" justify="end">
-								<Button @click="onClickRefreshProduct" :loading="product.isLoading">刷新</Button>
+						<Col>
+							<Row v-if="!product.isLoading" type="flex" justify="end">
+								<Button v-if="isCancelable" class="margin-left-10" type="error" @click="onClickCancelProduct" :loading="product.isCanceling">取消</Button>
+								<Button v-if="isPublishable" class="margin-left-10" type="primary" @click="onClickPublishProduct" :loading="product.isPublishing">发布</Button>
+								<Button v-if="isPauseable" class="margin-left-10" type="warning" @click="onClickPauseProduct" :loading="product.isPausing">暂停</Button>
+								<Button v-if="isResumeable" class="margin-left-10" type="success" @click="onClickResumeProduct" :loading="product.isResuming">恢复</Button>
 							</Row>
 						</Col>
 					</Row>
@@ -186,10 +184,20 @@
 					<p slot="title">
 						上架状态
 					</p>
-					<Form label-position="left" :label-width="sale.labelWidth">
-						<FormItem label="上架状态">{{util.getProductSaleStatus(product.isOnSale)}}</FormItem>
-						<FormItem label="上架时间">{{util.formatTime(product.data.publishTime)}}</FormItem>
-					</Form>
+					<Row type="flex" justify="space-between">
+						<Col>
+							<Form label-position="left" :label-width="sale.labelWidth">
+								<FormItem label="上架状态">{{util.getProductSaleStatus(this, product.data.isOnSale)}}</FormItem>
+								<FormItem label="上架时间">{{util.formatTime(this, product.data.publishTime)}}</FormItem>
+							</Form>
+						</Col>
+						<Col>
+							<Row v-if="!product.isLoading" type="flex" justify="end">
+								<Button v-if="!product.data.isOnSale" type="success" @click="onClickSwitchSaleStatus" :loading="product.isSaleStatusSwitching">上架</Button>
+								<Button v-else type="warning" @click="onClickSwitchSaleStatus" :loading="product.isSaleStatusSwitching">下架</Button>
+							</Row>
+						</Col>
+					</Row>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">
@@ -243,6 +251,7 @@ export default {
 				isPausing: false,
 				isResuming: false,
 				isCanceling: false,
+				isSaleStatusSwitching: false,
 				data: blank.product,
 				profile: {
 					labelWidth: 75,
@@ -329,6 +338,9 @@ export default {
 			},
 		}
 	},
+	mounted() {
+		this.initPage()
+	},
 	computed: {
 		isControlable() {
 			return this.access <= Enum.Role.Admin
@@ -357,9 +369,6 @@ export default {
 		isOnSale() {
 			return this.product.data.isOnSale ? '已上架' : '未上架'
 		},
-	},
-	mounted() {
-		this.initPage()
 	},
 	methods: {
 		// main
@@ -498,6 +507,28 @@ export default {
 				this.productUncanceling()
 			}
 		},
+		// switch sale
+		saleStatusSwitching() {
+			this.product.isSaleStatusSwitching = true
+		},
+		saleStatusUnswitching() {
+			this.product.isSaleStatusSwitching = false
+		},
+		onClickSwitchSaleStatus() {
+			this.saleStatusSwitching()
+			this.switchSaleStatus()
+		},
+		async switchSaleStatus() {
+			try {
+				const status = this.product.data.isOnSale === true
+				await api.product.switchSaleStatus(!status, this.$route.params.product_id)
+				this.loadProduct()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.saleStatusUnswitching()
+			}
+		},
 		// profile
 		onClickEditProfile() {
 			this.editProfile()
@@ -627,7 +658,6 @@ export default {
 						backBlurImageUrl: debtorIdentify.backBlurImageUrl,
 						location: debtorIdentify.location,
 					}
-					console.log('here')
 				} catch (e) {
 					this.$Message.error(e.message)
 				}
