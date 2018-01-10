@@ -128,18 +128,22 @@ export default {
 				{
 					title: '操作',
 					align: 'center',
-					render: (h, params) =>
-						h('div', [
-							h('Button', {
-								props: { type: 'primary',	size: 'small' },
-								style: { marginRight: '10px' },
-								on: {	click: () => this.onClickEditAccount(params.row) },
-							}, '编辑'),
-							h('Button', {
-								props: { type: 'error',	size: 'small', loading: this.account[`isAccount${params.index}Deleting`] || false },
-								on: {	click: () => this.onClickDeleteAccount(params.index, params.row.id) },
-							}, '删除'),
-						]),
+					render: (h, params) => {
+						if (params.row.role !== Enum.Role.SuperAdmin) {
+							return h('div', [
+								h('Button', {
+									props: { type: 'primary',	size: 'small' },
+									style: { marginRight: '10px' },
+									on: {	click: () => this.onClickEditAccount(params.row) },
+								}, '编辑'),
+								h('Button', {
+									props: { type: 'error',	size: 'small', loading: this.account[`isAccount${params.index}Deleting`] || false },
+									on: {	click: () => this.onClickDeleteAccount(params.index, params.row.id) },
+								}, '删除'),
+							])
+						}
+						return null
+					},
 				},
 			],
 			account: {
