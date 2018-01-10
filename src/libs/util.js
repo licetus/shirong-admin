@@ -284,8 +284,34 @@ util.md5 = (string) => {
 	return jsmd5(string).toUpperCase()
 }
 
-util.formatPercent = percent =>
-	`${Math.round(percent * 100)}%`
+util.passwordCheck = (vm, callback) => {
+	let password = ''
+	vm.$Modal.confirm({
+		title: '身份验证',
+		render: h => h('Input', {
+			style: {
+				'margin-top': '30px',
+			},
+			props: {
+				type: 'password',
+				value: password,
+				autofocus: true,
+				placeholder: '请输入密码',
+			},
+			on: {
+				input: (val) => {
+					password = val
+				},
+			},
+		}),
+		okText: '确认',
+		onOk: () => {
+			if (password === Cookies.get('password')) callback()
+			else vm.$Message.error('密码错误')
+		},
+		cancelText: '取消',
+	})
+}
 
 util.closeCurrentPage = (store, pageName, router, pushTo) => {
 	store.commit('removeTag', pageName)
@@ -319,6 +345,9 @@ util.inputLengthCheck = (string, length, vm) => {
 	vm.$Message.error(`输入长度请勿超过 ${length} 个字符`)
 	return false
 }
+
+util.formatPercent = percent =>
+	`${Math.round(percent * 100)}%`
 
 util.getTimestamp = (vm, date) => {
 	if (!date) {

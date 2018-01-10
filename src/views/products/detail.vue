@@ -431,8 +431,10 @@ export default {
 			this.product.isPublishing = false
 		},
 		onClickPublishProduct() {
-			this.productPublishing()
-			this.publishProduct()
+			util.passwordCheck(this, () => {
+				this.productPublishing()
+				this.publishProduct()
+			})
 		},
 		async publishProduct() {
 			try {
@@ -452,8 +454,10 @@ export default {
 			this.product.isPausing = false
 		},
 		onClickPauseProduct() {
-			this.productPausing()
-			this.pauseProduct()
+			util.passwordCheck(this, () => {
+				this.productPausing()
+				this.pauseProduct()
+			})
 		},
 		async pauseProduct() {
 			try {
@@ -473,8 +477,10 @@ export default {
 			this.product.isResuming = false
 		},
 		onClickResumeProduct() {
-			this.productResuming()
-			this.resumeProduct()
+			util.passwordCheck(this, () => {
+				this.productResuming()
+				this.resumeProduct()
+			})
 		},
 		async resumeProduct() {
 			try {
@@ -494,8 +500,10 @@ export default {
 			this.product.isCanceling = false
 		},
 		onClickCancelProduct() {
-			this.productCanceling()
-			this.cancelProduct()
+			util.passwordCheck(this, () => {
+				this.productCanceling()
+				this.cancelProduct()
+			})
 		},
 		async cancelProduct() {
 			try {
@@ -515,8 +523,10 @@ export default {
 			this.product.isSaleStatusSwitching = false
 		},
 		onClickSwitchSaleStatus() {
-			this.saleStatusSwitching()
-			this.switchSaleStatus()
+			util.passwordCheck(this, () => {
+				this.saleStatusSwitching()
+				this.switchSaleStatus()
+			})
 		},
 		async switchSaleStatus() {
 			try {

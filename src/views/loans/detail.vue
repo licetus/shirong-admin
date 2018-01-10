@@ -170,9 +170,9 @@
 			<Col :span="8" class="padding-left-5">
 				<Card class="margin-bottom-10">
 					<p slot="title">操作</p>
-					<Row type="flex" justify="space-bewtween">
-						<Col :span="16">
-							<div v-if="isEditable">
+					<Row type="flex" justify="space-between">
+						<Col>
+							<div v-if="isEditable && !loan.isLoading">
 								<div v-if="!isLockVisible">
 									<Button class="margin-right-10" type="primary" @click="onClickEditLoan">编辑</Button>
 									<Button class="margin-right-10" type="error" @click="onClickDeleteLoan" :loading="loan.isDeleting">删除</Button>
@@ -190,7 +190,7 @@
 								<Button v-else-if="isCompleteable" class="margin-right-10" type="primary" @click="onClickCompleteLoan">完成</Button>
 							</div>
 						</Col>
-						<Col :span="8">
+						<Col>
 							<Row type="flex" justify="end">
 								<Button class="margin-right-10" @click="onClickRefreshLoan" :loading="loan.isLoading">刷新</Button>
 							</Row>
@@ -410,6 +410,80 @@ export default {
 		onClickRefreshLoan() {
 			this.initPage()
 		},
+		// delete
+		loanDeleting() {
+			this.loan.isDeleting = true
+		},
+		loanUndeleting() {
+			this.loan.isDeleting = false
+		},
+		onClickDeleteLoan() {
+			util.passwordCheck(this, () => {
+				this.loanDeleting()
+				this.deleteLoan()
+			})
+		},
+		async deleteLoan() {
+			try {
+				await api.loan.delete(this.$route.params.loan_id)
+				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
+					name: 'loans_index',
+					query: {
+						action: 'refresh',
+					},
+				})
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUndeleting()
+			}
+		},
+		// start
+		loanStarting() {
+			this.loan.isStarting = true
+		},
+		loanUnstarting() {
+			this.loan.isStarting = false
+		},
+		onClickStartLoan() {
+			util.passwordCheck(this, () => {
+				this.loanStarting()
+				this.startLoan()
+			})
+		},
+		async startLoan() {
+			try {
+				await api.loan.start(this.$route.params.loan_id)
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUnstarting()
+			}
+		},
+		// complete
+		loanCompleting() {
+			this.loan.isCompleting = true
+		},
+		loanUncompleting() {
+			this.loan.isCompleting = false
+		},
+		onClickCompleteLoan() {
+			util.passwordCheck(this, () => {
+				this.loanCompleting()
+				this.completeLoan()
+			})
+		},
+		async completeLoan() {
+			try {
+				await api.loan.complete(this.$route.params.loan_id)
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loanUncompleting()
+			}
+		},
 		// loan
 		loanLoading() {
 			this.loan.isLoading = true
@@ -422,24 +496,6 @@ export default {
 		},
 		loanUnsubmitting() {
 			this.loan.isSubmitting = false
-		},
-		loanDeleting() {
-			this.loan.isDeleting = true
-		},
-		loanUndeleting() {
-			this.loan.isDeleting = false
-		},
-		loanStarting() {
-			this.loan.isStarting = true
-		},
-		loanUnstarting() {
-			this.loan.isStarting = false
-		},
-		loanCompleting() {
-			this.loan.isCompleting = true
-		},
-		loanUncompleting() {
-			this.loan.isCompleting = false
 		},
 		loadLoan() {
 			this.loanLoading()
@@ -479,60 +535,15 @@ export default {
 						remark: this.loan.form.remark,
 						sub,
 					}
-					this.loanSubmitting()
-					this.updateLoan(loan)
+					util.passwordCheck(this, () => {
+						this.loanSubmitting()
+						this.updateLoan(loan)
+					})
 				}
 			}
 		},
-		onClickDeleteLoan() {
-			this.loanDeleting()
-			this.deleteLoan()
-		},
 		onClickStartApproval() {
 			this.showApprovalModal()
-		},
-		onClickStartLoan() {
-			this.loanStarting()
-			this.startLoan()
-		},
-		onClickCompleteLoan() {
-			this.loanCompleting()
-			this.completeLoan()
-		},
-		async deleteLoan() {
-			try {
-				await api.loan.delete(this.$route.params.loan_id)
-				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
-					name: 'loans_index',
-					query: {
-						action: 'refresh',
-					},
-				})
-			} catch (e) {
-				this.$Message.error(e.message)
-			} finally {
-				this.loanUndeleting()
-			}
-		},
-		async startLoan() {
-			try {
-				await api.loan.start(this.$route.params.loan_id)
-				this.loadLoan()
-			} catch (e) {
-				this.$Message.error(e.message)
-			} finally {
-				this.loanUnstarting()
-			}
-		},
-		async completeLoan() {
-			try {
-				await api.loan.complete(this.$route.params.loan_id)
-				this.loadLoan()
-			} catch (e) {
-				this.$Message.error(e.message)
-			} finally {
-				this.loanUncompleting()
-			}
 		},
 		async updateLoan(loan) {
 			try {
