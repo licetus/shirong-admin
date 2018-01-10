@@ -5,6 +5,7 @@ import moment from 'moment'
 // import env from '../../build/env'
 import packjson from '../../package.json'
 import Enum from '../models/enum'
+import api from './api'
 
 /* eslint-disable */
 import semver from 'semver'
@@ -286,6 +287,20 @@ util.md5 = (string) => {
 
 util.passwordCheck = (vm, callback) => {
 	let password = ''
+	let isLoading = false
+	const validate = async () => {
+		if (!isLoading) {
+			try {
+				isLoading = true
+				await api.login(Cookies.get('username'), util.md5(password))
+				callback()
+			} catch (e) {
+				vm.$Message.error('密码错误')
+			} finally {
+				isLoading = false
+			}
+		}
+	}
 	vm.$Modal.confirm({
 		title: '身份验证',
 		render: h => h('InputPassword', {
@@ -300,14 +315,15 @@ util.passwordCheck = (vm, callback) => {
 				input: (val) => {
 					password = val
 				},
+				'on-enter': () => {
+					validate()
+					vm.$Modal.remove()
+				},
 			},
 		}),
-		okText: '确认',
-		onOk: () => {
-			if (password === Cookies.get('password')) callback()
-			else vm.$Message.error('密码错误')
-		},
 		cancelText: '取消',
+		okText: '确认',
+		onOk: () => validate(),
 	})
 }
 

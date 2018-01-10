@@ -228,6 +228,7 @@ export default {
 				search: {
 					key: 'realName',
 					val: '',
+					maxLength: 10,
 				},
 				list: {
 					isLoading: false,
@@ -385,7 +386,7 @@ export default {
 			this.fetchDebtorList()
 		},
 		onClickSearchDebtor() {
-			if (this.debtors.search.val && util.inputLengthCheck(this.debtors.search.val, 20, this)) {
+			if (this.debtors.search.val && util.inputLengthCheck(this.debtors.search.val, this.debtors.serach.maxLength, this)) {
 				this.generateSearchFilters()
 				this.listLoading()
 				this.fetchDebtorList()

@@ -6,13 +6,13 @@
 				<Button type="primary" @click="onClickNewAccount">新建帐号</Button>
 			</Col>
 				<Col>
-					<Input v-model="search.input" placeholder="请输入搜索内容...">
-						<Select v-model="search.column" slot="prepend" style="width: 75px">
+					<Input v-model="search.val" placeholder="请输入搜索内容...">
+						<Select v-model="search.key" slot="prepend" style="width: 75px">
 							<template v-for="(item, index) of searchOptions">
-								<Option :value="item.title">{{item.title}}</Option>
+								<Option :value="item.key" :label="item.title"></Option>
 							</template>
 						</Select>
-						<Button slot="append" icon="ios-search" @click="onClickSearch"></Button>
+						<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="list.isLoading"></Button>
 					</Input>
 				</Col>
 				<Col>
@@ -37,10 +37,12 @@
 					<Col>
 						<Row>
 							<Col><FormItem label="账号">
-								<Input v-model="account.form.account" icon="checkmark" @on-enter="focusPassword" @on-click="focusPassword"/>
+								<p v-if="account.action === 'edit'">{{account.form.account}}</p>
+								<Input v-else v-model="account.form.account" icon="checkmark" @on-enter="focusPassword" @on-click="focusPassword"/>
 							</FormItem></Col>
 							<Col><FormItem label="密码">
-								<InputPassword ref="passwordInput" v-model="account.form.password"></InputPassword>
+								<Button v-if="account.action === 'edit' && !account.resetPassword" @click="onClickResetPassword">重置密码</Button>
+								<InputPassword v-else ref="passwordInput" v-model="account.form.password"></InputPassword>
 							</FormItem></Col>
 							<Col><FormItem label="类别">
 								<RadioGroup v-model="account.form.role">
@@ -77,15 +79,16 @@ export default {
 				total: 0,
 				pagesize: 10,
 				page: 0,
-				filter: '',
-				orderBy: '',
+				filters: '',
+				orderBy: 'role',
 			},
 			search: {
-				column: '编号',
-				input: '',
+				key: 'id',
+				val: '',
 				maxLength: 10,
 			},
 			accounts: [],
+			accountsDeleting: [],
 			accountColumns: [ // TODO: columns detail needing
 				{
 					name: 'id',
@@ -133,7 +136,7 @@ export default {
 								on: {	click: () => this.onClickEditAccount(params.row) },
 							}, '编辑'),
 							h('Button', {
-								props: { type: 'error',	size: 'small' },
+								props: { type: 'error',	size: 'small', loading: this.account[`isAccount${params.index}Deleting`] || false },
 								on: {	click: () => this.onClickDeleteAccount(params.index, params.row.id) },
 							}, '删除'),
 						]),
@@ -162,7 +165,7 @@ export default {
 		searchOptions() {
 			const list = []
 			this.accountColumns.forEach((item) => {
-				if (item.searchable) list.push({ name: item.name, title: item.title })
+				if (item.searchable) list.push({ key: item.name, title: item.title })
 			})
 			return list
 		},
@@ -183,10 +186,10 @@ export default {
 			this.fetchAccountList()
 		},
 		accountDeleting(index) {
-			this.accounts[index].isDeleting = true
+			this.$set(this.account, `isAccount${index}Deleting`, true)
 		},
 		accountUndeleting(index) {
-			this.accounts[index].isDeleting = false
+			this.$delete(this.account, `isAccount${index}Deleting`)
 		},
 		onClickRefresh() {
 			this.initPage()
@@ -202,17 +205,17 @@ export default {
 		onClickDeleteAccount(index, id) {
 			util.passwordCheck(this, () => {
 				this.accountDeleting(index)
-				this.deleteAccount(id)
+				this.deleteAccount(index, id)
 			})
 		},
-		async deleteAccount(id) {
+		async deleteAccount(index, id) {
 			try {
 				await api.admin.account.delete(id)
 				this.initPage()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
-				this.accountUndeleting()
+				this.accountUndeleting(index)
 			}
 		},
 		// modal
@@ -222,11 +225,11 @@ export default {
 		hideAccountModal() {
 			this.account.isModalVisible = false
 		},
+		resetPassword() {
+			this.account.resetPassword = true
+		},
 		focusPassword() {
 			this.$refs.passwordInput.focus()
-		},
-		switchPasswordVisible() {
-			this.account.isPasswordVisible = !this.account.isPasswordVisible
 		},
 		accountSubmitting() {
 			this.account.isSubmitting = true
@@ -247,12 +250,16 @@ export default {
 				case 'edit':
 					this.account.action = 'edit'
 					this.account.form = {
+						id: account.id,
 						account: account.account,
 						role: account.role,
 					}
 					break
 				default:
 			}
+		},
+		onClickResetPassword() {
+			this.resetPassword()
 		},
 		onClickCancel() {
 			this.hideAccountModal()
@@ -279,7 +286,7 @@ export default {
 					}
 					if (this.account.resetPassword && this.account.form.password) account.password = util.md5(this.account.form.password)
 					this.accountSubmitting()
-					this.updateAccount(account)
+					this.updateAccount(account, this.account.form.id)
 					break
 				}
 				default:
@@ -288,6 +295,17 @@ export default {
 		async addAccount(account) {
 			try {
 				await api.admin.account.add(account)
+				this.initPage()
+				this.hideAccountModal()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.accountUnsubmitting()
+			}
+		},
+		async updateAccount(account, id) {
+			try {
+				await api.admin.account.update(account, id)
 				this.initPage()
 				this.hideAccountModal()
 			} catch (e) {
@@ -318,15 +336,16 @@ export default {
 				this.listUnloading()
 			}
 		},
-		onClickSearchOption(name) {
-			this.search.column = name
+		// search / sort
+		generateSearchFilters() {
+			this.list.filters = `${this.search.key} LIKE '%${this.search.val}%'`
 		},
 		onClickSearch() {
-			if (util.inputLengthCheck(this.search.input, this.search.maxLength, this)) {
-				this.$Message.info(`搜索: [${this.search.column}] - [${this.search.input}]`)
+			if (util.inputLengthCheck(this.search.val, this.search.maxLength, this)) {
+				this.generateSearchFilters()
+				this.initPage()
 			}
 		},
-		// search / sort
 		onClickSort() {
 		},
 	},
