@@ -6,14 +6,21 @@
 					<Button type="primary" @click="onClickNewLoan">新增贷款</Button>
 				</Col>
 				<Col>
-					<Input v-model="search.val" placeholder="请输入搜索内容...">
-						<Select v-model="search.key" slot="prepend" style="width: 75px">
-							<template v-for="(item, index) of searchOptions">
-								<Option :value="item.key" :label="item.title"></Option>
-							</template>
-						</Select>
-						<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="list.isLoading"></Button>
-					</Input>
+					<Row type="flex">
+						<Col>
+							<Input v-model="search.val" placeholder="请输入搜索内容..." @on-enter="onClickSearch">
+								<Select v-model="search.key" slot="prepend" style="width: 75px">
+									<template v-for="(item, index) of searchOptions">
+										<Option :value="item.key" :label="item.title"></Option>
+									</template>
+								</Select>
+								<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="list.isLoading"></Button>
+							</Input>
+						</Col>
+						<Col>
+							<Button type="text" @click="onClickResetPage" :loading="list.isLoading">重置</Button>
+						</Col>
+					</Row>
 				</Col>
 				<Col>
 					<Row type="flex" justify="end">
@@ -235,6 +242,10 @@ export default {
 				this.generateSearchFilters()
 				this.initPage()
 			}
+		},
+		onClickResetPage() {
+			this.list.filters = ''
+			this.initPage()
 		},
 		onClickSort() {
 		},

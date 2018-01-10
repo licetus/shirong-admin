@@ -2,18 +2,25 @@
 	<section>
 		<Card class="table-card">
 			<Row class="margin-bottom-20" type="flex" justify="space-between">
-			<Col>
-				<Button type="primary" @click="onClickNewProduct">新增项目</Button>
-			</Col>
 				<Col>
-					<Input v-model="search.input" placeholder="请输入搜索内容...">
-						<Select v-model="search.column" slot="prepend" style="width: 75px">
-							<template v-for="(item, index) of searchOptions">
-								<Option :value="item.title">{{item.title}}</Option>
-							</template>
-						</Select>
-						<Button slot="append" icon="ios-search" @click="onClickSearch"></Button>
-					</Input>
+					<Button type="primary" @click="onClickNewProduct">新增项目</Button>
+				</Col>
+				<Col>
+					<Row type="flex">
+						<Col>
+							<Input v-model="search.val" placeholder="请输入搜索内容..." @on-enter="onClickSearch">
+								<Select v-model="search.key" slot="prepend" style="width: 75px">
+									<template v-for="(item, index) of searchOptions">
+										<Option :value="item.key" :label="item.title"></Option>
+									</template>
+								</Select>
+								<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="list.isLoading"></Button>
+							</Input>
+						</Col>
+						<Col>
+							<Button type="text" @click="onClickResetPage" :loading="list.isLoading">重置</Button>
+						</Col>
+					</Row>
 				</Col>
 				<Col>
 					<Row type="flex" justify="end">
@@ -50,8 +57,8 @@ export default {
 				orderBy: '',
 			},
 			search: {
-				column: '编号',
-				input: '',
+				key: 'id',
+				val: '',
 				maxLength: 10,
 			},
 			products: [],
@@ -149,11 +156,19 @@ export default {
 	mounted() {
 		this.initPage()
 	},
+	activated() {
+		if (this.$route.query.action === 'refresh') {
+			this.initPage()
+			this.$router.push({
+				name: 'products_index',
+			})
+		}
+	},
 	computed: {
 		searchOptions() {
 			const list = []
 			this.productColumns.forEach((item) => {
-				if (item.searchable) list.push({ name: item.name, title: item.title })
+				if (item.searchable) list.push({ key: item.key, title: item.title })
 			})
 			return list
 		},
@@ -213,13 +228,18 @@ export default {
 			}
 		},
 		// search / sort
-		onClickSearchOption(name) {
-			this.search.column = name
+		generateSearchFilters() {
+			this.list.filters = `${this.search.key} LIKE '%${this.search.val}%'`
 		},
 		onClickSearch() {
-			if (util.inputLengthCheck(this.search.input, this.search.maxLength, this)) {
-				this.$Message.info(`搜索: [${this.search.column}] - [${this.search.input}]`)
+			if (util.inputLengthCheck(this.search.val, this.search.maxLength, this)) {
+				this.generateSearchFilters()
+				this.initPage()
 			}
+		},
+		onClickResetPage() {
+			this.list.filters = ''
+			this.initPage()
 		},
 		onClickSort() {
 		},

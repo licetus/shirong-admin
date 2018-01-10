@@ -6,14 +6,21 @@
 					<Button type="primary" @click="onClickNewDebtor">新增借款人</Button>
 				</Col>
 				<Col>
-					<Input v-model="search.input" placeholder="请输入搜索内容...">
-						<Select v-model="search.column" slot="prepend" style="width: 75px">
-							<template v-for="(item, index) of searchOptions">
-								<Option :value="item.title">{{item.title}}</Option>
-							</template>
-						</Select>
-						<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="search.isSearching"></Button>
-					</Input>
+					<Row type="flex">
+						<Col>
+							<Input v-model="search.val" placeholder="请输入搜索内容..." @on-enter="onClickSearch">
+								<Select v-model="search.key" slot="prepend" style="width: 75px">
+									<template v-for="(item, index) of searchOptions">
+										<Option :value="item.key" :label="item.title"></Option>
+									</template>
+								</Select>
+								<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="list.isLoading"></Button>
+							</Input>
+						</Col>
+						<Col>
+							<Button type="text" @click="onClickResetPage" :loading="list.isLoading">重置</Button>
+						</Col>
+					</Row>
 				</Col>
 				<Col>
 					<Row type="flex" justify="end">
@@ -50,9 +57,8 @@ export default {
 				orderBy: '',
 			},
 			search: {
-				isSearching: false,
-				column: '编号',
-				input: '',
+				key: 'id',
+				val: '',
 				maxLength: 10,
 			},
 			debtors: [],
@@ -110,7 +116,7 @@ export default {
 		searchOptions() {
 			const list = []
 			this.debtorColumns.forEach((item) => {
-				if (item.searchable) list.push({ name: item.name, title: item.title })
+				if (item.searchable) list.push({ key: item.key, title: item.title })
 			})
 			return list
 		},
@@ -165,16 +171,18 @@ export default {
 			}
 		},
 		// search / sort
-		onClickSearchOption(name) {
-			this.search.column = name
+		generateSearchFilters() {
+			this.list.filters = `${this.search.key} LIKE '%${this.search.val}%'`
 		},
 		onClickSearch() {
-			if (util.inputLengthCheck(this.search.input, this.search.maxLength, this)) {
-				this.$Notice.open({
-					title: `搜索: [${this.search.column}] - [${this.search.input}]`,
-					duration: 3,
-				})
+			if (util.inputLengthCheck(this.search.val, this.search.maxLength, this)) {
+				this.generateSearchFilters()
+				this.initPage()
 			}
+		},
+		onClickResetPage() {
+			this.list.filters = ''
+			this.initPage()
 		},
 		onClickSort() {
 		},
