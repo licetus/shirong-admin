@@ -202,18 +202,25 @@
 		</Row>
 
 		<Modal v-model="loans.isModalVisible" class="table-modal" width="75">
-			<Row class="modal-header-row">
-				<Col :span="16">
-					<Input v-model="loans.search.val" placeholder="请输入搜索内容...">
-						<Select v-model="loans.search.key" slot="prepend" style="width: 75px">
-							<template v-for="(item, index) of searchOptions">
-								<Option :value="item.key" :label="item.title"></Option>
-							</template>
-						</Select>
-						<Button slot="append" icon="ios-search" @click="onClickSearchDebtor" :loading="loans.list.isLoading"></Button>
-					</Input>
+			<Row class="modal-header-row" type="flex" justify="space-between">
+				<Col>
+					<Row type="flex">
+						<Col>
+							<Input v-model="loans.search.val" placeholder="请输入搜索内容..." @on-enter="onClickSearchLoan">
+								<Select v-model="loans.search.key" slot="prepend" style="width: 75px">
+									<template v-for="(item, index) of searchOptions">
+										<Option :value="item.key" :label="item.title"></Option>
+									</template>
+								</Select>
+								<Button slot="append" icon="ios-search" @click="onClickSearchLoan" :loading="loans.list.isLoading"></Button>
+							</Input>
+						</Col>
+						<Col>
+							<Button type="text" @click="onClickResetList" :loading="loans.list.isLoading">重置</Button>
+						</Col>
+					</Row>
 				</Col>
-				<Col :span="8">
+				<Col>
 					<Button type="text" @click="onClickNewLoan">新增贷款<Icon class="margin-left-10" type="plus-round"></Icon></Button>
 				</Col>
 			</Row>
@@ -287,6 +294,7 @@ export default {
 				search: {
 					key: 'object',
 					val: '',
+					maxLength: 10,
 				},
 				list: {
 					isLoading: false,
@@ -480,12 +488,17 @@ export default {
 			this.listLoading()
 			this.fetchLoanList()
 		},
-		onClickSearchDebtor() {
-			if (this.loans.search.val && util.inputLengthCheck(this.loans.search.val, 20, this)) {
+		onClickSearchLoan() {
+			if (this.loans.search.val && util.inputLengthCheck(this.loans.search.val, this.loans.search.maxLength, this)) {
 				this.generateSearchFilters()
 				this.listLoading()
 				this.fetchLoanList()
 			}
+		},
+		onClickResetList() {
+			this.loans.list.filters = ''
+			this.listLoading()
+			this.fetchLoanList()
 		},
 		onClickNewLoan() {
 			this.$router.push({

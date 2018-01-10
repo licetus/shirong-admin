@@ -181,18 +181,25 @@
 			</Col>
 		</Row>
 		<Modal v-model="debtors.isModalVisible" class="table-modal">
-			<Row class="modal-header-row">
-				<Col :span="16">
-					<Input v-model="debtors.search.val" placeholder="请输入搜索内容...">
-						<Select v-model="debtors.search.key" slot="prepend" style="width: 75px">
-							<template v-for="(item, index) of searchOptions">
-								<Option :value="item.key" :label="item.title"></Option>
-							</template>
-						</Select>
-						<Button slot="append" icon="ios-search" @click="onClickSearchDebtor" :loading="debtors.list.isLoading"></Button>
-					</Input>
+			<Row class="modal-header-row" type="flex" justify="space-between">
+				<Col>
+					<Row type="flex">
+						<Col>
+							<Input v-model="debtors.search.val" placeholder="请输入搜索内容..." @on-enter="onClickSearchDebtor">
+								<Select v-model="debtors.search.key" slot="prepend" style="width: 75px">
+									<template v-for="(item, index) of searchOptions">
+										<Option :value="item.key" :label="item.title"></Option>
+									</template>
+								</Select>
+								<Button slot="append" icon="ios-search" @click="onClickSearchDebtor" :loading="debtors.list.isLoading"></Button>
+							</Input>
+						</Col>
+						<Col>
+							<Button type="text" @click="onClickResetList" :loading="debtors.list.isLoading">重置</Button>
+						</Col>
+					</Row>
 				</Col>
-				<Col :span="8">
+				<Col>
 					<Button type="text" @click="onClickNewDebtor">新建借款人<Icon class="margin-left-10" type="plus-round"></Icon></Button>
 				</Col>
 			</Row>
@@ -386,11 +393,16 @@ export default {
 			this.fetchDebtorList()
 		},
 		onClickSearchDebtor() {
-			if (this.debtors.search.val && util.inputLengthCheck(this.debtors.search.val, this.debtors.serach.maxLength, this)) {
+			if (this.debtors.search.val && util.inputLengthCheck(this.debtors.search.val, this.debtors.search.maxLength, this)) {
 				this.generateSearchFilters()
 				this.listLoading()
 				this.fetchDebtorList()
 			}
+		},
+		onClickResetList() {
+			this.debtors.list.filters = ''
+			this.listLoading()
+			this.fetchDebtorList()
 		},
 		onClickNewDebtor() {
 			this.$router.push({
