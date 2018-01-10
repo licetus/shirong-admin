@@ -236,4 +236,18 @@ api.customer = {
 		createAuthInstance().get(`user/${id}`).then(res => res.data),
 }
 
+// investment
+api.investment = {
+	fetchList: async (pagesize, page, filters, orderBy) => {
+		const query = {
+			pagesize,
+			page,
+			filters,
+			orderBy,
+		}
+		const str = `?${util.generateQueryString(query)}`
+		return createAuthInstance().get(`investment${str}`).then(res => res.data)
+	},
+}
+
 export default api

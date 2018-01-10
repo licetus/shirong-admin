@@ -331,7 +331,7 @@ export default {
 					pagesize: 10,
 					page: 0,
 					filters: '',
-					sortBy: 'create_time desc',
+					orderBy: 'create_time desc',
 				},
 				data: [
 					blank.loan,
@@ -756,7 +756,7 @@ export default {
 					this.approval.list.pagesize,
 					this.approval.list.page,
 					this.approval.list.filters,
-					this.approval.list.sortBy,
+					this.approval.list.orderBy,
 					this.$route.params.loan_id,
 				)
 			} catch (e) {

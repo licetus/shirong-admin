@@ -91,3 +91,15 @@ export function Debtor() {
 		hasHouse: null,
 	}
 }
+
+export function Customer() {
+	this.id = null
+	this.accountType = null
+	this.account = ''
+	this.avatarUrl = ''
+	this.isIdVerified = null
+	this.realName = ''
+	this.idCardNumber = ''
+	this.vipLevel = null
+	this.remark = ''
+}
