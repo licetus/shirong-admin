@@ -62,8 +62,8 @@ api.admin = {
 		},
 		add: async params =>
 			createAuthInstance().post('auth/admin', params).then(res => res.data),
-		delete: async (params, id) =>
-			createAuthInstance().delete(`auth/admin/${id}`, params).then(res => res.data),
+		delete: async id =>
+			createAuthInstance().delete(`auth/admin/${id}`).then(res => res.data),
 		update: async (params, id) =>
 			createAuthInstance().patch(`auth/admin/${id}`, params).then(res => res.data),
 		updateSelf: async params =>

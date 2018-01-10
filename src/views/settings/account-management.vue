@@ -22,18 +22,48 @@
 				</Col>
 			</Row>
 			<Table
-			:loading="list.isLoading"
-			:data="accounts"
-			:columns="accountColumns"
-			@on-sort-change="onClickSort"
-			stripe
-			border>
-		</Table>
-	</Card>
+				:loading="list.isLoading"
+				:data="accounts"
+				:columns="accountColumns"
+				@on-sort-change="onClickSort"
+				stripe
+				border>
+			</Table>
+		</Card>
+		<Modal v-model="account.isModalVisible" width="400">
+			<p slot="header">{{account.modalTitle}}</p>
+			<Form ref="accountForm" :model="account.form" :rules="account.rules" label-position="left" :label-width="account.labelWidth" inline>
+				<Row type="flex" justify="center">
+					<Col>
+						<Row>
+							<Col><FormItem label="账号">
+								<Input v-model="account.form.account" icon="checkmark" @on-enter="focusPassword" @on-click="focusPassword"/>
+							</FormItem></Col>
+							<Col><FormItem label="密码">
+								<Input v-show="account.isPasswordVisible" type="text" v-model="account.form.password" icon="eye-disabled" @on-click="switchPasswordVisible"/>
+								<Input v-show="!account.isPasswordVisible" ref="passwordInput" type="password" v-model="account.form.password" icon="eye" @on-click="switchPasswordVisible"/>
+							</FormItem></Col>
+							<Col><FormItem label="类别">
+								<RadioGroup v-model="account.form.role">
+									<Radio :label="Enum.Role.Admin">{{util.getRole(this, Enum.Role.Admin)}}</Radio>
+									<Radio :label="Enum.Role.Operator">{{util.getRole(this, Enum.Role.Operator)}}</Radio>
+									<Radio :label="Enum.Role.Agent">{{util.getRole(this, Enum.Role.Agent)}}</Radio>
+								</RadioGroup>
+							</FormItem></Col>
+						</Row>
+					</Col>
+				</Row>
+			</Form>
+			<div slot="footer">
+				<Button @click="onClickCancel">取消</Button>
+				<Button type="primary" @click="onClickSubmitAccount" :loading="account.isSubmitting">提交</Button>
+			</div>
+		</Modal>
 	</section>
 </template>
 
 <script>
+import Enum from '../../models/enum'
 import util from '../../libs/util'
 import api from '../../libs/api'
 
@@ -41,6 +71,8 @@ export default {
 	name: 'account_management',
 	data() {
 		return {
+			Enum,
+			util,
 			list: {
 				isLoading: false,
 				total: 0,
@@ -65,7 +97,7 @@ export default {
 				},
 				{
 					name: 'role',
-					title: '权限',
+					title: '类别',
 					key: 'role',
 					align: 'center',
 					render: (h, params) => h('p', `${util.getRole(this, params.row.role) || '-'}`),
@@ -99,15 +131,29 @@ export default {
 							h('Button', {
 								props: { type: 'primary',	size: 'small' },
 								style: { marginRight: '10px' },
-								on: {	click: () => this.onClickEditAccount(params.row.id) },
+								on: {	click: () => this.onClickEditAccount(params.row) },
 							}, '编辑'),
 							h('Button', {
 								props: { type: 'error',	size: 'small' },
-								on: {	click: () => this.onClickDeleteAccount(params.row.id) },
+								on: {	click: () => this.onClickDeleteAccount(params.index, params.row.id) },
 							}, '删除'),
 						]),
 				},
 			],
+			account: {
+				isModalVisible: false,
+				isPasswordVisible: false,
+				isSubmitting: false,
+				action: 'add',
+				resetPassword: false,
+				labelWidth: 75,
+				form: {
+					account: '',
+					role: null,
+				},
+				rules: {
+				},
+			},
 		}
 	},
 	mounted() {
@@ -128,8 +174,119 @@ export default {
 			this.listLoading()
 			this.fetchAccountList()
 		},
+		accountDeleting(index) {
+			this.accounts[index].isDeleting = true
+		},
+		accountUndeleting(index) {
+			this.accounts[index].isDeleting = false
+		},
 		onClickRefresh() {
 			this.initPage()
+		},
+		onClickNewAccount() {
+			this.initAccountForm('add')
+			this.showAccountModal()
+		},
+		onClickEditAccount(account) {
+			this.initAccountForm('edit', account)
+			this.showAccountModal()
+		},
+		onClickDeleteAccount(index, id) {
+			util.passwordCheck(this, () => {
+				this.accountDeleting(index)
+				this.deleteAccount(id)
+			})
+		},
+		async deleteAccount(id) {
+			try {
+				await api.admin.account.delete(id)
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.accountUndeleting()
+			}
+		},
+		// modal
+		showAccountModal() {
+			this.account.isModalVisible = true
+		},
+		hideAccountModal() {
+			this.account.isModalVisible = false
+		},
+		focusPassword() {
+			this.$refs.passwordInput.focus()
+		},
+		switchPasswordVisible() {
+			this.account.isPasswordVisible = !this.account.isPasswordVisible
+		},
+		accountSubmitting() {
+			this.account.isSubmitting = true
+		},
+		accountUnsubmitting() {
+			this.account.isSubmitting = false
+		},
+		initAccountForm(action, account) {
+			switch (action) {
+				case 'add':
+					this.account.action = 'add'
+					this.account.form = {
+						account: '',
+						password: '',
+						role: null,
+					}
+					break
+				case 'edit':
+					this.account.action = 'edit'
+					this.account.form = {
+						account: account.account,
+						role: account.role,
+					}
+					break
+				default:
+			}
+		},
+		onClickCancel() {
+			this.hideAccountModal()
+		},
+		onClickSubmitAccount() { // BUG validator doesn't work
+			// this.$refs.accountForm.validator((valid) => {
+			// 	if (valid) {
+			// 	}
+			// })
+			switch (this.account.action) {
+				case 'add': {
+					const account = {
+						account: this.account.form.account,
+						password: util.md5(this.account.form.password),
+						role: this.account.form.role,
+					}
+					this.accountSubmitting()
+					this.addAccount(account)
+					break
+				}
+				case 'edit': {
+					const account = {
+						role: this.account.form.role,
+					}
+					if (this.account.resetPassword && this.account.form.password) account.password = util.md5(this.account.form.password)
+					this.accountSubmitting()
+					this.updateAccount(account)
+					break
+				}
+				default:
+			}
+		},
+		async addAccount(account) {
+			try {
+				await api.admin.account.add(account)
+				this.initPage()
+				this.hideAccountModal()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.accountUnsubmitting()
+			}
 		},
 		// list
 		listLoading() {
@@ -137,18 +294,6 @@ export default {
 		},
 		listUnloading() {
 			this.list.isLoading = false
-		},
-		accountViewing(index) {
-			this.accounts[index].isViewing = true
-		},
-		accountUnviewing(index) {
-			this.accounts[index].isViewing = false
-		},
-		onClickNewAccount() {
-		},
-		onClickEditAccount() {
-		},
-		onClickDeleteAccount() {
 		},
 		async fetchAccountList() {
 			try {
@@ -165,7 +310,6 @@ export default {
 				this.listUnloading()
 			}
 		},
-		// search / sort
 		onClickSearchOption(name) {
 			this.search.column = name
 		},
@@ -174,6 +318,7 @@ export default {
 				this.$Message.info(`搜索: [${this.search.column}] - [${this.search.input}]`)
 			}
 		},
+		// search / sort
 		onClickSort() {
 		},
 	},
