@@ -189,14 +189,14 @@ export default {
 		listUnloading() {
 			this.list.isLoading = false
 		},
-		productViewing(index) {
-			this.products[index].isViewing = true
-		},
-		productUnviewing(index) {
-			this.products[index].isViewing = false
-		},
+		// productViewing(index) {
+		// 	this.products[index].isViewing = true
+		// },
+		// productUnviewing(index) {
+		// 	this.products[index].isViewing = false
+		// },
 		onClickViewProduct(index) {
-			this.productViewing(index)
+			// this.productViewing(index)
 			this.viewProduct(index)
 		},
 		onClickNewProduct() {
@@ -211,6 +211,7 @@ export default {
 					product_id: this.products[index].id,
 				},
 			})
+			// this.productUnviewing()
 		},
 		async fetchProductList() {
 			try {

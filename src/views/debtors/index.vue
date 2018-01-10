@@ -137,14 +137,14 @@ export default {
 		listUnloading() {
 			this.list.isLoading = false
 		},
-		debtorViewing(index) {
-			this.debtors[index].isViewing = true
-		},
-		debtorUnviewing(index) {
-			this.debtors[index].isViewing = false
-		},
+		// debtorViewing(index) {
+		// 	this.debtors[index].isViewing = true
+		// },
+		// debtorUnviewing(index) {
+		// 	this.debtors[index].isViewing = false
+		// },
 		onClickViewDebtor(index) {
-			this.debtorViewing(index)
+			// this.debtorViewing(index)
 			this.viewDebtor(index)
 		},
 		viewDebtor(index) {
@@ -154,6 +154,7 @@ export default {
 					debtor_id: this.debtors[index].id,
 				},
 			})
+			// this.debtorUnviewing()
 		},
 		async fetchDebtorList() {
 			try {

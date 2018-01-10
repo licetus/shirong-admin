@@ -200,14 +200,14 @@ export default {
 		listUnloading() {
 			this.list.isLoading = false
 		},
-		loanViewing(index) {
-			this.loans[index].isViewing = true
-		},
-		loanUnviewing(index) {
-			this.loans[index].isViewing = false
-		},
+		// loanViewing(index) {
+		// 	this.loans[index].isViewing = true
+		// },
+		// loanUnviewing(index) {
+		// 	this.loans[index].isViewing = false
+		// },
 		onClickViewLoan(index) {
-			this.loanViewing(index)
+			// this.loanViewing(index)
 			this.viewLoan(index)
 		},
 		viewLoan(index) {
@@ -217,6 +217,7 @@ export default {
 					loan_id: this.loans[index].id,
 				},
 			})
+			// this.loanUnviewing()
 		},
 		async fetchLoanList() {
 			try {

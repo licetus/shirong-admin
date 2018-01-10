@@ -220,5 +220,20 @@ api.product = {
 	switchSaleStatus: async (status, id) =>
 		createAuthInstance().put(`product/${id}/changeOnSale?isOnSale=${status}`).then(res => res.data),
 }
+// customer
+api.customer = {
+	fetchList: async (pagesize, page, filters, orderBy) => {
+		const query = {
+			pagesize,
+			page,
+			filters,
+			orderBy,
+		}
+		const str = `?${util.generateQueryString(query)}`
+		return createAuthInstance().get(`user/${str}`).then(res => res.data)
+	},
+	fetch: async id =>
+		createAuthInstance().get(`user/${id}`).then(res => res.data),
+}
 
 export default api
