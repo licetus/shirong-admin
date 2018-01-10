@@ -6,13 +6,13 @@
 					<Button type="primary" @click="onClickNewLoan">新增贷款</Button>
 				</Col>
 				<Col>
-					<Input v-model="search.input" placeholder="请输入搜索内容...">
-						<Select v-model="search.column" slot="prepend" style="width: 75px">
+					<Input v-model="search.val" placeholder="请输入搜索内容...">
+						<Select v-model="search.key" slot="prepend" style="width: 75px">
 							<template v-for="(item, index) of searchOptions">
-								<Option :value="item.title">{{item.title}}</Option>
+								<Option :value="item.key" :label="item.title"></Option>
 							</template>
 						</Select>
-						<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="search.isSearching"></Button>
+						<Button slot="append" icon="ios-search" @click="onClickSearch" :loading="list.isLoading"></Button>
 					</Input>
 				</Col>
 				<Col>
@@ -50,15 +50,14 @@ export default {
 				orderBy: '',
 			},
 			search: {
-				isSearching: false,
-				column: '编号',
-				input: '',
+				key: 'id',
+				val: '',
 				maxLength: 10,
 			},
 			loans: [],
 			loanColumns: [ // TODO: columns detail needing
 				{
-					name: 'loanId',
+					name: 'id',
 					title: '编号',
 					key: 'id',
 					searchable: true,
@@ -80,40 +79,47 @@ export default {
 					name: 'object',
 					title: '标的',
 					key: 'object',
+					align: 'center',
 					searchable: true,
 				},
 				{
 					name: 'amount',
 					title: '借款金额',
 					key: 'amount',
+					align: 'center',
 				},
 				{
 					name: 'interestRate',
 					title: '利率',
 					key: 'interestRate',
+					align: 'center',
 				},
 				{
 					name: 'termType',
 					title: '周期',
 					key: 'termType',
+					align: 'center',
 					render: (h, params) => h('p', util.getLoanTermType(this, params.row.termType) || '-'),
 				},
 				{
 					name: 'repaymentWay',
 					title: '还款方式',
 					key: 'repaymentWay',
+					align: 'center',
 					render: (h, params) => h('p', util.getLoanRepaymentWay(this, params.row.repaymentWay) || '-'),
 				},
 				{
-					name: 'debtorId',
+					name: 'debtorName',
 					title: '借款人',
-					key: 'debtorId',
+					key: 'debtorName',
+					align: 'center',
 					searchable: true,
 				},
 				{
 					name: 'agentId',
 					title: '业务员',
 					key: 'agentId',
+					align: 'center',
 					searchable: true,
 				},
 				{
@@ -166,7 +172,7 @@ export default {
 		searchOptions() {
 			const list = []
 			this.loanColumns.forEach((item) => {
-				if (item.searchable) list.push({ name: item.name, title: item.title })
+				if (item.searchable) list.push({ key: item.key, title: item.title })
 			})
 			return list
 		},
@@ -221,15 +227,13 @@ export default {
 			}
 		},
 		// search / sort
-		onClickSearchOption(name) {
-			this.search.column = name
+		generateSearchFilters() {
+			this.list.filters = `${this.search.key} LIKE '%${this.search.val}%'`
 		},
 		onClickSearch() {
-			if (util.inputLengthCheck(this.search.input, this.search.maxLength, this)) {
-				this.$Notice.open({
-					title: `搜索: [${this.search.column}] - [${this.search.input}]`,
-					duration: 3,
-				})
+			if (util.inputLengthCheck(this.search.val, this.search.maxLength, this)) {
+				this.generateSearchFilters()
+				this.initPage()
 			}
 		},
 		onClickSort() {
