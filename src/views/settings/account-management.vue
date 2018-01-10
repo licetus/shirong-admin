@@ -31,7 +31,7 @@
 			</Table>
 		</Card>
 		<Modal v-model="account.isModalVisible" width="400">
-			<p slot="header">{{account.modalTitle}}</p>
+			<p slot="header">{{modalTitle}}</p>
 			<Form ref="accountForm" :model="account.form" :rules="account.rules" label-position="left" :label-width="account.labelWidth" inline>
 				<Row type="flex" justify="center">
 					<Col>
@@ -40,8 +40,7 @@
 								<Input v-model="account.form.account" icon="checkmark" @on-enter="focusPassword" @on-click="focusPassword"/>
 							</FormItem></Col>
 							<Col><FormItem label="密码">
-								<Input v-show="account.isPasswordVisible" type="text" v-model="account.form.password" icon="eye-disabled" @on-click="switchPasswordVisible"/>
-								<Input v-show="!account.isPasswordVisible" ref="passwordInput" type="password" v-model="account.form.password" icon="eye" @on-click="switchPasswordVisible"/>
+								<InputPassword ref="passwordInput" v-model="account.form.password"></InputPassword>
 							</FormItem></Col>
 							<Col><FormItem label="类别">
 								<RadioGroup v-model="account.form.role">
@@ -166,6 +165,15 @@ export default {
 				if (item.searchable) list.push({ name: item.name, title: item.title })
 			})
 			return list
+		},
+		modalTitle() {
+			switch (this.account.action) {
+				case 'add':
+					return '新建'
+				case 'edit':
+					return '编辑'
+				default: return ''
+			}
 		},
 	},
 	methods: {

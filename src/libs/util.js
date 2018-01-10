@@ -288,15 +288,13 @@ util.passwordCheck = (vm, callback) => {
 	let password = ''
 	vm.$Modal.confirm({
 		title: '身份验证',
-		render: h => h('Input', {
+		render: h => h('InputPassword', {
 			style: {
 				'margin-top': '30px',
 			},
 			props: {
-				type: 'password',
 				value: password,
 				autofocus: true,
-				placeholder: '请输入密码',
 			},
 			on: {
 				input: (val) => {
