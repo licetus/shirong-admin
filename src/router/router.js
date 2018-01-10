@@ -1,4 +1,5 @@
 import Main from '../views/Main.vue'
+import Enum from '../models/enum'
 
 // 不作为Main组件的子页面展示的页面单独写，如下
 export const loginRouter = {
@@ -150,10 +151,10 @@ export const appRouter = [
 		icon: 'gear-a',
 		name: 'settings',
 		title: '设置',
-		access: 1,
+		access: Enum.Role.SuperAdmin,
 		component: Main,
 		children: [
-			{ path: 'index', title: '设置', name: 'settings_index', access: 1, component: (resolve) => { require(['@/views/settings/settings.vue'], resolve) } },
+			{ path: 'account_management', title: '账号管理', name: 'account_management', access: Enum.Role.SuperAdmin, component: (resolve) => { require(['@/views/settings/account-management.vue'], resolve) } },
 		],
 	},
 	{

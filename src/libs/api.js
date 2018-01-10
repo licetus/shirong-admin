@@ -47,6 +47,36 @@ api.login = async (account, password) => {
 	return createInstance().post('auth/admin/login', params).then(res => res.data)
 }
 
+// account
+api.admin = {
+	account: {
+		fetchList: async (pagesize, page, filters, orderBy) => {
+			const query = {
+				pagesize,
+				page,
+				filters,
+				orderBy,
+			}
+			const str = `?${util.generateQueryString(query)}`
+			return createAuthInstance().get(`auth/admin${str}`).then(res => res.data)
+		},
+		add: async params =>
+			createAuthInstance().post('auth/admin', params).then(res => res.data),
+		delete: async (params, id) =>
+			createAuthInstance().delete(`auth/admin/${id}`, params).then(res => res.data),
+		update: async (params, id) =>
+			createAuthInstance().patch(`auth/admin/${id}`, params).then(res => res.data),
+		updateSelf: async params =>
+			createAuthInstance().patch('auth/admin', params).then(res => res.data),
+	},
+	profile: {
+		updateSelf: async params =>
+			createAuthInstance().patch('admin/profile', params).then(res => res.data),
+		fetchSelf: async params =>
+			createAuthInstance().patch('admin/profile', params).then(res => res.data),
+	},
+}
+
 // debtor
 api.debtor = {
 	fetchList: async (pagesize, page, filters, orderBy) => {

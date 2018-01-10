@@ -385,6 +385,27 @@ util.getAge = (vm, timestamp) => {
 	return moment().diff(moment(timestamp), 'years')
 }
 
+util.getRole = (vm, role) => {
+	if (!role) {
+		// vm.$Message.error('错误: 性别数据缺失')
+		return null
+	}
+	switch (role) {
+		case Enum.Role.SuperAdmin:
+			return '超级管理员'
+		case Enum.Role.Admin:
+			return '管理员'
+		case Enum.Role.Operator:
+			return '操作员'
+		case Enum.Role.Agent:
+			return '业务员'
+		default: {
+			vm.$Message.error('错误: 未知的权限')
+			return null
+		}
+	}
+}
+
 util.getGender = (vm, gender) => {
 	if (!gender) {
 		// vm.$Message.error('错误: 性别数据缺失')
