@@ -226,13 +226,16 @@
 					<p slot="title">
 						审核信息
 					</p>
-					<Form :model="approval.form" label-position="left" :label-width="approval.labelWidth">
-						<FormItem label="业务员">测试数据</FormItem>
-						<FormItem label="评估内容">测试数据</FormItem>
-						<FormItem label="审核员">测试数据</FormItem>
-						<FormItem label="审核意见">测试数据</FormItem>
-						<FormItem label="提交时间">测试数据</FormItem>
-						<FormItem label="修改时间">测试数据</FormItem>
+					<p v-if="approval.data.length < 1">无</p>
+					<Form label-position="left" :label-width="approval.labelWidth" inline>
+						<Row class="border-bottom" v-for="(item, index) of approval.data" :key="index">
+							<Col :span="24"><FormItem label="审核意见">
+								<p>{{item.content}}</p>
+							</FormItem></Col>
+							<Col :span="24"><FormItem label="审核时间">
+								<p>{{util.formatTime(this, item.createTime) || '-'}}</p>
+							</FormItem></Col>
+						</Row>
 					</Form>
 				</Card>
 			</Col>
@@ -337,7 +340,23 @@ export default {
 			},
 			approval: {
 				labelWidth: 75,
-				data: blank.product.approval,
+				isModalVisible: false,
+				isDisapproving: false,
+				isApproving: false,
+				list: {
+					isLoading: false,
+					pagesize: 10,
+					page: 0,
+					filters: '',
+					orderBy: 'create_time desc',
+				},
+				data: [
+					blank.loanComment,
+				],
+				form: {
+					content: '',
+				},
+				rules: {},
 			},
 			investments: {
 				list: {
@@ -420,6 +439,7 @@ export default {
 			this.uneditFinance()
 			this.loadProduct()
 			this.loadInvestments()
+			this.loadApprovalComments()
 		},
 		productLoading() {
 			this.product.isLoading = true
@@ -879,6 +899,32 @@ export default {
 				this.$Message.error(e.message)
 			} finally {
 				this.investmentsUnloading()
+			}
+		},
+		// approval
+		approvalLoading() {
+			this.approval.list.isLoading = true
+		},
+		approvalUnloading() {
+			this.approval.list.isLoading = false
+		},
+		loadApprovalComments() {
+			this.approvalLoading()
+			this.fetchApprovalComments()
+		},
+		async fetchApprovalComments() {
+			try {
+				this.approval.data = await api.loan.comment.fetchList(
+					this.approval.list.pagesize,
+					this.approval.list.page,
+					this.approval.list.filters,
+					this.approval.list.orderBy,
+					this.$route.params.product_id,
+				)
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.approvalUnloading()
 			}
 		},
 	},

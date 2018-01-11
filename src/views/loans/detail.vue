@@ -227,7 +227,7 @@
 								<p>{{item.content}}</p>
 							</FormItem></Col>
 							<Col :span="24"><FormItem label="审核时间">
-								<p>{{util.formatTime(this, item.createTime)}}</p>
+								<p>{{util.formatTime(this, item.createTime) || '-'}}</p>
 							</FormItem></Col>
 						</Row>
 					</Form>
@@ -253,7 +253,7 @@
 
 <script>
 import Cookies from 'js-cookie'
-import { Debtor, Loan, Car } from '../../models/data'
+import { Debtor, Loan, Car, LoanComment } from '../../models/data'
 import Enum from '../../models/enum'
 import api from '../../libs/api'
 import util from '../../libs/util'
@@ -265,6 +265,7 @@ export default {
 			debtor: new Debtor(),
 			loan: new Loan(),
 			car: new Car(),
+			loanComment: new LoanComment(),
 		}
 		return {
 			access: parseInt(Cookies.get('access'), 10),
@@ -334,7 +335,7 @@ export default {
 					orderBy: 'create_time desc',
 				},
 				data: [
-					blank.loan,
+					blank.loanComment,
 				],
 				form: {
 					content: '',
@@ -758,7 +759,7 @@ export default {
 			}
 		},
 
-		// approval
+		// approve
 		showApprovalModal() {
 			this.approval.isModalVisible = true
 		},
