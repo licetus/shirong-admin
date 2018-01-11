@@ -61,7 +61,6 @@
 import { Customer } from '../../models/data'
 import util from '../../libs/util'
 import api from '../../libs/api'
-import Enum from '../../models/enum'
 
 export default {
 	name: 'debtor_detail',
@@ -86,9 +85,9 @@ export default {
 				data: [],
 				columns: [
 					{
-						name: 'product',
+						name: 'productName',
 						title: '项目名称',
-						key: 'productId', // TODO should be productName
+						key: 'productName', // TODO should be productName
 					},
 					{
 						name: 'amount',
@@ -101,6 +100,7 @@ export default {
 						title: '当前状态',
 						key: 'productStatus',
 						align: 'center',
+						render: (h, params) => h('p', `${util.getProductStatus(this, params.row.productStatus) || '-'}`),
 					},
 					{
 						name: 'createTime',
