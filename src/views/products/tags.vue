@@ -171,6 +171,7 @@ export default {
 					color: '',
 					description: '',
 				},
+				rules: {},
 			},
 		}
 	},

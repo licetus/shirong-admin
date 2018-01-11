@@ -50,6 +50,8 @@ export function Product() {
 	this.remark = ''
 	this.rankingScore = 0
 	this.tagId = null
+	this.tag = ''
+	this.tagColor = ''
 	this.createTime = null
 	this.lastUpdateTime = null
 	// finance

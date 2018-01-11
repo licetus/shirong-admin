@@ -30,7 +30,23 @@
 								<p v-if="!product.profile.isEditable">{{product.profile.form.name}}</p>
 								<Input v-else v-model="product.profile.form.name" />
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="项目标签">测试数据</FormItem></Col>
+							<Col :span="8"><FormItem label="项目标签">
+								<SimpleTag v-if="!product.profile.isEditable" :color="product.data.tagColor" :text="product.data.tag"></SimpleTag>
+								<Dropdown v-if="product.profile.isEditable" class="tags-dropdown" trigger="custom" :visible="product.profile.tags.isDropdownVisible" @on-click="onClickTag">
+									<Button type="text" size="small" @click="onClickSwitchDropdown">
+										<SimpleTag v-if="product.profile.isEditable" :color="product.profile.form.tagColor" :text="product.profile.form.tag"></SimpleTag>
+										<Icon type="arrow-down-b"></Icon>
+									</Button>
+									<DropdownMenu slot="list">
+										<Spin v-if="product.profile.tags.list.isLoading" fix></Spin>
+										<template v-for="(item, index) of product.profile.tags.data">
+											<DropdownItem :name="index">
+												<Row type="flex" justify="center"><SimpleTag :color="item.color" :text="item.content"></SimpleTag></Row>
+											</DropdownItem>
+										</template>
+									</DropdownMenu>
+								</Dropdown>
+							</FormItem></Col>
 							<Col :span="8"><FormItem label="排名参数">
 								<p v-if="!product.profile.isEditable">{{product.profile.form.rankingScore}}</p>
 								<InputNumber v-else v-model="product.profile.form.rankingScore" :min="0" :max="9.99" :step="0.1"></InputNumber>
@@ -261,10 +277,28 @@ export default {
 					form: {
 						name: blank.product.name,
 						tagId: blank.product.tagId,
+						tag: blank.product.tag,
+						tagColor: blank.product.tagColor,
 						rankingScore: blank.product.rankingScore,
 						remark: blank.product.remark,
 					},
 					rules: {},
+					tags: {
+						isDropdownVisible: false,
+						data: [
+							{
+								content: '',
+								color: '#FFFFFF',
+							},
+						],
+						list: {
+							isLoading: false,
+							pagesize: 10,
+							page: 0,
+							filters: '',
+							orderBy: '',
+						},
+					},
 				},
 				finance: {
 					labelWidth: 75,
@@ -417,6 +451,8 @@ export default {
 					remark: product.remark,
 					rankingScore: product.rankingScore,
 					tagId: product.tagId,
+					tag: product.tag,
+					tagColor: product.tagColor,
 					interestRateBase: product.interestRateBase,
 					interestRateDelta: product.interestRateDelta,
 					minInvestment: product.minInvestment,
@@ -589,6 +625,8 @@ export default {
 			this.product.profile.form = {
 				name: this.product.data.name,
 				tagId: this.product.data.tagId,
+				tag: this.product.data.tag,
+				tagColor: this.product.data.tagColor,
 				rankingScore: this.product.data.rankingScore,
 				remark: this.product.data.remark,
 			}
@@ -615,6 +653,60 @@ export default {
 				this.profileSubmitting()
 				this.updateProduct(product)
 			})
+		},
+		// tag
+		tagsLoading() {
+			this.product.profile.tags.list.isLoading = true
+		},
+		tagsUnloading() {
+			this.product.profile.tags.list.isLoading = false
+		},
+		showDropdown() {
+			this.product.profile.tags.isDropdownVisible = true
+		},
+		hideDropdown() {
+			this.product.profile.tags.isDropdownVisible = false
+		},
+		onClickSwitchDropdown() {
+			if (this.product.profile.tags.isDropdownVisible === false) {
+				this.tagsLoading()
+				this.showDropdown()
+				this.fetchTagList()
+			} else {
+				this.hideDropdown()
+			}
+		},
+		onClickTag(index) {
+			console.log(index)
+			const tag = this.product.profile.tags.data[index]
+			this.product.profile.form.tagId = tag.id
+			this.product.profile.form.tag = tag.content
+			this.product.profile.form.tagColor = tag.color
+			this.hideDropdown()
+		},
+		async fetchTagList() {
+			try {
+				const tags = await api.product.tag.fetchList(
+					this.product.profile.tags.list.pagesize,
+					this.product.profile.tags.list.page,
+					this.product.profile.tags.list.filters,
+					this.product.profile.tags.list.orderBy,
+				)
+				this.product.profile.tags.data = tags
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.tagsUnloading()
+			}
+		},
+		async fetchTag() {
+			try {
+				const tag = api.product.tag.fetch(this.product.data.tagId)
+				this.product.data.tag = tag.content
+				this.product.data.tagColor = tag.color
+			} catch (e) {
+				this.$Message.error(e.message)
+			}
 		},
 		// finance
 		editFinance() {
@@ -788,4 +880,9 @@ export default {
 <style lang="less">
 @import '../../styles/common.less';
 @import '../../styles/public.less';
+.tags-dropdown{
+	.ivu-dropdown-item {
+		padding: 3px 0;
+	}
+}
 </style>
