@@ -135,6 +135,7 @@ export default {
 				{
 					title: '操作',
 					align: 'center',
+					width: 150,
 					render: (h, params) => {
 						if (params.row.role !== Enum.Role.SuperAdmin) {
 							return h('div', [
@@ -144,8 +145,8 @@ export default {
 									on: {	click: () => this.onClickEditAccount(params.row) },
 								}, '编辑'),
 								h('Button', {
-									props: { type: 'error',	size: 'small', loading: this.account[`isAccount${params.index}Deleting`] || false },
-									on: {	click: () => this.onClickDeleteAccount(params.index, params.row.id) },
+									props: { type: 'error',	size: 'small', loading: this.account[`isAccount${params.row.id}Deleting`] || false },
+									on: {	click: () => this.onClickDeleteAccount(params.row.id) },
 								}, '删除'),
 							])
 						}
@@ -155,7 +156,6 @@ export default {
 			],
 			account: {
 				isModalVisible: false,
-				isPasswordVisible: false,
 				isSubmitting: false,
 				action: 'add',
 				resetPassword: false,
@@ -196,11 +196,11 @@ export default {
 			this.listLoading()
 			this.fetchAccountList()
 		},
-		accountDeleting(index) {
-			this.$set(this.account, `isAccount${index}Deleting`, true)
+		accountDeleting(id) {
+			this.$set(this.account, `isAccount${id}Deleting`, true)
 		},
-		accountUndeleting(index) {
-			this.$delete(this.account, `isAccount${index}Deleting`)
+		accountUndeleting(id) {
+			this.$delete(this.account, `isAccount${id}Deleting`)
 		},
 		onClickRefresh() {
 			this.initPage()
@@ -213,20 +213,20 @@ export default {
 			this.initAccountForm('edit', account)
 			this.showAccountModal()
 		},
-		onClickDeleteAccount(index, id) {
+		onClickDeleteAccount(id) {
 			util.passwordCheck(this, () => {
-				this.accountDeleting(index)
-				this.deleteAccount(index, id)
+				this.accountDeleting(id)
+				this.deleteAccount(id)
 			})
 		},
-		async deleteAccount(index, id) {
+		async deleteAccount(id) {
 			try {
 				await api.admin.account.delete(id)
 				this.initPage()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
-				this.accountUndeleting(index)
+				this.accountUndeleting(id)
 			}
 		},
 		// modal
@@ -280,34 +280,36 @@ export default {
 			// 	if (valid) {
 			// 	}
 			// })
-			switch (this.account.action) {
-				case 'add': {
-					const account = {
-						account: this.account.form.account,
-						password: util.md5(this.account.form.password),
-						role: this.account.form.role,
+			util.passwordCheck(this, () => {
+				switch (this.account.action) {
+					case 'add': {
+						const account = {
+							account: this.account.form.account,
+							password: util.md5(this.account.form.password),
+							role: this.account.form.role,
+						}
+						this.accountSubmitting()
+						this.addAccount(account)
+						break
 					}
-					this.accountSubmitting()
-					this.addAccount(account)
-					break
-				}
-				case 'edit': {
-					const account = {
-						role: this.account.form.role,
+					case 'edit': {
+						const account = {
+							role: this.account.form.role,
+						}
+						if (this.account.resetPassword && this.account.form.password) account.password = util.md5(this.account.form.password)
+						this.accountSubmitting()
+						this.updateAccount(account, this.account.form.id)
+						break
 					}
-					if (this.account.resetPassword && this.account.form.password) account.password = util.md5(this.account.form.password)
-					this.accountSubmitting()
-					this.updateAccount(account, this.account.form.id)
-					break
+					default:
 				}
-				default:
-			}
+			})
 		},
 		async addAccount(account) {
 			try {
 				await api.admin.account.add(account)
-				this.initPage()
 				this.hideAccountModal()
+				this.initPage()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
@@ -317,8 +319,8 @@ export default {
 		async updateAccount(account, id) {
 			try {
 				await api.admin.account.update(account, id)
-				this.initPage()
 				this.hideAccountModal()
+				this.initPage()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {

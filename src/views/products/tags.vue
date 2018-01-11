@@ -2,8 +2,8 @@
 	<section>
 		<Card class="table-card">
 			<Row class="margin-bottom-20" type="flex" justify="space-between">
-				<Col :span='2'>
-					<!-- <Button type="primary" @click="onClickNewCustomer">新增借款人</Button> -->
+				<Col>
+					<Button type="primary" @click="onClickNewTag">新增标签</Button>
 				</Col>
 				<Col>
 					<Row type="flex">
@@ -29,14 +29,38 @@
 				</Col>
 			</Row>
 			<Table
-			:loading="list.isLoading"
-			:data="customers"
-			:columns="customerColumns"
-			@on-sort-change="onClickSort"
-			stripe
-			border>
-		</Table>
-	</Card>
+				:loading="list.isLoading"
+				:data="tags"
+				:columns="tagColumns"
+				@on-sort-change="onClickSort"
+				stripe
+				border>
+			</Table>
+		</Card>
+		<Modal v-model="tag.isModalVisible">
+			<p slot="header">{{modalTitle}}</p>
+			<Form ref="tagForm" :model="tag.form" :rules="tag.rules" label-position="left" :label-width="tag.labelWidth" inline>
+				<Row type="flex" justify="center">
+					<Col>
+						<Row>
+							<Col><FormItem label="内容">
+								<Input v-model="tag.form.content"/>
+							</FormItem></Col>
+							<Col><FormItem label="色彩">
+								 <ColorPicker v-model="tag.form.color" recommend/>
+							</FormItem></Col>
+							<Col><FormItem label="描述">
+								<Input v-model="tag.form.description"/>
+							</FormItem></Col>
+						</Row>
+					</Col>
+				</Row>
+			</Form>
+			<div slot="footer">
+				<Button @click="onClickCancel">取消</Button>
+				<Button type="primary" @click="onClickSubmit" :loading="tag.isSubmitting">提交</Button>
+			</div>
+		</Modal>
 	</section>
 </template>
 
@@ -45,7 +69,7 @@ import api from '../../libs/api'
 import util from '../../libs/util'
 
 export default {
-	name: 'customers_index',
+	name: 'tags_index',
 	data() {
 		return {
 			list: {
@@ -61,8 +85,8 @@ export default {
 				val: '',
 				maxLength: 10,
 			},
-			customers: [],
-			customerColumns: [ // TODO: columns detail needing
+			tags: [],
+			tagColumns: [ // TODO: columns detail needing
 				{
 					name: 'id',
 					title: '编号',
@@ -71,90 +95,116 @@ export default {
 					searchable: true,
 				},
 				{
-					name: 'account',
-					title: '账号',
-					key: 'account',
+					name: 'tag',
+					title: '标签',
+					align: 'center',
+					render: (h, params) => h('Tag', {
+						props: {
+							color: params.row.color,
+						},
+					}, params.row.content),
+				},
+				{
+					name: 'content',
+					title: '内容',
+					key: 'content',
 					align: 'center',
 					searchable: true,
 				},
 				{
-					name: 'vipLevel',
-					title: 'Vip等级',
-					key: 'vipLevel',
+					name: 'color',
+					title: '色彩',
+					key: 'color',
 					align: 'center',
 				},
 				{
-					name: 'isIdVerified',
-					title: '认证状态',
-					key: 'isIdVerified',
-					align: 'center',
-					render: (h, params) => h('p', `${params.row.isIdVerified ? '已认证' : '未认证'}`),
-				},
-				{
-					name: 'realName',
-					title: '姓名',
-					key: 'realName',
+					name: 'description',
+					title: '描述',
+					key: 'description',
 					align: 'center',
 					searchable: true,
-					render: (h, params) => h('div', [
-						h('p', {
-							style: {
-								'font-size': '12px',
-							},
-						}, params.row.realName),
-						h('p', {
-							style: {
-								'font-size': '10px',
-							},
-						}, params.row.idCardNumber),
-					]),
 				},
 				{
-					name: 'remark',
-					title: '备注',
-					key: 'remark',
+					name: 'createTime',
+					title: '创建时间',
+					key: 'createTime',
 					align: 'center',
-					searchable: true,
+					render: (h, params) => h('p', {
+						style: 'word-break:keep-all',
+					}, `${util.formatTime(this, params.row.createTime) || '-'}`),
+				},
+				{
+					name: 'lastUpdateTime',
+					title: '修改时间',
+					key: 'lastUpdateTime',
+					align: 'center',
+					render: (h, params) => h('p', {
+						style: 'word-break:keep-all',
+					}, `${util.formatTime(this, params.row.lastUpdateTime) || '-'}`),
 				},
 				{
 					title: '操作',
 					align: 'center',
-					render: (h, params) =>
-						h('div', [
-							h('Button', {
-								props: { type: 'text', loading: this.customers[params.index].isViewing },
-								on: {	click: () => this.onClickViewCustomer(params.index) },
-							}, '查看'),
-						]),
+					width: 150,
+					render: (h, params) => h('div', [
+						h('Button', {
+							props: { type: 'primary',	size: 'small' },
+							style: { marginRight: '10px' },
+							on: {	click: () => this.onClickEditTag(params.row) },
+						}, '编辑'),
+						h('Button', {
+							props: { type: 'error',	size: 'small', loading: this.tag[`isTag${params.row.id}Deleting`] || false },
+							on: {	click: () => this.onClickDeleteTag(params.row.id) },
+						}, '删除'),
+					]),
 				},
 			],
+
+			// modal
+			tag: {
+				isModalVisible: false,
+				isSubmitting: false,
+				action: '',
+				labelWidth: 75,
+				form: {
+					content: '',
+					color: '',
+					description: '',
+				},
+			},
 		}
 	},
 	mounted() {
 		this.initPage()
 	},
 	activated() {
-		if (this.$route.query.action === 'refresh') {
-			this.initPage()
-			this.$router.push({
-				name: 'customers_index',
-			})
+		if (this.$route.query.action === 'add') {
+			this.showTagModal()
 		}
 	},
 	computed: {
 		searchOptions() {
 			const list = []
-			this.customerColumns.forEach((item) => {
+			this.tagColumns.forEach((item) => {
 				if (item.searchable) list.push({ key: item.key, title: item.title })
 			})
 			return list
+		},
+		modalTitle() {
+			switch (this.tag.action) {
+				case 'add':
+					return '新建'
+				case 'edit':
+					return '编辑'
+				default: return ''
+			}
 		},
 	},
 	methods: {
 		// main
 		initPage() {
 			this.listLoading()
-			this.fetchCustomerList()
+			this.fetchTagList()
 		},
 		onClickRefresh() {
 			this.initPage()
@@ -166,38 +216,46 @@ export default {
 		listUnloading() {
 			this.list.isLoading = false
 		},
-		// customerViewing(index) {
-		// 	this.customers[index].isViewing = true
-		// },
-		// customerUnviewing(index) {
-		// 	this.customers[index].isViewing = false
-		// },
-		onClickViewCustomer(index) {
-			// this.customerViewing(index)
-			this.viewCustomer(index)
+		tagDeleting(id) {
+			this.$set(this.tag, `isTag${id}Deleting`, true)
 		},
-		viewCustomer(index) {
-			this.$router.push({
-				name: 'customer_detail',
-				params: {
-					customer_id: this.customers[index].id,
-				},
+		tagUndeleting(id) {
+			this.$delete(this.tag, `isTag${id}Deleting`)
+		},
+		onClickDeleteTag(id) {
+			util.passwordCheck(this, () => {
+				this.tagDeleting(id)
+				this.deleteTag(id)
 			})
-			// this.customerUnviewing()
 		},
-		async fetchCustomerList() {
+		async fetchTagList() {
 			try {
-				const list = await api.customer.fetchList(
+				const list = await api.product.tag.fetchList(
 					this.list.pagesize,
 					this.list.page,
 					this.list.filters,
 					this.list.orderBy,
 				)
-				this.customers = list
+				this.tags = list
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
 				this.listUnloading()
+			}
+		},
+		async deleteTag(id) {
+			try {
+				await api.product.tag.delete(id)
+				this.initPage()
+			} catch (e) {
+				switch (e.code) {
+					case 'ERROR':
+						this.$Message.error('删除失败, 该标签正在使用中')
+						break
+					default: this.$Message.error(e.message)
+				}
+			} finally {
+				this.tagUndeleting(id)
 			}
 		},
 		// search / sort
@@ -215,6 +273,105 @@ export default {
 			this.initPage()
 		},
 		onClickSort() {
+		},
+		// tag
+		showTagModal() {
+			this.tag.isModalVisible = true
+		},
+		hideTagModal() {
+			this.tag.isModalVisible = false
+		},
+		tagSubmitting() {
+			this.tag.isSubmitting = true
+		},
+		tagUnsubmitting() {
+			this.tag.isSubmitting = false
+		},
+		initTagForm(action, tag) {
+			switch (action) {
+				case 'add':
+					this.tag.action = 'add'
+					this.tag.form = {
+						content: '',
+						color: '',
+						description: '',
+					}
+					break
+				case 'edit':
+					this.tag.action = 'edit'
+					this.tag.form = {
+						id: tag.id,
+						content: tag.content,
+						color: tag.color,
+						description: tag.description,
+					}
+					break
+				default:
+			}
+		},
+		onClickNewTag() {
+			this.initTagForm('add')
+			this.showTagModal()
+		},
+		onClickEditTag(tag) {
+			this.initTagForm('edit', tag)
+			this.showTagModal()
+		},
+		onClickCancel() {
+			this.hideTagModal()
+		},
+		onClickSubmit() { // BUG validator doenst work
+			// this.$refs.tagForm.validate((valid) => {
+			// 	if (valid) {
+			// 	}
+			// })
+			util.passwordCheck(this, () => {
+				switch (this.tag.action) {
+					case 'add': {
+						const tag = {
+							content: this.tag.form.content,
+							color: this.tag.form.color,
+							description: this.tag.form.description,
+						}
+						this.tagSubmitting()
+						this.addTag(tag)
+						break
+					}
+					case 'edit': {
+						const tag = {
+							content: this.tag.form.content,
+							color: this.tag.form.color,
+							description: this.tag.form.description,
+						}
+						this.tagSubmitting()
+						this.updateTag(tag, this.tag.form.id)
+						break
+					}
+					default:
+				}
+			})
+		},
+		async addTag(tag) {
+			try {
+				await api.product.tag.add(tag)
+				this.hideTagModal()
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.tagUnsubmitting()
+			}
+		},
+		async updateTag(tag, id) {
+			try {
+				await api.product.tag.update(tag, id)
+				this.hideTagModal()
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.tagUnsubmitting()
+			}
 		},
 	},
 }

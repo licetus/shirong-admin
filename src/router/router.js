@@ -106,6 +106,7 @@ export const appRouter = [
 		component: Main,
 		children: [
 			{ path: 'index', title: '项目列表', name: 'products_index', icon: '', component: (resolve) => { require(['@/views/products/index.vue'], resolve) } },
+			{ path: 'tags', title: '标签管理', name: 'tags_index', icon: '', component: (resolve) => { require(['@/views/products/tags.vue'], resolve) } },
 		],
 	},
 	{
