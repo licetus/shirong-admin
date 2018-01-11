@@ -37,7 +37,7 @@
 				border>
 			</Table>
 		</Card>
-		<Modal v-model="tag.isModalVisible">
+		<Modal v-model="tag.isModalVisible" width="400">
 			<p slot="header">{{modalTitle}}</p>
 			<Form ref="tagForm" :model="tag.form" :rules="tag.rules" label-position="left" :label-width="tag.labelWidth" inline>
 				<Row type="flex" justify="center">

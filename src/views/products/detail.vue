@@ -13,7 +13,7 @@
 						</div>
 						<div v-else>
 							<Button type="text" @click="onClickCancelProfile">取消</Button>
-							<Button type="text" @click="onClickSaveProfile" :loading="product.profile.isSaving" :disabled="product.finance.isSaving">提交</Button>
+							<Button type="text" @click="onClickSubmitProfile" :loading="product.profile.isSubmitting" :disabled="product.finance.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form ref="profileForm" :model="product.profile.form" :rules="product.profile.rules" label-position="left" :label-width="product.profile.labelWidth" inline>
@@ -58,7 +58,7 @@
 						</div>
 						<div v-else>
 							<Button type="text" @click="onClickCancelFinance">取消</Button>
-							<Button type="text" @click="onClickSaveFinance" :loading="product.finance.isSaving" :disabled="product.profile.isSaving">提交</Button>
+							<Button type="text" @click="onClickSaveFinance" :loading="product.finance.isSubmitting" :disabled="product.profile.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form :model="product.finance.form" :rules="product.finance.rules" label-position="left" :label-width="product.finance.labelWidth" inline>
@@ -257,7 +257,7 @@ export default {
 					labelWidth: 75,
 					isLoading: false,
 					isEditable: false,
-					isSaving: false,
+					isSubmitting: false,
 					form: {
 						name: blank.product.name,
 						tagId: blank.product.tagId,
@@ -270,7 +270,7 @@ export default {
 					labelWidth: 75,
 					isLoading: false,
 					isEditable: false,
-					isSaving: false,
+					isSubmitting: false,
 					form: {
 						amount: blank.product.amount,
 						interestRateBase: blank.product.interestRateBase,
@@ -381,6 +381,8 @@ export default {
 	methods: {
 		// main
 		initPage() {
+			this.uneditProfile()
+			this.uneditFinance()
 			this.loadProduct()
 			this.loadInvestments()
 		},
@@ -436,12 +438,16 @@ export default {
 		async updateProduct(product) {
 			try {
 				await api.product.update(product, this.$route.params.product_id)
+				this.$Notice.success({
+					title: '更新成功, 正在刷新...',
+					duration: 3,
+				})
 				this.initPage()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
-				this.profileUnsaving()
-				this.financeUnsaving()
+				this.profileUnsubmitting()
+				this.financeUnsubmittng()
 			}
 		},
 		// publish
@@ -573,6 +579,12 @@ export default {
 		profileUnloading() {
 			this.product.profile.isLoading = false
 		},
+		profileSubmitting() {
+			this.product.profile.isSubmitting = true
+		},
+		profileUnsubmitting() {
+			this.product.profile.isSubmitting = false
+		},
 		initProfileForm() {
 			this.product.profile.form = {
 				name: this.product.data.name,
@@ -588,7 +600,7 @@ export default {
 			this.initProfileForm()
 			this.uneditProfile()
 		},
-		onClickSaveProfile() { // BUG validator doesnt work
+		onClickSubmitProfile() { // BUG validator doesnt work
 			// this.$refs.profileForm.validate((valid) => {
 			// 	if (valid) {
 			// 	}
@@ -600,9 +612,8 @@ export default {
 					rankingScore: this.product.profile.form.rankingScore,
 					remark: this.product.profile.form.remark,
 				}
-				this.profileSaving()
+				this.profileSubmitting()
 				this.updateProduct(product)
-				this.uneditProfile()
 			})
 		},
 		// finance
@@ -617,6 +628,12 @@ export default {
 		},
 		financeUnloading() {
 			this.product.finance.isLoading = false
+		},
+		financeSubmitting() {
+			this.product.finance.isSubmitting = true
+		},
+		financeUnsubmittng() {
+			this.product.finance.isSubmitting = false
 		},
 		initFinanceForm() {
 			this.product.finance.form = {
@@ -643,9 +660,8 @@ export default {
 					interestRateDelta: this.product.finance.form.interestRateDelta,
 					minInvestment: this.product.finance.form.minInvestment,
 				}
-				this.financeSaving()
+				this.financeSubmitting()
 				this.updateProduct(product)
-				this.uneditFinance()
 			})
 		},
 		// loan
