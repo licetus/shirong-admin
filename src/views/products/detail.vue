@@ -9,11 +9,11 @@
 					</p>
 					<div v-if="isEditVisible" slot="extra">
 						<div v-if="!product.profile.isEditable">
-							<Button type="text" @click="onClickEditProfile">编辑</Button>
+							<Button type="text" @click="onClickEditProfile">解锁</Button>
 						</div>
 						<div v-else>
 							<Button type="text" @click="onClickCancelProfile">取消</Button>
-							<Button type="text" @click="onClickSaveProfile" :loading="product.profile.isSaving">保存</Button>
+							<Button type="text" @click="onClickSaveProfile" :loading="product.profile.isSaving" :disabled="product.finance.isSaving">提交</Button>
 						</div>
 					</div>
 					<Form ref="profileForm" :model="product.profile.form" :rules="product.profile.rules" label-position="left" :label-width="product.profile.labelWidth" inline>
@@ -54,11 +54,11 @@
 					</p>
 					<div v-if="isEditVisible" slot="extra">
 						<div v-if="!product.finance.isEditable">
-							<Button type="text" @click="onClickEditFinance">编辑</Button>
+							<Button type="text" @click="onClickEditFinance">解锁</Button>
 						</div>
 						<div v-else>
 							<Button type="text" @click="onClickCancelFinance">取消</Button>
-							<Button type="text" @click="onClickSaveFinance" :loading="product.finance.isSaving">保存</Button>
+							<Button type="text" @click="onClickSaveFinance" :loading="product.finance.isSaving" :disabled="product.profile.isSaving">提交</Button>
 						</div>
 					</div>
 					<Form :model="product.finance.form" :rules="product.finance.rules" label-position="left" :label-width="product.finance.labelWidth" inline>
@@ -315,9 +315,10 @@ export default {
 				data: [],
 				columns: [
 					{
-						name: 'account',
+						name: 'userAccount',
 						title: '投资人',
-						key: 'account',
+						key: 'userAccount',
+						aligin: 'center',
 					},
 					{
 						name: 'amount',
@@ -381,6 +382,7 @@ export default {
 		// main
 		initPage() {
 			this.loadProduct()
+			this.loadInvestments()
 		},
 		productLoading() {
 			this.product.isLoading = true
@@ -428,6 +430,18 @@ export default {
 				this.profileUnloading()
 				this.financeUnloading()
 				this.productUnloading()
+			}
+		},
+		// update
+		async updateProduct(product) {
+			try {
+				await api.product.update(product, this.$route.params.product_id)
+				this.initPage()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.profileUnsaving()
+				this.financeUnsaving()
 			}
 		},
 		// publish
@@ -547,16 +561,6 @@ export default {
 			}
 		},
 		// profile
-		onClickEditProfile() {
-			this.editProfile()
-		},
-		onClickCancelProfile() {
-			this.initProfileForm()
-			this.uneditProfile()
-		},
-		onClickSaveProfile() {
-			this.uneditProfile()
-		},
 		editProfile() {
 			this.product.profile.isEditable = true
 		},
@@ -577,17 +581,31 @@ export default {
 				remark: this.product.data.remark,
 			}
 		},
+		onClickEditProfile() {
+			this.editProfile()
+		},
+		onClickCancelProfile() {
+			this.initProfileForm()
+			this.uneditProfile()
+		},
+		onClickSaveProfile() { // BUG validator doesnt work
+			// this.$refs.profileForm.validate((valid) => {
+			// 	if (valid) {
+			// 	}
+			// })
+			util.passwordCheck(this, () => {
+				const product = {
+					name: this.product.profile.form.name,
+					tagId: this.product.profile.form.tagId,
+					rankingScore: this.product.profile.form.rankingScore,
+					remark: this.product.profile.form.remark,
+				}
+				this.profileSaving()
+				this.updateProduct(product)
+				this.uneditProfile()
+			})
+		},
 		// finance
-		onClickEditFinance() {
-			this.editFinance()
-		},
-		onClickCancelFinance() {
-			this.initFinanceForm()
-			this.uneditFinance()
-		},
-		onClickSaveFinance() {
-			this.uneditFinance()
-		},
 		editFinance() {
 			this.product.finance.isEditable = true
 		},
@@ -606,6 +624,29 @@ export default {
 				interestRateDelta: this.product.data.interestRateDelta,
 				minInvestment: this.product.data.minInvestment,
 			}
+		},
+		onClickEditFinance() {
+			this.editFinance()
+		},
+		onClickCancelFinance() {
+			this.initFinanceForm()
+			this.uneditFinance()
+		},
+		onClickSaveFinance() {
+			// this.$refs.financeForm.validate((valid) => {
+			// 	if (valid) {
+			// 	}
+			// })
+			util.passwordCheck(this, () => {
+				const product = {
+					interestRateBase: this.product.finance.form.interestRateBase,
+					interestRateDelta: this.product.finance.form.interestRateDelta,
+					minInvestment: this.product.finance.form.minInvestment,
+				}
+				this.financeSaving()
+				this.updateProduct(product)
+				this.uneditFinance()
+			})
 		},
 		// loan
 		loanLoading() {
@@ -696,6 +737,34 @@ export default {
 		// },
 		// async fetchProfile() {
 		// },
+
+		// investments
+		investmentsLoading() {
+			this.investments.list.isLoading = true
+		},
+		investmentsUnloading() {
+			this.investments.list.isLoading = false
+		},
+		loadInvestments() {
+			this.investmentsLoading()
+			this.fetchInvestmentList()
+		},
+		async fetchInvestmentList() {
+			try {
+				const filters = `${this.investments.list.filters ? `${this.investment.list.filters},productId=${this.$route.params.product_id}` : `userId=${this.$route.params.product_id}`}`
+				const res = await api.investment.fetchList(
+					this.investments.list.pagesize,
+					this.investments.list.page,
+					filters,
+					this.investments.list.orderBy,
+				)
+				this.investments.data = res
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.investmentsUnloading()
+			}
+		},
 	},
 }
 </script>
