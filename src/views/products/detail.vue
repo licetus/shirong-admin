@@ -203,7 +203,7 @@
 					<p slot="title">
 						投资记录
 					</p>
-					<Table :data="investmentRecord.data" :columns="investmentRecord.columns"></Table>
+					<Table :data="investments.data" :columns="investments.columns"></Table>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">
@@ -304,42 +304,49 @@ export default {
 				labelWidth: 75,
 				data: blank.product.approval,
 			},
-			investmentRecord: {
-				data: [
-					{
-						username: '15996496248',
-						amount: 10000,
-						createTime: '2018-1-10',
-					},
-					{
-						username: '15996496248',
-						amount: 10000,
-						createTime: '2018-1-10',
-					},
-					{
-						username: '15996496248',
-						amount: 10000,
-						createTime: '2018-1-10',
-					},
-				],
+			investments: {
+				list: {
+					isLoading: false,
+					pagesize: 10,
+					page: 0,
+					filters: '',
+					orderBy: '',
+				},
+				data: [],
 				columns: [
 					{
-						name: 'investor',
+						name: 'account',
 						title: '投资人',
-						key: 'username',
+						key: 'account',
 					},
 					{
 						name: 'amount',
 						title: '金额',
 						key: 'amount',
-						align: 'right',
+						align: 'center',
+					},
+					{
+						name: 'createTime',
+						title: '投资时间',
+						key: 'createTime',
+						align: 'center',
+						render: (h, params) => h('p', {
+							style: 'word-break:keep-all',
+						}, `${util.formatTime(this, params.row.createTime) || '-'}`),
 					},
 				],
 			},
 		}
 	},
 	mounted() {
+		this.util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 		this.initPage()
+	},
+	activated() {
+		const { path } = util.getPageCache(this.$route.name)
+		if (!path || this.$route.fullPath !== path) {
+			this.initPage()
+		}
 	},
 	computed: {
 		isControlable() {
@@ -611,6 +618,14 @@ export default {
 			this.loanLoading()
 			this.fetchLoan()
 		},
+		onClickLoanDetail() {
+			this.$router.push({
+				name: 'loan_detail',
+				params: {
+					loan_id: this.loan.data.main.id,
+				},
+			})
+		},
 		async fetchLoan() {
 			try {
 				const loan = await api.loan.fetch(this.product.data.id)
@@ -676,14 +691,6 @@ export default {
 			} finally {
 				this.loanUnloading()
 			}
-		},
-		onClickLoanDetail() {
-			this.$router.push({
-				name: 'customer_detail',
-				params: {
-					customer_id: 1,
-				},
-			})
 		},
 		// async updateProfile() {
 		// },

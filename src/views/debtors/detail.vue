@@ -231,7 +231,14 @@ export default {
 		}
 	},
 	mounted() {
+		this.util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 		this.initPage()
+	},
+	activated() {
+		const { path } = util.getPageCache(this.$route.name)
+		if (!path || this.$route.fullPath !== path) {
+			this.initPage()
+		}
 	},
 	computed: {
 		debtorGender() {

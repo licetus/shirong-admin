@@ -116,7 +116,14 @@ export default {
 		}
 	},
 	mounted() {
+		util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 		this.initPage()
+	},
+	activated() {
+		const { path } = util.getPageCache(this.$route.name)
+		if (!path || this.$route.fullPath !== path) {
+			this.initPage()
+		}
 	},
 	computed: {
 	},
@@ -162,7 +169,7 @@ export default {
 		},
 		async fetchInvestmentList() {
 			try {
-				const filters = `${this.investments.list.filters}userId=${this.$route.params.customer_id}`
+				const filters = `${this.investments.list.filters ? `${this.investment.list.filters},userId=${this.$route.params.customer_id}` : `userId=${this.$route.params.customer_id}`}`
 				const res = await api.investment.fetchList(
 					this.investments.list.pagesize,
 					this.investments.list.page,

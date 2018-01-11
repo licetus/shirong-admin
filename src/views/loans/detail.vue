@@ -344,7 +344,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.currentPageName = this.$route.name
+		util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 		this.initPage()
 	},
 	activated() {
@@ -352,14 +352,6 @@ export default {
 		if (!path || this.$route.fullPath !== path) {
 			this.initPage()
 		}
-	},
-	watch: {
-		// $route(to) {
-		// 	if (to.id && to.path !== Cookies.get('newLoanPath')) {
-		// 		console.log(to.path, Cookies.get('newLoanPath'))
-		// 		this.initPage()
-		// 	}
-		// },
 	},
 	computed: {
 		isEditable() {
