@@ -20,6 +20,10 @@ export default {
 			type: String,
 			default: '#FFFFFF',
 		},
+		clickable: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
@@ -64,7 +68,7 @@ export default {
 				'vertical-align': 'middle',
 				opacity: 1,
 				overflow: 'hidden',
-				cursor: 'pointer',
+				cursor: `${this.clickable ? 'pointer' : 'default'}`,
 				color: fontColor,
 				background: backgroundColor,
 			}

@@ -31,22 +31,31 @@
 								<Input v-else v-model="product.profile.form.name" />
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="项目标签">
-								<SimpleTag v-if="!product.profile.isEditable" :color="product.data.tagColor" :text="product.data.tag"></SimpleTag>
-								<Dropdown v-if="product.profile.isEditable" class="tags-dropdown" trigger="custom" :visible="product.profile.tags.isDropdownVisible" @on-click="onClickTag">
-									<Button type="text" size="small" @click="onClickSwitchDropdown">
-										<SimpleTag v-if="product.profile.isEditable" :color="product.profile.form.tagColor" :text="product.profile.form.tag"></SimpleTag>
-										<Icon type="arrow-down-b"></Icon>
-									</Button>
-									<DropdownMenu slot="list">
-										<Spin v-if="product.profile.tags.list.isLoading" fix></Spin>
-										<template v-for="(item, index) of product.profile.tags.data">
-											<DropdownItem :name="index">
-												<Row type="flex" justify="center"><SimpleTag :color="item.color" :text="item.content"></SimpleTag></Row>
+								<div v-if="!product.profile.isEditable">
+									<p v-if="!product.data.tagId">暂无标签</p>
+									<SimpleTag v-else :color="product.data.tagColor" :text="product.data.tag"></SimpleTag>
+								</div>
+								<div v-else>
+									<Dropdown class="tags-dropdown" trigger="custom" :visible="product.profile.tags.isDropdownVisible" @on-click="onClickTag">
+										<Button type="text" size="small" @click="onClickSwitchDropdown">
+											<span v-if="!product.profile.form.tagId">无标签</span>
+											<SimpleTag v-else :color="product.profile.form.tagColor" :text="product.profile.form.tag" clickable></SimpleTag>
+											<Icon type="arrow-down-b"></Icon>
+										</Button>
+										<DropdownMenu slot="list">
+											<Spin v-if="product.profile.tags.list.isLoading" fix></Spin>
+											<template v-for="(item, index) of product.profile.tags.data">
+												<DropdownItem :name="index">
+													<Row type="flex" justify="center"><SimpleTag :color="item.color" :text="item.content"></SimpleTag></Row>
+												</DropdownItem>
+											</template>
+											<DropdownItem name="null">
+												<Row type="flex" justify="center"><p>无标签</p></Row>
 											</DropdownItem>
-										</template>
-									</DropdownMenu>
-								</Dropdown>
-								<Button v-if="product.profile.isEditable" type="text" @click="onClickNewTag"><Icon type="plus-round"></Icon></Button>
+										</DropdownMenu>
+									</Dropdown>
+									<Button v-if="product.profile.isEditable" type="text" @click="onClickNewTag"><Icon type="plus-round"></Icon></Button>
+								</div>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="排名参数">
 								<p v-if="!product.profile.isEditable">{{product.profile.form.rankingScore}}</p>
@@ -289,12 +298,7 @@ export default {
 					rules: {},
 					tags: {
 						isDropdownVisible: false,
-						data: [
-							{
-								content: '',
-								color: '#FFFFFF',
-							},
-						],
+						data: [],
 						list: {
 							isLoading: false,
 							pagesize: 10,
@@ -657,6 +661,7 @@ export default {
 		},
 		onClickCancelProfile() {
 			this.initProfileForm()
+			this.hideDropdown()
 			this.uneditProfile()
 		},
 		onClickSubmitProfile() { // BUG validator doesnt work
@@ -698,10 +703,13 @@ export default {
 			}
 		},
 		onClickTag(index) {
-			const tag = this.product.profile.tags.data[index]
-			this.product.profile.form.tagId = tag.id
-			this.product.profile.form.tag = tag.content
-			this.product.profile.form.tagColor = tag.color
+			if (index === 'null') this.product.profile.form.tagId = null
+			else {
+				const tag = this.product.profile.tags.data[index]
+				this.product.profile.form.tagId = tag.id
+				this.product.profile.form.tag = tag.content
+				this.product.profile.form.tagColor = tag.color
+			}
 			this.hideDropdown()
 		},
 		onClickNewTag() {
