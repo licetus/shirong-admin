@@ -50,7 +50,7 @@
 								 <ColorPicker v-model="tag.form.color" recommend/>
 							</FormItem></Col>
 							<Col><FormItem label="描述">
-								<Input v-model="tag.form.description"/>
+								<Input v-model="tag.form.description" @on-enter="onClickSubmit"/>
 							</FormItem></Col>
 						</Row>
 					</Col>
@@ -180,7 +180,10 @@ export default {
 	},
 	activated() {
 		if (this.$route.query.action === 'add') {
-			this.showTagModal()
+			this.$router.replace({
+				name: 'tags_index',
+			})
+			this.onClickNewTag()
 		}
 	},
 	computed: {

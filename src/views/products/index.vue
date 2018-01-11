@@ -84,11 +84,12 @@ export default {
 					align: 'center',
 					render: (h, params) => {
 						const tag = util.getProductStatusTag(this, params.row.status)
-						return h('Tag', {
+						return h('SimpleTag', {
 							props: {
 								color: tag.color,
+								text: tag.text || '-',
 							},
-						}, tag.text || '')
+						})
 					},
 				},
 				{

@@ -46,6 +46,7 @@
 										</template>
 									</DropdownMenu>
 								</Dropdown>
+								<Button v-if="product.profile.isEditable" type="text" @click="onClickNewTag"><Icon type="plus-round"></Icon></Button>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="排名参数">
 								<p v-if="!product.profile.isEditable">{{product.profile.form.rankingScore}}</p>
@@ -374,7 +375,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
+		util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 		this.initPage()
 	},
 	activated() {
@@ -677,12 +678,19 @@ export default {
 			}
 		},
 		onClickTag(index) {
-			console.log(index)
 			const tag = this.product.profile.tags.data[index]
 			this.product.profile.form.tagId = tag.id
 			this.product.profile.form.tag = tag.content
 			this.product.profile.form.tagColor = tag.color
 			this.hideDropdown()
+		},
+		onClickNewTag() {
+			this.$router.push({
+				name: 'tags_index',
+				query: {
+					action: 'add',
+				},
+			})
 		},
 		async fetchTagList() {
 			try {

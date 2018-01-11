@@ -73,13 +73,15 @@ export default {
 					name: 'status',
 					title: '状态',
 					key: 'status',
+					align: 'center',
 					render: (h, params) => {
 						const tag = util.getLoanStatusTag(this, params.row.status)
-						return h('Tag', {
+						return h('SimpleTag', {
 							props: {
 								color: tag.color,
+								text: tag.text || '',
 							},
-						}, tag.text || '')
+						})
 					},
 				},
 				{
@@ -136,11 +138,12 @@ export default {
 					align: 'center',
 					render: (h, params) => {
 						const tag = util.getLoanApprovalStatusTag(this, params.row.approvalStatus)
-						return h('Tag', {
+						return h('SimpleTag', {
 							props: {
 								color: tag.color,
+								text: tag.text || '',
 							},
-						}, tag.text || '')
+						})
 					},
 				},
 				{

@@ -58,7 +58,7 @@ export default {
 				'line-height': '22px',
 				margin: '2px 4px 2px 0',
 				padding: '0 8px',
-				border: `1px solid ${borderColor}`,
+				border: `1px solid ${this.color === 'default' ? borderColor : backgroundColor}`,
 				'border-radius': '3px',
 				'font-size': '12px',
 				'vertical-align': 'middle',
