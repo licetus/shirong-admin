@@ -41,6 +41,13 @@ const createAuthInstance = () => createInstance(true)
 
 const api = {}
 
+// media
+api.uploadImage = async (image) => {
+	const data = new window.FormData()
+	data.append('image', image)
+	return createAuthInstance().post('media/image', data).then(res => res.data)
+}
+
 // auth
 api.login = async (account, password) => {
 	const params = { account, password }

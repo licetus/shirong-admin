@@ -24,11 +24,11 @@
 								<Col :span="24">
 									<Row type="flex" justify="center" align="middle" class="image-uploader-con-preview-con">
 										<!-- <div id="preview"></div> -->
-										<SafeImg id="preview" :src="option.imgUrl" type="certificate-lg"></SafeImg>
+										<SafeImg id="preview" :src="img.url" type="certificate-lg"></SafeImg>
 									</Row>
 								</Col>
 								<Col :span="24">
-									<Row type="flex" justify="center"><Button type="ghost" icon="upload" @click="onClickUpload">上传图片</Button></Row>
+									<Row type="flex" justify="center"><Button type="ghost" icon="upload" @click="onClickUpload" :loading="img.isUploading">上传图片</Button></Row>
 								</Col>
 							</Row>
 						</Col>
@@ -42,15 +42,16 @@
 <script>
 import Cropper from 'cropperjs'
 import './cropper.min.css'
+import api from '../../libs/api'
 
 export default {
 	name: 'image-editor',
 	data() {
 		return {
 			cropper: {},
-			option: {
-				cropedImg: '',
-				imgUrl: '',
+			img: {
+				isUploading: false,
+				url: '',
 			},
 		}
 	},
@@ -66,12 +67,26 @@ export default {
 		},
 		handlecrop() {
 			this.cropper.getCroppedCanvas().toBlob((blob) => {
-				const url = URL.createObjectURL(blob)
-				console.log(url)
-				this.option.imgUrl = url
+				this.img.url = URL.createObjectURL(blob)
 			}, 'image/jpeg')
 		},
+		imgUploading() {
+			this.img.isUploading = true
+		},
+		imgUnuploading() {
+			this.img.isUploading = false
+		},
 		onClickUpload() {
+			this.uploadImg(this.img.url)
+		},
+		async uploadImg(img) {
+			try {
+				await api.uploadImage(img)
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.imgUnuploading()
+			}
 		},
 	},
 	mounted() {
