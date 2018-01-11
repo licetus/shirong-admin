@@ -231,7 +231,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
+		util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 		this.initPage()
 	},
 	activated() {
