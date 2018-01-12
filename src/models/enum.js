@@ -9,6 +9,10 @@ const Enum = {
 		Male: 1,
 		Female: 2,
 	},
+	ImageType: {
+		Other: 1,
+		IdCard: 2,
+	},
 
 	Loan: {
 		Status: {
