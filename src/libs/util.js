@@ -4,6 +4,7 @@ import Cookies from 'js-cookie'
 import moment from 'moment'
 // import env from '../../build/env'
 import packjson from '../../package.json'
+import config from '../../build/config'
 import Enum from '../models/enum'
 import api from './api'
 
@@ -358,6 +359,11 @@ util.inputLengthCheck = (string, length, vm) => {
 	if (string.length <= length) return true
 	vm.$Message.error(`输入长度请勿超过 ${length} 个字符`)
 	return false
+}
+
+util.generateImageUrl = (url) => {
+	if (url) return `${config.host}${url}`
+	return ''
 }
 
 util.formatPercent = percent =>

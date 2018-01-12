@@ -23,8 +23,8 @@
 							<Col :span="8"><FormItem label="性别" prop="gender">
 								<p v-if="!profile.isEditable">{{debtorGender}}</p>
 								<RadioGroup v-else v-model="profile.form.gender">
-									<Radio :label="Gender.Male">男</Radio>
-									<Radio :label="Gender.Female">女</Radio>
+									<Radio :label="Enum.Gender.Male">男</Radio>
+									<Radio :label="Enum.Gender.Female">女</Radio>
 								</RadioGroup>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="出生日期" prop="birthDate">
@@ -69,7 +69,12 @@
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="身份证正面" prop="frontImageUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row type="flex" justify="center"><Col :span="12">
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontImageUrl)" type="certificate-md"></SafeImg>
+									<ImageUploader v-else @on-upload="url => identify.form.frontImageUrl = url">
+										<SafeImg :src="util.generateImageUrl(identify.form.frontImageUrl)" type="certificate-md"></SafeImg>
+									</ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="正面模糊" prop="frontBlurImageUrl">
 								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
@@ -181,7 +186,8 @@ export default {
 			debtor: new Debtor(),
 		}
 		return {
-			Gender: Enum.Gender,
+			Enum,
+			util,
 			isEditVisible: true,
 			isSubmitting: false,
 			debtor: blank.debtor,
