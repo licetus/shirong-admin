@@ -56,6 +56,8 @@
 <script>
 import Cropper from 'cropperjs'
 import './cropper.min.css'
+import certificateLg from './assets/certificate@3x.png'
+import photoLg from './assets/photo@3x.png'
 import Enum from '../../models/enum'
 import api from '../../libs/api'
 
@@ -75,15 +77,14 @@ export default {
 		}
 	},
 	computed: {
-		previewType() {
-			if (this.img.type === Enum.ImageType.IdCard) return 'certificate-lg'
-			return 'photo-lg'
+		defaultUrl() {
+			return this.img.type === Enum.ImageType.IdCard ? certificateLg : photoLg
 		},
 		previewStyle() {
 			const style = {
 				width: '100%',
 				height: '200px',
-				'background-image': `url(${this.img.dataUrl})`,
+				'background-image': `url(${this.img.dataUrl || this.defaultUrl})`,
 				'background-size': 'contain',
 				'background-repeat': 'no-repeat',
 				'background-position': 'center',
