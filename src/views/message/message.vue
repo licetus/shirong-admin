@@ -202,9 +202,9 @@ export default {
             // you can write ajax request here to get message content
             let mesContent = '';
             switch (this.currentMessageType + index) {
-                case 'unread0': mesContent = '这是您点击的《欢迎登录iView-admin后台管理系统，来了解他的用途吧》的相关内容。'; break;
-                case 'unread1': mesContent = '这是您点击的《使用iView-admin和iView-ui组件库快速搭建你的后台系统吧》的相关内容。'; break;
-                case 'unread2': mesContent = '这是您点击的《喜欢iView-admin的话，欢迎到github主页给个star吧》的相关内容。'; break;
+                case 'unread0': mesContent = '这是您点击的《欢迎登录世融后台管理系统，来了解他的用途吧》的相关内容。'; break;
+                case 'unread1': mesContent = '这是您点击的《超级管理员负责管理后台用户》的相关内容。'; break;
+                case 'unread2': mesContent = '这是您点击的《新用户请至超级管理员处申请分发账号》的相关内容。'; break;
                 case 'hasread0': mesContent = '这是您点击的《这是一条您已经读过的消息》的相关内容。'; break;
                 default: mesContent = '这是您点击的《这是一条被删除的消息》的相关内容。'; break;
             }
@@ -214,15 +214,15 @@ export default {
     mounted () {
         this.currentMesList = this.unreadMesList = [
             {
-                title: '欢迎登录iView-admin后台管理系统，来了解他的用途吧',
+                title: '欢迎登录世融后台管理系统，来了解他的用途吧',
                 time: 1507390106000
             },
             {
-                title: '使用iView-admin和iView-ui组件库快速搭建你的后台系统吧',
+                title: '超级管理员负责管理后台用户',
                 time: 1507390106000
             },
             {
-                title: '喜欢iView-admin的话，欢迎到github主页给个star吧',
+                title: '新用户请至超级管理员处申请分发账号',
                 time: 1507390106000
             }
         ];
@@ -255,4 +255,3 @@ export default {
     }
 };
 </script>
-
