@@ -14,13 +14,13 @@ const option = {
             name: '入流量',
             type: 'gauge',
             min: 0,
-            max: 100,
+            max: 20,
             detail: {
-                formatter: '{value}k+',
+                formatter: '{value}',
                 fontSize: 14,
                 offsetCenter: [0, '50px']
             },
-            data: [{value: 50, name: '今日收入资金'}],
+            data: [{value: 50, name: '今日新增项目'}],
             center: ['25%', '50%'],
             radius: '80%',
             title: {
@@ -40,13 +40,13 @@ const option = {
             name: '出流量',
             type: 'gauge',
             min: 0,
-            max: 100,
+            max: 50,
             detail: {
-                formatter: '{value}k+',
+                formatter: '{value}',
                 fontSize: 14,
                 offsetCenter: [0, '50px']
             },
-            data: [{value: 50, name: '今日支出资金'}],
+            data: [{value: 50, name: '今日售罄项目'}],
             center: ['75%', '50%'],
             radius: '80%',
             title: {
@@ -69,8 +69,8 @@ export default {
     name: 'userFlow',
     mounted () {
         let userFlow = echarts.init(document.getElementById('user_flow'));
-        option.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0;
-        option.series[1].data[0].value = (Math.random() * 100).toFixed(2) - 0;
+        option.series[0].data[0].value = (Math.random() * 10).toFixed(0) - 0;
+        option.series[1].data[0].value = (Math.random() * 10).toFixed(0) - 0;
         userFlow.setOption(option);
 
         window.addEventListener('resize', function () {

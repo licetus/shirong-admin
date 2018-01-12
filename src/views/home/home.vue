@@ -138,7 +138,7 @@
 			<Card>
 				<p slot="title" class="card-title">
 					<Icon type="ios-pulse-strong"></Icon>
-					数据来源统计
+					交易来源统计
 				</p>
 				<div class="data-source-row">
 					<data-source-pie></data-source-pie>
@@ -149,7 +149,7 @@
 			<Card>
 				<p slot="title" class="card-title">
 					<Icon type="android-wifi"></Icon>
-					今日收入支出变化统计
+					今日项目销售情况
 				</p>
 				<div class="data-source-row">
 					<user-flow></user-flow>
@@ -161,7 +161,7 @@
 		<Card>
 			<p slot="title" class="card-title">
 				<Icon type="ios-shuffle-strong"></Icon>
-				上周每日收入总额
+				上周每日销售总额(/笔)
 			</p>
 			<div class="line-chart-con">
 				<service-requests></service-requests>
