@@ -36,6 +36,7 @@ export default {
 	},
 	computed: {
 		imgType() {
+			if (!this.value) return 'upload-img'
 			switch (this.type) {
 				case Enum.ImageType.IdCard:
 					return 'certificate-md'

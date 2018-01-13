@@ -19,7 +19,10 @@ export default {
 			type: String,
 			default: '',
 		},
-		type: String,
+		type: {
+			type: String,
+			default: '',
+		},
 		styles: String,
 	},
 	data() {
@@ -29,9 +32,9 @@ export default {
 	},
 	mounted() {
 	},
-	methods: {
-		onImageError() {
-			this.showSrc = false
+	watch: {
+		src() {
+			this.showSrc = true
 		},
 	},
 	computed: {
@@ -67,6 +70,11 @@ export default {
 		imageUrl() {
 			if (!this.src || this.src === '') return this.default
 			return this.showSrc ? this.src : this.default
+		},
+	},
+	methods: {
+		onImageError() {
+			this.showSrc = false
 		},
 	},
 }

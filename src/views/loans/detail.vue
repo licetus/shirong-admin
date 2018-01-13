@@ -111,6 +111,7 @@
 					</Form>
 				</Card>
 				<Card v-if="loan.data.type === Enum.Loan.Type.Car" class="margin-top-10">
+					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">车辆详情</p>
 					<div v-show="isEditable && isLockVisible" slot="extra">
 						<div v-show="!loan.sub.car.isEditable">
@@ -142,26 +143,32 @@
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="车辆行驶证">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.vehicleLicenseImageUrl)" type="photo-md"></SafeImg>
+								<ImageUploader v-else v-model="loan.sub.car.form.vehicleLicenseImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="车辆检验证">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.inspectionLicenseImageUrl)" type="photo-md"></SafeImg>
+								<ImageUploader v-else v-model="loan.sub.car.form.inspectionLicenseImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="正面照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carFrontImageUrl)" type="photo-md"></SafeImg>
+								<ImageUploader v-else v-model="loan.sub.car.form.carFrontImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="背面照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carBackImageUrl)" type="photo-md"></SafeImg>
+								<ImageUploader v-else v-model="loan.sub.car.form.carBackImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="里程照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carMilageImageUrl)" type="photo-md"></SafeImg>
+								<ImageUploader v-else v-model="loan.sub.car.form.carMilageImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="内饰照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carInsideImageUrl)" type="photo-md"></SafeImg>
+								<ImageUploader v-else v-model="loan.sub.car.form.carInsideImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 						</Row>
 					</Form>
@@ -201,9 +208,8 @@
 					<p slot="title">业务员</p>
 					<Form label-position="left" :label-width="75" inline>
 						<Row>
-							<Col :span="24"><FormItem label="姓名"></FormItem></Col>
-							<Col :span="24"><FormItem label="工号"></FormItem></Col>
-							<Col :span="24"><FormItem label="签约时间"></FormItem></Col>
+							<Col :span="24"><FormItem label="账号">{{agent.data.username || '-'}}</FormItem></Col>
+							<Col :span="24"><FormItem label="备注">{{agent.data.remark || '-'}}</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -294,7 +300,7 @@ export default {
 					car: {
 						data: blank.car,
 						isEditable: false,
-						labelWidth: 75,
+						labelWidth: 100,
 						form: {
 							carBrand: blank.car.carBrand,
 							purchasePrice: blank.car.purchasePrice,
@@ -313,6 +319,14 @@ export default {
 			},
 			debtor: {
 				data: blank.debtor,
+				isLoading: false,
+				labelWidth: 75,
+			},
+			agent: {
+				data: {
+					username: '',
+					remark: '',
+				},
 				isLoading: false,
 				labelWidth: 75,
 			},
@@ -540,12 +554,13 @@ export default {
 		},
 		async updateLoan(loan) {
 			try {
-				const res = await api.loan.update(loan, this.$route.params.loan_id)
+				await api.loan.update(loan, this.$route.params.loan_id)
 				this.$Notice.success({
 					title: '更新成功, 正在刷新...',
 					duration: 3,
 				})
-				this.loadLoan(res)
+				this.hideLock()
+				this.loadLoan()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
@@ -826,10 +841,6 @@ export default {
 			} finally {
 				this.loanUnapproving()
 			}
-		},
-
-		onClickImage() {
-			console.log('upload img')
 		},
 	},
 }
