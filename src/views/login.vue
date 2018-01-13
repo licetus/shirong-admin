@@ -35,7 +35,7 @@
 
 <script>
 import Cookies from 'js-cookie'
-import Api from '../libs/api'
+import api from '../libs/api'
 import util from '../libs/util'
 
 export default {
@@ -73,23 +73,38 @@ export default {
 		},
 		async login() {
 			try {
-				const res = await Api.login(this.loginForm.username, util.md5(this.loginForm.password))
-				console.log('here', res)
+				const res = await api.login(this.loginForm.username, util.md5(this.loginForm.password))
 				if (res && res.id && res.token && res.role) {
 					Cookies.set('username', this.loginForm.username)
 					Cookies.set('password', this.loginForm.password)
 					Cookies.set('access', res.role)
 					sessionStorage.setItem('token', res.token)
 					// this.$store.commit('setAvatar', user.avatarUrl)
-					this.loginUnloading()
 					this.$router.push({
 						name: 'home_index',
 					})
+					this.fetchProfile()
 				}
 			} catch (error) {
 				if (error.code === 'INVALID_ADMIN_ID_ERROR') this.$Message.error('用户名或密码错误')
 				else this.$Message.error(error.message)
+			} finally {
 				this.loginUnloading()
+			}
+		},
+		async fetchProfile() {
+			try {
+				const res = await api.admin.profile.fetchSelf()
+				const userProfile = {
+					id: res.id,
+					avatarUrl: res.avatarUrl,
+					phoneNumber: res.phoneNumber,
+					remark: res.remark,
+				}
+				Cookies.set('userProfile', JSON.stringify(userProfile))
+				this.$store.commit('setAvatar', util.generateImageUrl(res.avatarUrl))
+			} catch (e) {
+				this.$Message.error(e.message)
 			}
 		},
 	},

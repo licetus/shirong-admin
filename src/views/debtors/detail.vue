@@ -69,23 +69,30 @@
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="身份证正面" prop="frontImageUrl">
-								<Row type="flex" justify="center"><Col :span="12">
+								<Row><Col :span="16">
 									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontImageUrl)" type="certificate-md"></SafeImg>
-									<ImageUploader v-else @on-upload="url => identify.form.frontImageUrl = url">
-										<SafeImg :src="util.generateImageUrl(identify.form.frontImageUrl)" type="certificate-md"></SafeImg>
-									</ImageUploader>
+									<ImageUploader v-else v-model="identify.form.frontImageUrl" name="frontImage"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="正面模糊" prop="frontBlurImageUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row><Col :span="16">
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontBlurImageUrl)" type="certificate-md"></SafeImg>
+									<ImageUploader v-else v-model="identify.form.frontBlurImageUrl" name="frontBlurImage"></ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="身份证背面" prop="backImageUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row><Col :span="16">
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backImageUrl)" type="certificate-md"></SafeImg>
+									<ImageUploader v-else v-model="identify.form.backImageUrl" name="frontBlurImage"></ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
-							<Col :span="12"><FormItem label="背面模糊" prop="backBlurImaegUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							<Col :span="12"><FormItem label="背面模糊" prop="backBlurImageUrl">
+								<Row><Col :span="16">
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backBlurImageUrl)" type="certificate-md"></SafeImg>
+									<ImageUploader v-else v-model="identify.form.backBlurImageUrl" name="frontBlurImage"></ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
 						</Row>
 					</Form>
@@ -209,14 +216,14 @@ export default {
 				isEditable: false,
 				isLoading: false,
 				isSaving: false,
-				labelWidth: 75,
+				labelWidth: 100,
 				form: {
 					idNumber: blank.debtor.identify.idNumber,
 					location: blank.debtor.identify.location,
 					frontImageUrl: blank.debtor.identify.frontImageUrl,
 					frontBlurImageUrl: blank.debtor.identify.frontBlurImageUrl,
 					backImageUrl: blank.debtor.identify.backImageUrl,
-					backBlurImageUrl: blank.debtor.identify.backBlurImaegUrl,
+					backBlurImageUrl: blank.debtor.identify.backBlurImageUrl,
 				},
 			},
 			credit: {
@@ -417,7 +424,7 @@ export default {
 				frontImageUrl: this.debtor.identify.frontImageUrl,
 				frontBlurImageUrl: this.debtor.identify.frontBlurImageUrl,
 				backImageUrl: this.debtor.identify.backImageUrl,
-				backBlurImageUrl: this.debtor.identify.backBlurImaegUrl,
+				backBlurImageUrl: this.debtor.identify.backBlurImageUrl,
 			}
 		},
 		loadIdentify() {
@@ -440,7 +447,7 @@ export default {
 						frontImageUrl: this.identify.form.frontImageUrl,
 						frontBlurImageUrl: this.identify.form.frontBlurImageUrl,
 						backImageUrl: this.identify.form.backImageUrl,
-						backBlurImageUrl: this.identify.form.backBlurImaegUrl,
+						backBlurImageUrl: this.identify.form.backBlurImageUrl,
 					}
 					this.identifySaving()
 					this.updateIdentify(identify)
@@ -456,7 +463,7 @@ export default {
 					frontImageUrl: res.frontImageUrl,
 					frontBlurImageUrl: res.frontBlurImageUrl,
 					backImageUrl: res.backImageUrl,
-					backBlurImageUrl: res.backBlurImaegUrl,
+					backBlurImageUrl: res.backBlurImageUrl,
 				}
 				this.initIdentifyForm()
 			} catch (e) {

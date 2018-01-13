@@ -1,5 +1,5 @@
 <template>
-	<img :src="imageUrl" @error="onImageError" :style="styles"/>
+	<img class="safe-img" :src="imageUrl" @error="onImageError" :style="styles"/>
 </template>
 
 <script>
@@ -62,3 +62,10 @@ export default {
 	},
 }
 </script>
+
+<style lang="less">
+	.safe-img{
+		width: 100%;
+		height: auto;
+	}
+</style>

@@ -78,9 +78,9 @@ api.admin = {
 	},
 	profile: {
 		updateSelf: async params =>
-			createAuthInstance().patch('admin/profile', params).then(res => res.data),
-		fetchSelf: async params =>
-			createAuthInstance().patch('admin/profile', params).then(res => res.data),
+			createAuthInstance().post('admin/profile', params).then(res => res.data),
+		fetchSelf: async () =>
+			createAuthInstance().get('admin/profile').then(res => res.data),
 	},
 }
 
