@@ -21,14 +21,14 @@
 								<Input v-else v-model="profile.form.realName"/>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="性别" prop="gender">
-								<p v-if="!profile.isEditable">{{debtorGender}}</p>
+								<p v-if="!profile.isEditable">{{util.getGender(this, profile.form.gender) || '-'}}</p>
 								<RadioGroup v-else v-model="profile.form.gender">
 									<Radio :label="Enum.Gender.Male">男</Radio>
 									<Radio :label="Enum.Gender.Female">女</Radio>
 								</RadioGroup>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="出生日期" prop="birthDate">
-								<p v-if="!profile.isEditable">{{debtorBirthday}}</p>
+								<p v-if="!profile.isEditable">{{util.formatBirthday(this, this.profile.form.birthDate) || '-'}}</p>
 								<DatePicker v-else v-model="profile.form.birthDate"></DatePicker>
 							</FormItem></Col>
 						</Row>
@@ -71,13 +71,13 @@
 							<Col :span="12"><FormItem label="身份证正面" prop="frontImageUrl">
 								<Row><Col :span="16">
 									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontImageUrl)" type="certificate-md"></SafeImg>
-									<ImageUploader v-else v-model="identify.form.frontImageUrl" name="frontImage"></ImageUploader>
+									<ImageUploader v-else v-model="identify.form.frontImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="正面模糊" prop="frontBlurImageUrl">
 								<Row><Col :span="16">
 									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontBlurImageUrl)" type="certificate-md"></SafeImg>
-									<ImageUploader v-else v-model="identify.form.frontBlurImageUrl" name="frontBlurImage"></ImageUploader>
+									<ImageUploader v-else v-model="identify.form.frontBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
 						</Row>
@@ -85,13 +85,13 @@
 							<Col :span="12"><FormItem label="身份证背面" prop="backImageUrl">
 								<Row><Col :span="16">
 									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backImageUrl)" type="certificate-md"></SafeImg>
-									<ImageUploader v-else v-model="identify.form.backImageUrl" name="frontBlurImage"></ImageUploader>
+									<ImageUploader v-else v-model="identify.form.backImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="背面模糊" prop="backBlurImageUrl">
 								<Row><Col :span="16">
 									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backBlurImageUrl)" type="certificate-md"></SafeImg>
-									<ImageUploader v-else v-model="identify.form.backBlurImageUrl" name="frontBlurImage"></ImageUploader>
+									<ImageUploader v-else v-model="identify.form.backBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
 						</Row>
@@ -254,14 +254,6 @@ export default {
 		}
 	},
 	computed: {
-		debtorGender() {
-			if (this.profile.form.gender) return util.getGender(this, this.profile.form.gender)
-			return '-'
-		},
-		debtorBirthday() {
-			if (this.profile.form.birthDate) return util.formatBirthday(this, this.profile.form.birthDate)
-			return '-'
-		},
 		debtorHasCar() {
 			if (this.credit.form.hasCar || this.credit.form.hasCar === false) return `${this.credit.form.hasCar ? '是' : '否'}`
 			return '-'

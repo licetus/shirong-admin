@@ -24,10 +24,10 @@
 			<Row :gutter="0" type="flex" align="middle" style="height:100%">
 				<Col :span="24">
 					<Row type="flex" justify="center">
-						<RadioGroup :value="img.type">
-							<Radio :label="Enum.ImageType.IdCard" :disabled="img.type !== Enum.ImageType.IdCard">身份证</Radio>
-							<Radio :label="Enum.ImageType.Avatar" :disabled="img.type !== Enum.ImageType.Avatar">头像</Radio>
-							<Radio :label="Enum.ImageType.Other" :disabled="img.type !== Enum.ImageType.Other">其他</Radio>
+						<RadioGroup :value="type">
+							<Radio :label="Enum.ImageType.IdCard" :disabled="type !== Enum.ImageType.IdCard">身份证</Radio>
+							<Radio :label="Enum.ImageType.Avatar" :disabled="type !== Enum.ImageType.Avatar">头像</Radio>
+							<Radio :label="Enum.ImageType.Other" :disabled="type !== Enum.ImageType.Other">其他</Radio>
 						</RadioGroup>
 					</Row>
 				</Col>

@@ -22,14 +22,14 @@
 								<Input v-else v-model="profile.form.realName"/>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="性别" prop="gender">
-								<p v-if="!profile.isEditable">{{debtorGender}}</p>
+								<p v-if="!profile.isEditable">{{util.getGender(this, profile.form.gender) || '-'}}</p>
 								<RadioGroup v-else v-model="profile.form.gender">
-									<Radio :label="Gender.Male">男</Radio>
-									<Radio :label="Gender.Female">女</Radio>
+									<Radio :label="Enum.Gender.Male">男</Radio>
+									<Radio :label="Enum.Gender.Female">女</Radio>
 								</RadioGroup>
 							</FormItem></Col>
 							<Col :span="8"><FormItem label="出生日期" prop="birthDate">
-								<p v-if="!profile.isEditable">{{debtorBirthday}}</p>
+								<p v-if="!profile.isEditable">{{util.formatBirthday(this, this.profile.form.birthDate) || '-'}}</p>
 								<DatePicker v-else v-model="profile.form.birthDate"></DatePicker>
 							</FormItem></Col>
 						</Row>
@@ -70,18 +70,18 @@
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="身份证正面" prop="frontImageUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<ImageUploader v-model="identify.form.frontImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="正面模糊" prop="frontBlurImageUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<ImageUploader v-model="identify.form.frontBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="身份证背面" prop="backImageUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<ImageUploader v-model="identify.form.backImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 							</FormItem></Col>
-							<Col :span="12"><FormItem label="背面模糊" prop="backBlurImaegUrl">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+							<Col :span="12"><FormItem label="背面模糊" prop="backBlurImageUrl">
+								<ImageUploader v-model="identify.form.backBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 							</FormItem></Col>
 						</Row>
 					</Form>
@@ -159,7 +159,8 @@ export default {
 			debtor: new Debtor(),
 		}
 		return {
-			Gender: Enum.Gender,
+			Enum,
+			util,
 			isEditVisible: true,
 			isSubmitting: false,
 			debtor: blank.debtor,
@@ -181,14 +182,14 @@ export default {
 				isEditable: true,
 				isLoading: false,
 				isSaving: false,
-				labelWidth: 75,
+				labelWidth: 100,
 				form: {
 					idNumber: blank.debtor.identify.idNumber,
 					location: blank.debtor.identify.location,
 					frontImageUrl: blank.debtor.identify.frontImageUrl,
 					frontBlurImageUrl: blank.debtor.identify.frontBlurImageUrl,
 					backImageUrl: blank.debtor.identify.backImageUrl,
-					backBlurImageUrl: blank.debtor.identify.backBlurImaegUrl,
+					backBlurImageUrl: blank.debtor.identify.backBlurImageUrl,
 				},
 			},
 			credit: {
@@ -212,14 +213,6 @@ export default {
 		this.initPage()
 	},
 	computed: {
-		debtorGender() {
-			if (this.profile.form.gender) return util.getGender(this, this.profile.form.gender)
-			return '-'
-		},
-		debtorBirthday() {
-			if (this.profile.form.birthDate) return util.formatBirthday(this, this.profile.form.birthDate)
-			return '-'
-		},
 		debtorHasCar() {
 			if (this.credit.form.hasCar || this.credit.form.hasCar === false) return `${this.credit.form.hasCar ? '是' : '否'}`
 			return '-'
@@ -389,7 +382,7 @@ export default {
 				frontImageUrl: this.debtor.identify.frontImageUrl,
 				frontBlurImageUrl: this.debtor.identify.frontBlurImageUrl,
 				backImageUrl: this.debtor.identify.backImageUrl,
-				backBlurImageUrl: this.debtor.identify.backBlurImaegUrl,
+				backBlurImageUrl: this.debtor.identify.backBlurImageUrl,
 			}
 		},
 		loadIdentify() {
@@ -412,7 +405,7 @@ export default {
 						frontImageUrl: this.identify.form.frontImageUrl,
 						frontBlurImageUrl: this.identify.form.frontBlurImageUrl,
 						backImageUrl: this.identify.form.backImageUrl,
-						backBlurImageUrl: this.identify.form.backBlurImaegUrl,
+						backBlurImageUrl: this.identify.form.backBlurImageUrl,
 					}
 					this.identifySaving()
 					this.updateIdentify(identify)
@@ -428,7 +421,7 @@ export default {
 					frontImageUrl: res.frontImageUrl,
 					frontBlurImageUrl: res.frontBlurImageUrl,
 					backImageUrl: res.backImageUrl,
-					backBlurImageUrl: res.backBlurImaegUrl,
+					backBlurImageUrl: res.backBlurImageUrl,
 				}
 				this.$Notice.info({
 					title: '更新实名信息成功',
