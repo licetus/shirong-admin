@@ -160,26 +160,26 @@
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆行驶证">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.vehicleLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.sub.car.vehicleLicenseImageUrl)" type="certificate-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆检验证">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.inspectionLicenseImageUrl" type="certificate-md"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.sub.car.inspectionLicenseImageUrl)" type="certificate-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆正面照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carFrontImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.sub.car.carFrontImageUrl)" type="photo-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆背面照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carBackImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.sub.car.carBackImageUrl)" type="photo-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 							<Row>
 								<Col :span="12"><FormItem label="车辆里程照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carMilageImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.sub.car.carMilageImageUrl)" type="photo-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 								<Col :span="12"><FormItem label="车辆内饰照">
-									<Row><Col :span="18"><SafeImg :src="loan.data.sub.car.carInsideImageUrl" type="photo-sm"></SafeImg></Col></Row>
+									<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.sub.car.carInsideImageUrl)" type="photo-md"></SafeImg></Col></Row>
 								</FormItem></Col>
 							</Row>
 						</div>
