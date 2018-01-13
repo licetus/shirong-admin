@@ -3,7 +3,7 @@
 		<Button type="text" @click="onClickOpenModal"><SafeImg :src="util.generateImageUrl(value)" :type="imgType"></SafeImg></Button>
 		<Modal v-model="isModalVisible" class-name="image-uploader" width="800">
 				<p slot="header">图片上传</p>
-				<VueCropper v-if="isModalVisible" @on-upload="onUploadImage" :imgType="type"></VueCropper>
+				<VueCropper v-if="isModalVisible" @on-upload="onUploadImage" :type="type"></VueCropper>
 				<div slot="footer">
 					<Button @click="onClickCancel">取消</Button>
 					<Button type="primary" @click="onClickConfirm" :disabled="isConfirmDisabled">确认</Button>

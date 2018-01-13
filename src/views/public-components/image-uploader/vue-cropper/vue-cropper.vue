@@ -58,7 +58,7 @@ export default {
 	name: 'vue-cropper',
 	props: {
 		value: String,
-		imgType: {
+		type: {
 			type: Number,
 			default: Enum.ImageType.Other,
 		},
@@ -72,7 +72,6 @@ export default {
 			cropper: {},
 			img: {
 				isUploading: false,
-				type: this.imgType,
 				defaultUrl: '',
 				dataUrl: '',
 			},
@@ -87,6 +86,10 @@ export default {
 				'background-size': 'contain',
 				'background-repeat': 'no-repeat',
 				'background-position': 'center',
+			}
+			if (this.type === Enum.ImageType.Avatar) {
+				this.$set(style, 'width', '200px')
+				this.$set(style, 'border-radius', '50%')
 			}
 			return style
 		},
@@ -117,7 +120,7 @@ export default {
 				toggleDragModeOnDblclick: false,
 				autoCropArea: 0.9,
 			})
-			switch (this.img.type) {
+			switch (this.type) {
 				case Enum.ImageType.IdCard:
 					this.cropper.setAspectRatio(1 / 0.63)
 					this.img.defaultUrl = certificate

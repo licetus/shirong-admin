@@ -1,5 +1,5 @@
 <template>
-	<img class="safe-img" :src="imageUrl" @error="onImageError" :style="styles"/>
+	<img class="safe-img" :src="imageUrl" @error="onImageError" :style="imgStyle"/>
 </template>
 
 <script>
@@ -35,6 +35,15 @@ export default {
 		},
 	},
 	computed: {
+		imgStyle() {
+			if (this.style) return this.style
+			const style = {
+				width: '100%',
+				height: 'auto',
+			}
+			if (this.type === 'avatar-md' || this.type === 'avatar-lg') this.$set(style, 'border-radius', '50%')
+			return style
+		},
 		default() {
 			switch (this.type) {
 				case 'avatar-md':
@@ -64,8 +73,4 @@ export default {
 </script>
 
 <style lang="less">
-	.safe-img{
-		width: 100%;
-		height: auto;
-	}
 </style>
