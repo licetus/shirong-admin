@@ -12,6 +12,7 @@ const Enum = {
 	ImageType: {
 		Other: 1,
 		IdCard: 2,
+		Avatar: 3,
 	},
 
 	Loan: {

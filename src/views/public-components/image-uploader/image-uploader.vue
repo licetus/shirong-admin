@@ -1,9 +1,9 @@
 <template>
 	<div>
-		<Button type="text" @click="onClickOpenModal"><SafeImg :src="util.generateImageUrl(value)" type="upload-img"></SafeImg></Button>
+		<Button type="text" @click="onClickOpenModal"><SafeImg :src="util.generateImageUrl(value)" :type="imgType"></SafeImg></Button>
 		<Modal v-model="isModalVisible" class-name="image-uploader" width="800">
 				<p slot="header">图片上传</p>
-				<VueCropper v-if="isModalVisible" @on-upload="onUploadImage"></VueCropper>
+				<VueCropper v-if="isModalVisible" @on-upload="onUploadImage" :imgType="type"></VueCropper>
 				<div slot="footer">
 					<Button @click="onClickCancel">取消</Button>
 					<Button type="primary" @click="onClickConfirm" :disabled="isConfirmDisabled">确认</Button>
@@ -14,6 +14,7 @@
 
 <script>
 import VueCropper from './vue-cropper/vue-cropper.vue'
+import Enum from '../../../models/enum'
 import util from '../../../libs/util'
 
 export default {
@@ -23,6 +24,7 @@ export default {
 	},
 	props: {
 		value: String,
+		type: Number,
 	},
 	data() {
 		return {
@@ -33,6 +35,16 @@ export default {
 		}
 	},
 	computed: {
+		imgType() {
+			switch (this.type) {
+				case Enum.ImageType.IdCard:
+					return 'certificate-md'
+				case Enum.ImageType.Avatar:
+					return 'avatar-md'
+				default:
+					return 'default'
+			}
+		},
 	},
 	methods: {
 		showModal() {

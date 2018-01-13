@@ -24,9 +24,10 @@
 			<Row :gutter="0" type="flex" align="middle" style="height:100%">
 				<Col :span="24">
 					<Row type="flex" justify="center">
-						<RadioGroup v-model="img.type" @on-change="onClickImgType">
-							<Radio :label="Enum.ImageType.IdCard">身份证</Radio>
-							<Radio :label="Enum.ImageType.Other">其他</Radio>
+						<RadioGroup :value="img.type">
+							<Radio :label="Enum.ImageType.IdCard" :disabled="img.type !== Enum.ImageType.IdCard">身份证</Radio>
+							<Radio :label="Enum.ImageType.Avatar" :disabled="img.type !== Enum.ImageType.Avatar">头像</Radio>
+							<Radio :label="Enum.ImageType.Other" :disabled="img.type !== Enum.ImageType.Other">其他</Radio>
 						</RadioGroup>
 					</Row>
 				</Col>
@@ -46,8 +47,9 @@
 <script>
 import Cropper from 'cropperjs'
 import './cropper.min.css'
-import certificateLg from './assets/certificate@3x.png'
-import photoLg from './assets/photo@3x.png'
+import certificate from './assets/certificate@3x.png'
+import avatar from './assets/avatar@3x.png'
+import photo from './assets/photo@3x.png'
 import Enum from '../../../../models/enum'
 import api from '../../../../libs/api'
 import util from '../../../../libs/util'
@@ -56,7 +58,10 @@ export default {
 	name: 'vue-cropper',
 	props: {
 		value: String,
-		name: String,
+		imgType: {
+			type: Number,
+			default: Enum.ImageType.Other,
+		},
 	},
 	data() {
 		return {
@@ -67,20 +72,18 @@ export default {
 			cropper: {},
 			img: {
 				isUploading: false,
-				type: Enum.ImageType.Other,
+				type: this.imgType,
+				defaultUrl: '',
 				dataUrl: '',
 			},
 		}
 	},
 	computed: {
-		defaultUrl() {
-			return this.img.type === Enum.ImageType.IdCard ? certificateLg : photoLg
-		},
 		previewStyle() {
 			const style = {
 				width: '100%',
 				height: '200px',
-				'background-image': `url(${this.img.dataUrl || this.defaultUrl})`,
+				'background-image': `url(${this.img.dataUrl || this.img.defaultUrl})`,
 				'background-size': 'contain',
 				'background-repeat': 'no-repeat',
 				'background-position': 'center',
@@ -101,6 +104,34 @@ export default {
 		imgUnuploading() {
 			this.img.isUploading = false
 		},
+		initCropper() {
+			const img = document.getElementById('cropimg')
+			this.cropper = new Cropper(img, {
+				dragMode: 'move',
+				aspectRatio: null,
+				// preview: '#preview',
+				restore: false,
+				center: false,
+				highlight: false,
+				cropBoxMovable: true,
+				toggleDragModeOnDblclick: false,
+				autoCropArea: 0.9,
+			})
+			switch (this.img.type) {
+				case Enum.ImageType.IdCard:
+					this.cropper.setAspectRatio(1 / 0.63)
+					this.img.defaultUrl = certificate
+					break
+				case Enum.ImageType.Avatar:
+					this.cropper.setAspectRatio(1)
+					this.img.defaultUrl = avatar
+					break
+				default:
+					this.cropper.setAspectRatio(null)
+					this.img.defaultUrl = photo
+					break
+			}
+		},
 		handelChange(e) {
 			this.disableUpload()
 			const file = e.target.files[0]
@@ -115,11 +146,6 @@ export default {
 			const canvas = this.cropper.getCroppedCanvas()
 			this.img.dataUrl = canvas.toDataURL('image/png')
 			this.enableUpload()
-		},
-		onClickImgType(type) {
-			this.img.type = type
-			const aspectRatio = type === Enum.ImageType.IdCard ? 1 / 0.63 : null
-			this.cropper.setAspectRatio(aspectRatio)
 		},
 		onClickUpload() {
 			this.imgUploading()
@@ -144,22 +170,7 @@ export default {
 		},
 	},
 	mounted() {
-		console.log('mounted')
-		const img = document.getElementById('cropimg')
-		this.cropper = new Cropper(img, {
-			dragMode: 'move',
-			aspectRatio: null,
-			// preview: '#preview',
-			restore: false,
-			center: false,
-			highlight: false,
-			cropBoxMovable: true,
-			toggleDragModeOnDblclick: false,
-			autoCropArea: 0.9,
-		})
-	},
-	destroyed() {
-		console.log('destroyed')
+		this.initCropper()
 	},
 }
 </script>
