@@ -118,7 +118,7 @@ export default {
 				highlight: false,
 				cropBoxMovable: true,
 				toggleDragModeOnDblclick: false,
-				autoCropArea: 0.9,
+				autoCropArea: 1,
 			})
 			switch (this.type) {
 				case Enum.ImageType.IdCard:

@@ -43,7 +43,7 @@ export default {
 				case Enum.ImageType.Avatar:
 					return 'avatar-md'
 				default:
-					return 'default'
+					return 'photo-lg'
 			}
 		},
 	},

@@ -134,26 +134,26 @@
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="车辆行驶证">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.vehicleLicenseImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="车辆检验证">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.inspectionLicenseImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="正面照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carFrontImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="背面照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carBackImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="里程照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carMilageImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="内饰照片">
-								<Row type="flex" justify="center"><Col :span="12"><Button type="text" @click="onClickImage"><SafeImg src="" type="upload-img"></SafeImg></Button></Col></Row>
+								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carInsideImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 						</Row>
 					</Form>
@@ -162,9 +162,8 @@
 			<Col :span="8" class="padding-left-5">
 				<Card>
 					<p slot="title">操作</p>
-						<Row  type="flex" justify="space-between">
-							<Button type="error">删除</Button>
-							<Button>取消</Button>
+						<Row>
+							<Button class="margin-right-10" @click="onClickCancel">取消</Button>
 							<Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">保存</Button>
 						</Row>
 				</Card>
@@ -351,7 +350,6 @@ export default {
 			return util.getAge(this, this.debtor.data.profile.birthday)
 		},
 		identifyArray() {
-			console.log(this.debtor.data.identify)
 			const arr = []
 			/* eslint-disable */
 			for (const item in this.debtor.data.identify) {
@@ -413,6 +411,11 @@ export default {
 		onClickRow(params) {
 			this.hideDebtorsModal()
 			this.initDebtor(params.id)
+		},
+		onClickCancel() {
+			util.closeCurrentPage(this.$store, this.$route.name, () => {
+				this.$router.go(-1)
+			})
 		},
 		async fetchDebtorList() {
 			try {
@@ -619,10 +622,6 @@ export default {
 		},
 		onClickSaveCar() {
 			this.uneditCar()
-		},
-
-		onClickImage() {
-			console.log('upload img')
 		},
 	},
 }
