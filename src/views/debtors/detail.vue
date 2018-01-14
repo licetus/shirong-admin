@@ -180,11 +180,7 @@
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">贷款查看</p>
-					<Table :data="loans.data" :columns="loans.columns" :loading="loans.list.isLoading"></Table>
-				</Card>
-				<Card class="margin-top-10">
-					<p slot="title">账户管理</p>
-					<!-- <Table :data="investmentRecord.data" :columns="investmentRecord.columns"></Table> -->
+					<Table :data="loans.data" :columns="loans.columns" :loading="loans.list.isLoading" @on-row-click="onClickLoansRow"></Table>
 				</Card>
 			</Col>
 		</Row>
@@ -692,6 +688,14 @@ export default {
 		},
 		loansUnloading() {
 			this.loans.list.isLoading = false
+		},
+		onClickLoansRow(params) {
+			this.$router.push({
+				name: 'loan_detail',
+				params: {
+					loan_id: params.id,
+				},
+			})
 		},
 		async loadLoans() {
 			try {
