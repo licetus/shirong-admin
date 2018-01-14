@@ -116,44 +116,52 @@
 					<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
 						<Row>
 							<Col :span="12"><FormItem label="品牌型号">
-								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.carBrand}}</p>
-								<Input v-else v-model="loan.sub.car.form.carBrand" />
+								<Row><Col :span="16">
+									<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.carBrand}}</p>
+									<Input v-else v-model="loan.sub.car.form.carBrand" />
+								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="购买价格">
-								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.purchasePrice}}</p>
-								<InputNumber v-else v-model="loan.sub.car.form.purchasePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+								<Row><Col :span="16">
+									<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.purchasePrice}}</p>
+									<InputNumber v-else v-model="loan.sub.car.form.purchasePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="行驶里程">
-								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.milage}}</p>
-								<InputNumber v-else v-model="loan.sub.car.form.milage" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+								<Row><Col :span="16">
+									<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.milage}}</p>
+									<InputNumber v-else v-model="loan.sub.car.form.milage" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="评估价格">
-								<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.evaluatePrice}}</p>
-								<InputNumber v-else v-model="loan.sub.car.form.evaluatePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+								<Row><Col :span="16">
+									<p v-if="!loan.sub.car.isEditable">{{loan.sub.car.form.evaluatePrice}}</p>
+									<InputNumber v-else v-model="loan.sub.car.form.evaluatePrice" :min="0" :max="9999999" :step="1000" :precision="0"></InputNumber>
+								</Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="车辆行驶证">
-								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.vehicleLicenseImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
+								<Row><Col :span="16"><ImageUploader v-model="loan.sub.car.form.vehicleLicenseImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="车辆检验证">
-								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.inspectionLicenseImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
+								<Row><Col :span="16"><ImageUploader v-model="loan.sub.car.form.inspectionLicenseImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="正面照片">
-								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carFrontImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
+								<Row><Col :span="16"><ImageUploader v-model="loan.sub.car.form.carFrontImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="背面照片">
-								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carBackImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
+								<Row><Col :span="16"><ImageUploader v-model="loan.sub.car.form.carBackImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="里程照片">
-								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carMilageImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
+								<Row><Col :span="16"><ImageUploader v-model="loan.sub.car.form.carMilageImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="内饰照片">
-								<Row type="flex" justify="center"><Col :span="12"><ImageUploader v-model="loan.sub.car.form.carInsideImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
+								<Row><Col :span="16"><ImageUploader v-model="loan.sub.car.form.carInsideImageUrl" :type="Enum.ImageType.Other" /></Col></Row>
 							</FormItem></Col>
 						</Row>
 					</Form>
@@ -297,7 +305,7 @@ export default {
 					car: {
 						data: blank.car,
 						isEditable: true,
-						labelWidth: 75,
+						labelWidth: 100,
 						form: {
 							carBrand: blank.car.carBrand,
 							purchasePrice: blank.car.purchasePrice,

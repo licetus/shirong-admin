@@ -70,18 +70,26 @@
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="身份证正面" prop="frontImageUrl">
-								<ImageUploader v-model="identify.form.frontImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								<Row><Col :span="16">
+									<ImageUploader v-model="identify.form.frontImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="正面模糊" prop="frontBlurImageUrl">
-								<ImageUploader v-model="identify.form.frontBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								<Row><Col :span="16">
+									<ImageUploader v-model="identify.form.frontBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="身份证背面" prop="backImageUrl">
-								<ImageUploader v-model="identify.form.backImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								<Row><Col :span="16">
+									<ImageUploader v-model="identify.form.backImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="背面模糊" prop="backBlurImageUrl">
-								<ImageUploader v-model="identify.form.backBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								<Row><Col :span="16">
+									<ImageUploader v-model="identify.form.backBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
+								</Col></Row>
 							</FormItem></Col>
 						</Row>
 					</Form>

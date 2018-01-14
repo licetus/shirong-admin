@@ -21,22 +21,46 @@
 					<Form ref="profileForm" :model="product.profile.form" :rules="product.profile.rules" label-position="left" :label-width="product.profile.labelWidth" inline>
 						<Row>
 							<Col :span="12"><FormItem label="项目名称">
-								<p v-if="!product.profile.isEditable">{{product.profile.form.name}}</p>
-								<Input v-else v-model="product.profile.form.name" />
+								<Row><Col :span="12">
+									<p v-if="!product.profile.isEditable">{{product.profile.form.name}}</p>
+									<Input v-else v-model="product.profile.form.name" />
+								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="项目类型">
 								<p>{{util.getLoanType(this, loan.data.main.type)}}</p>
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="12"><FormItem label="项目标签">测试数据</FormItem></Col>
+							<Col :span="12"><FormItem label="项目标签">
+								<Dropdown class="tags-dropdown" trigger="custom" :visible="product.profile.tags.isDropdownVisible" @on-click="onClickTag">
+									<Button type="text" size="small" @click="onClickSwitchDropdown">
+										<span v-if="!product.profile.form.tagId">无标签</span>
+										<SimpleTag v-else :color="product.profile.form.tagColor" :text="product.profile.form.tag" clickable></SimpleTag>
+										<Icon type="arrow-down-b"></Icon>
+									</Button>
+									<DropdownMenu slot="list">
+										<Spin v-if="product.profile.tags.list.isLoading" fix></Spin>
+										<template v-for="(item, index) of product.profile.tags.data">
+											<DropdownItem :name="index">
+												<Row type="flex" justify="center"><SimpleTag :color="item.color" :text="item.content"></SimpleTag></Row>
+											</DropdownItem>
+										</template>
+										<DropdownItem name="null">
+											<Row type="flex" justify="center"><p>无标签</p></Row>
+										</DropdownItem>
+									</DropdownMenu>
+								</Dropdown>
+								<Button v-if="product.profile.isEditable" type="text" @click="onClickNewTag"><Icon type="plus-round"></Icon></Button>
+							</FormItem></Col>
 							<Col :span="12"><FormItem label="排名参数">
-								<p v-if="!product.profile.isEditable">{{product.profile.form.rankingScore}}</p>
-								<InputNumber v-else v-model="product.profile.form.rankingScore" :min="0" :max="9.99" :step="0.1"></InputNumber>
+								<Row><Col :span="12">
+									<p v-if="!product.profile.isEditable">{{product.profile.form.rankingScore}}</p>
+									<InputNumber v-else v-model="product.profile.form.rankingScore" :min="0" :max="9.99" :step="0.1"></InputNumber>
+								</Col></Row>
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="24"><FormItem label="项目备注">
+							<Col :span="12"><FormItem label="项目备注">
 								<p v-if="!product.profile.isEditable">{{product.profile.form.remark}}</p>
 								<Input v-else v-model="product.profile.form.remark" type="textarea" :rows="1"/>
 							</FormItem></Col>
@@ -110,10 +134,10 @@
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="身份证正面">
-								<Row><Col :span="18"><SafeImg :src="loan.data.debtor.identify.frontImageUrl" type="certificate-md"></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.debtor.identify.frontImageUrl)" type="certificate-md" viewable></SafeImg></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证背面">
-								<Row><Col :span="18"><SafeImg :src="loan.data.debtor.identify.backImageUrl" type="certificate-md"></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.debtor.identify.backImageUrl)" type="certificate-md" viewable></SafeImg></Col></Row>
 							</FormItem></Col>
 						</Row>
 					</Form>
@@ -128,13 +152,9 @@
 					<Form>
 						<FormItem>
 							<Row>
-								<Col :span="4">
-									<!-- TODO need to handle reset -->
-									<Button type="ghost">重置</Button>
-								</Col>
-								<Col :span="4" :offset="2">
-									<Button type="primary" @click="onClickSubmitProduct" :loading="isSubmitting" :disabled="!this.product.data.id">提交</Button>
-								</Col>
+								<!-- TODO need to handle reset -->
+								<Button class="margin-right-10" type="ghost">重置</Button>
+								<Button type="primary" @click="onClickSubmitProduct" :loading="isSubmitting" :disabled="!this.product.data.id">提交</Button>
 							</Row>
 						</FormItem>
 						<FormItem>
@@ -270,6 +290,17 @@ export default {
 						remark: blank.product.remark,
 					},
 					rules: {},
+					tags: {
+						isDropdownVisible: false,
+						data: [],
+						list: {
+							isLoading: false,
+							pagesize: 10,
+							page: 0,
+							filters: '',
+							orderBy: '',
+						},
+					},
 				},
 				finance: {
 					labelWidth: 75,
@@ -432,6 +463,10 @@ export default {
 		productUnsubmit() {
 			this.isSubmitting = false
 		},
+		onClickResetProduct() {
+			this.initProfileForm()
+			this.initFinanceForm()
+		},
 		onClickSubmitProduct() {
 			const profile = this.$refs.profileForm.validate(valid => valid)
 			const finance = this.$refs.profileForm.validate(valid => valid)
@@ -565,6 +600,70 @@ export default {
 			this.profileUnloading()
 			this.initFinanceForm()
 			this.financeUnloading()
+		},
+		// tag
+		tagsLoading() {
+			this.product.profile.tags.list.isLoading = true
+		},
+		tagsUnloading() {
+			this.product.profile.tags.list.isLoading = false
+		},
+		showDropdown() {
+			this.product.profile.tags.isDropdownVisible = true
+		},
+		hideDropdown() {
+			this.product.profile.tags.isDropdownVisible = false
+		},
+		onClickSwitchDropdown() {
+			if (this.product.profile.tags.isDropdownVisible === false) {
+				this.tagsLoading()
+				this.showDropdown()
+				this.fetchTagList()
+			} else {
+				this.hideDropdown()
+			}
+		},
+		onClickTag(index) {
+			if (index === 'null') this.product.profile.form.tagId = null
+			else {
+				const tag = this.product.profile.tags.data[index]
+				this.product.profile.form.tagId = tag.id
+				this.product.profile.form.tag = tag.content
+				this.product.profile.form.tagColor = tag.color
+			}
+			this.hideDropdown()
+		},
+		onClickNewTag() {
+			this.$router.push({
+				name: 'tags_index',
+				query: {
+					action: 'add',
+				},
+			})
+		},
+		async fetchTagList() {
+			try {
+				const tags = await api.product.tag.fetchList(
+					this.product.profile.tags.list.pagesize,
+					this.product.profile.tags.list.page,
+					this.product.profile.tags.list.filters,
+					this.product.profile.tags.list.orderBy,
+				)
+				this.product.profile.tags.data = tags
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.tagsUnloading()
+			}
+		},
+		async fetchTag() {
+			try {
+				const tag = api.product.tag.fetch(this.product.data.tagId)
+				this.product.data.tag = tag.content
+				this.product.data.tagColor = tag.color
+			} catch (e) {
+				this.$Message.error(e.message)
+			}
 		},
 		// finance
 		onClickEditFinance() {

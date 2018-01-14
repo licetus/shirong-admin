@@ -67,24 +67,28 @@ export default {
 					name: 'id',
 					title: '编号',
 					key: 'id',
+					align: 'center',
 					searchable: true,
 				},
 				{
 					name: 'realName',
 					title: '姓名',
 					key: 'realName',
+					align: 'center',
 					searchable: true,
 				},
 				{
 					name: 'primaryNumber',
 					title: '手机',
 					key: 'primaryNumber',
+					align: 'center',
 					searchable: true,
 				},
 				{
 					name: 'remark',
 					title: '备注',
 					key: 'remark',
+					align: 'center',
 					searchable: true,
 				},
 				{
