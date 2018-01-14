@@ -68,8 +68,18 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
-							<Col :span="8"><FormItem label="创建时间">{{util.formatTime(this, product.data.createTime)}}</FormItem></Col>
-							<Col :span="8"><FormItem label="修改时间">{{util.formatTime(this, product.data.lastUpdateTime)}}</FormItem></Col>
+							<Col :span="8"><FormItem label="创建时间">{{util.formatTime(this, product.data.createTime) || '-'}}</FormItem></Col>
+							<Col :span="8"><FormItem label="修改时间">{{util.formatTime(this, product.data.lastUpdateTime) || '-'}}</FormItem></Col>
+						</Row>
+						<Row>
+							<Col :span="24"><FormItem label="项目描述">
+								<ProductDescription
+									:type="loan.data.main.type"
+									:debtorName="loan.data.debtor.profile.realName"
+									:object="loan.data.main.object"
+									:location="loan.data.debtor.identify.location"
+								></ProductDescription>
+							</FormItem></Col>
 						</Row>
 					</Form>
 				</Card>
@@ -483,6 +493,8 @@ export default {
 					minInvestment: product.minInvestment,
 					interestWay: product.interestWay,
 					currentInvestment: product.currentInvestment,
+					createTime: product.createTime,
+					lastUpdateTime: product.lastUpdateTime,
 				}
 				this.loadLoan()
 				this.initProfileForm()

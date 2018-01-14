@@ -73,6 +73,16 @@
 								</RadioGroup>
 							</FormItem></Col>
 						</Row>
+						<Row>
+							<Col :span="24"><FormItem label="项目描述">
+								<ProductDescription
+									:type="loan.form.type"
+									:debtorName="debtor.data.profile.realName"
+									:object="loan.form.object"
+									:location="debtor.data.identify.location"
+								></ProductDescription>
+							</FormItem></Col>
+						</Row>
 					</Form>
 				</Card>
 				<Card class="margin-top-10">

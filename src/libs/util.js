@@ -704,7 +704,6 @@ util.getProductTermType = (vm, type) => {
 	}
 }
 
-
 util.getProductInterestWay = (vm, type) => {
 	if (!type) {
 		// vm.$Message.error('错误: 计息方式缺失')
