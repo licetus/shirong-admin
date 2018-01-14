@@ -172,7 +172,7 @@
 					<p slot="title">操作</p>
 						<Row>
 							<Button class="margin-right-10" @click="onClickCancel">取消</Button>
-							<Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">保存</Button>
+							<Button type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">提交</Button>
 						</Row>
 				</Card>
 				<Card class="margin-top-10">

@@ -541,11 +541,17 @@ export default {
 		loanUnsubmitting() {
 			this.loan.isSubmitting = false
 		},
+		initApprovalForm() {
+			this.approval.form = {
+				content: '',
+			}
+		},
 		loadLoan() {
 			this.loanLoading()
 			this.fetchLoan()
 		},
 		onClickStartApproval() {
+			this.initApprovalForm()
 			this.showApprovalModal()
 		},
 		async fetchLoan() {
