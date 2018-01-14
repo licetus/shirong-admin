@@ -296,6 +296,7 @@ util.passwordCheck = (vm, callback) => {
 				await api.login(Cookies.get('username'), util.md5(password))
 				callback()
 			} catch (e) {
+				vm.$Message.error(e.message)
 				vm.$Message.error('密码错误')
 			} finally {
 				isLoading = false
@@ -386,6 +387,15 @@ util.formatTime = (vm, timestamp) => {
 	}
 	return moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
 }
+
+util.formatDate = (vm, timestamp) => {
+	if (!timestamp) {
+		// vm.$Message.error('错误: Date缺失')
+		return null
+	}
+	return moment(timestamp).format('YYYY-MM-DD')
+}
+
 util.formatBirthday = (vm, date) => {
 	if (!date) {
 		// vm.$Message.error('错误: Date缺失')

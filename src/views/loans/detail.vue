@@ -887,7 +887,7 @@ export default {
 				await api.loan.comment.add(comment, this.$route.params.loan_id)
 				await api.loan.approve(this.$route.params.loan_id)
 				this.hideApprovalModal()
-				this.loadApprovalComments()
+				this.initPage()
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {

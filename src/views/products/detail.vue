@@ -204,15 +204,15 @@
 					</p>
 					<Row type="flex" justify="space-between">
 						<Col>
-							<Button @click="onClickRefreshProduct" :loading="product.isLoading">刷新</Button>
+							<Row v-if="!product.isLoading" type="flex" justify="end">
+								<Button v-if="isCancelable" class="margin-right-10" type="error" @click="onClickCancelProduct" :loading="product.isCanceling">取消</Button>
+								<Button v-if="isPublishable" class="margin-right-10" type="primary" @click="onClickPublishProduct" :loading="product.isPublishing">发布</Button>
+								<Button v-if="isPauseable" class="margin-right-10" type="warning" @click="onClickPauseProduct" :loading="product.isPausing">暂停</Button>
+								<Button v-if="isResumeable" class="margin-right-10" type="success" @click="onClickResumeProduct" :loading="product.isResuming">恢复</Button>
+							</Row>
 						</Col>
 						<Col>
-							<Row v-if="!product.isLoading" type="flex" justify="end">
-								<Button v-if="isCancelable" class="margin-left-10" type="error" @click="onClickCancelProduct" :loading="product.isCanceling">取消</Button>
-								<Button v-if="isPublishable" class="margin-left-10" type="primary" @click="onClickPublishProduct" :loading="product.isPublishing">发布</Button>
-								<Button v-if="isPauseable" class="margin-left-10" type="warning" @click="onClickPauseProduct" :loading="product.isPausing">暂停</Button>
-								<Button v-if="isResumeable" class="margin-left-10" type="success" @click="onClickResumeProduct" :loading="product.isResuming">恢复</Button>
-							</Row>
+							<Button @click="onClickRefreshProduct" :loading="product.isLoading">刷新</Button>
 						</Col>
 					</Row>
 				</Card>
@@ -239,7 +239,7 @@
 					<p slot="title">
 						投资记录
 					</p>
-					<Table :data="investments.data" :columns="investments.columns"></Table>
+					<Table :data="investments.data" :columns="investments.columns" :loading="investments.list.isLoading"></Table>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">

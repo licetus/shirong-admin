@@ -174,12 +174,13 @@
 								</div>
 							</Col>
 							<Col>
-								<Button>刷新</Button>
+								<Button @click="onClickRefreshDebtor" :loading="profile.isLoading || identify.isLoading || credit.isLoading">刷新</Button>
 							</Col>
 						</Row>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">贷款查看</p>
+					<Table :data="loans.data" :columns="loans.columns" :loading="loans.list.isLoading"></Table>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">账户管理</p>
@@ -252,6 +253,41 @@ export default {
 					hasCar: blank.debtor.credit.hasCar,
 					hasHouse: blank.debtor.credit.hasHouse,
 				},
+			},
+			loans: {
+				list: {
+					isLoading: false,
+					pagesize: 10,
+					page: 0,
+					filters: '',
+					orderBy: '',
+				},
+				data: [],
+				columns: [
+					{
+						name: 'object',
+						title: '抵押物',
+						key: 'object',
+						align: 'left',
+					},
+					{
+						name: 'detail',
+						title: '详情',
+						align: 'center',
+						render: (h, params) => h('div', [
+							h('p', `${params.row.amount} - ${params.row.interestRate}`),
+							h('p', { style: { 'font-size': '9px' } }, `${util.getLoanTermType(this, params.row.type) || '-'} - ${util.getLoanRepaymentWay(this, params.row.repaymentWay)}`),
+							h('p', `${util.formatDate(this, params.row.createTime) || '-'}`),
+						]),
+					},
+					{
+						name: 'status',
+						title: '状态',
+						key: 'status',
+						align: 'right',
+						render: (h, params) => h('p', util.getLoanStatus(this, params.row.status) || '-'),
+					},
+				],
 			},
 		}
 	},
@@ -339,6 +375,7 @@ export default {
 				this.profileLoading()
 				this.identifyLoading()
 				this.creditLoading()
+				this.loansLoading()
 				const res = await api.debtor.profile.fetch(this.$route.params.debtor_id)
 				this.debtor.profile = {
 					id: res.id,
@@ -352,6 +389,7 @@ export default {
 				this.initProfileForm()
 				this.loadIdentify()
 				this.loadCredit()
+				this.loadLoans()
 			} catch (e) {
 				switch (e.code) {
 					case 'D_B_GET_FAILED_ERROR':
@@ -370,6 +408,7 @@ export default {
 				this.profileUnloading()
 				this.identifyUnloading()
 				this.creditUnloading()
+				this.loansUnloading()
 			}
 		},
 		// profile
@@ -647,7 +686,29 @@ export default {
 				this.creditUnsubmitting()
 			}
 		},
-
+		// loans
+		loansLoading() {
+			this.loans.list.isLoading = true
+		},
+		loansUnloading() {
+			this.loans.list.isLoading = false
+		},
+		async loadLoans() {
+			try {
+				const filters = `${this.loans.list.filters ? `${this.loans.list.filters},debtorId=${this.$route.params.debtor_id}` : `debtorId=${this.$route.params.debtor_id}`}`
+				const res = await api.loan.fetchList(
+					this.loans.list.pagesize,
+					this.loans.list.page,
+					filters,
+					this.loans.list.orderBy,
+				)
+				this.loans.data = res
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.loansUnloading()
+			}
+		},
 	},
 }
 </script>
