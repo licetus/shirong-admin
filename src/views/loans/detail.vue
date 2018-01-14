@@ -186,7 +186,7 @@
 			</Col>
 			<Col :span="8" class="padding-left-5">
 				<Card class="margin-bottom-10">
-					<p slot="title">操作</p>
+					<p slot="title">控制台</p>
 					<Row type="flex" justify="space-between">
 						<Col>
 							<div v-if="isEditable && !loan.isLoading">
@@ -443,11 +443,13 @@ export default {
 		async deleteLoan() {
 			try {
 				await api.loan.delete(this.$route.params.loan_id)
-				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
-					name: 'loans_index',
-					query: {
-						action: 'refresh',
-					},
+				util.closeCurrentPage(this.$store, this.$route.name, () => {
+					this.$router.push({
+						name: 'loans_index',
+						query: {
+							action: 'refresh',
+						},
+					})
 				})
 			} catch (e) {
 				this.$Message.error(e.message)

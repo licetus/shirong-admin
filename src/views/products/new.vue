@@ -455,11 +455,13 @@ export default {
 		async addProduct(product) {
 			try {
 				const res = await api.product.add(product, this.product.data.id)
-				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
-					name: 'product_detail',
-					params: {
-						product_id: res,
-					},
+				util.closeCurrentPage(this.$store, this.$route.name, () => {
+					this.$router.push({
+						name: 'product_detail',
+						params: {
+							product_id: res,
+						},
+					})
 				})
 			} catch (e) {
 				this.$Message.error(e.message)

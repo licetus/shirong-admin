@@ -5,13 +5,13 @@
 				<Card>
 					<Spin v-if="profile.isLoading" size="large" fix></Spin>
 					<p slot="title">借款人信息</p>
-					<div v-if="isEditVisible" slot="extra">
-						<div v-if="!profile.isEditable">
+					<div v-show="isEditable && isEditVisible" slot="extra">
+						<div v-show="!profile.isEditable">
 							<Button type="text" @click="onClickEditProfile">编辑</Button>
 						</div>
-						<div v-else>
+						<div v-show="profile.isEditable">
 							<Button type="text" @click="onClickResetProfile">重置</Button>
-							<Button type="text" @click="onClickSaveProfile" :loading="profile.isSaving">保存</Button>
+							<Button type="text" @click="onClickSubmitProfile" :loading="profile.isSubmitting" :disabled="identify.isSubmitting || credit.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form ref="profileForm" :model="profile.form" :rules="profile.rules" label-position="left" :label-width="profile.labelWidth" inline>
@@ -47,13 +47,13 @@
 				<Card class="margin-top-10">
 					<Spin v-if="identify.isLoading" size="large" fix></Spin>
 					<p slot="title">实名信息</p>
-					<div v-if="isEditVisible" slot="extra">
-						<div v-if="!identify.isEditable">
+					<div v-show="isEditable && isEditVisible" slot="extra">
+						<div v-show="!identify.isEditable">
 							<Button type="text" @click="onClickEditIdentify">编辑</Button>
 						</div>
-						<div v-else>
+						<div v-show="identify.isEditable">
 							<Button type="text" @click="onClickResetIdentify">重置</Button>
-							<Button type="text" @click="onClickSaveIdentify" :loading="identify.isSaving">保存</Button>
+							<Button type="text" @click="onClickSubmitIdentify" :loading="identify.isSubmitting" :disabled="profile.isSubmitting || credit.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form ref="identifyForm" :model="identify.form" :rules="identify.rules" label-position="left" :label-width="identify.labelWidth" inline>
@@ -100,31 +100,33 @@
 				<Card class="margin-top-10">
 					<Spin v-if="credit.isLoading" size="large" fix></Spin>
 					<p slot="title">信用信息</p>
-					<div v-if="isEditVisible" slot="extra">
-						<div v-if="!credit.isEditable">
+					<div v-show="isEditable && isEditVisible" slot="extra">
+						<div v-show="!credit.isEditable">
 							<Button type="text" @click="onClickEditCredit">编辑</Button>
 						</div>
-						<div v-else>
+						<div v-show="credit.isEditable">
 							<Button type="text" @click="onClickResetCredit">重置</Button>
-							<Button type="text" @click="onClickSaveCredit" :loading="credit.isSaving">保存</Button>
+							<Button type="text" @click="onClickSubmitCredit" :loading="credit.isSubmitting" :disabled="identify.isSubmitting || identify.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form ref="creditForm" :model="credit.form" :rules="credit.rules" label-position="left" :label-width="credit.labelWidth" inline>
 						<Row>
-							<Col :span="8"><FormItem label="工作地点" prop="workPlace">
+							<Col :span="24"><FormItem label="工作地点" prop="workPlace">
 								<p v-if="!credit.isEditable">{{credit.form.workPlace || '-'}}</p>
 								<Input v-else v-model="credit.form.workPlace"/>
 							</FormItem></Col>
-							<Col :span="8"><FormItem label="常住地址" prop="address">
+						</Row>
+						<Row>
+							<Col :span="24"><FormItem label="常住地址" prop="address">
 								<p v-if="!credit.isEditable">{{credit.form.address || '-'}}</p>
 								<Input v-else v-model="credit.form.address"/>
 							</FormItem></Col>
+						</Row>
+						<Row>
 							<Col :span="8"><FormItem label="学历状况" prop="education">
 								<p v-if="!credit.isEditable">{{credit.form.education || '-'}}</p>
 								<Input v-else v-model="credit.form.education"/>
 							</FormItem></Col>
-						</Row>
-						<Row>
 							<Col :span="8"><FormItem label="月稳定收入" prop="monthlyStableIncome">
 								<p v-if="!credit.isEditable">{{credit.form.monthlyStableIncome || '-'}}</p>
 								<Input v-else v-model="credit.form.monthlyStableIncome"/>
@@ -159,14 +161,22 @@
 			<Col :span="8" class="padding-left-5">
 				<Card>
 					<p slot="title">控制台</p>
-					<Row>
-						<Col :span="4">
-							<Button long>取消</Button>
-						</Col>
-						<Col :span="4" :offset="1">
-							<Button type="primary" long>关闭</Button>
-						</Col>
-					</Row>
+						<Row type="flex" justify="space-between">
+							<Col>
+								<div v-if="isEditable && !profile.isLoading && !identify.isLoading && !credit.isLoading">
+									<div v-if="!isEditVisible">
+										<Button class="margin-right-10" type="primary" @click="onClickUnlock">解锁</Button>
+										<Button class="margin-right-10" type="error" @click="onClickDeleteDebtor" :loading="isDeleting">删除</Button>
+									</div>
+									<div v-else>
+										<Button class="margin-right-10" @click="onClickLock">取消</Button>
+									</div>
+								</div>
+							</Col>
+							<Col>
+								<Button>刷新</Button>
+							</Col>
+						</Row>
 				</Card>
 				<Card class="margin-top-10">
 					<p slot="title">贷款查看</p>
@@ -195,13 +205,15 @@ export default {
 		return {
 			Enum,
 			util,
-			isEditVisible: true,
+			isEditable: true,
+			isEditVisible: false,
 			isSubmitting: false,
+			isDeleting: false,
 			debtor: blank.debtor,
 			profile: {
 				isEditable: false,
 				isLoading: false,
-				isSaving: false,
+				isSubmitting: false,
 				labelWidth: 75,
 				form: {
 					realName: blank.debtor.profile.realName,
@@ -215,7 +227,7 @@ export default {
 			identify: {
 				isEditable: false,
 				isLoading: false,
-				isSaving: false,
+				isSubmitting: false,
 				labelWidth: 100,
 				form: {
 					idNumber: blank.debtor.identify.idNumber,
@@ -229,7 +241,7 @@ export default {
 			credit: {
 				isEditable: false,
 				isLoading: false,
-				isSaving: false,
+				isSubmitting: false,
 				labelWidth: 100,
 				form: {
 					workPlace: blank.debtor.credit.workPlace,
@@ -266,11 +278,61 @@ export default {
 	methods: {
 		// main
 		initPage() {
+			this.hideEdit()
 			this.loadAll()
 		},
 		closePage() {
 			this.$store.commit('removeTag', 'debtor_detail')
 			this.$store.commit('closePage', 'debtor_detail')
+		},
+		showEdit() {
+			this.isEditVisible = true
+		},
+		hideEdit() {
+			this.isEditVisible = false
+		},
+		debtorDeleting() {
+			this.isDeleting = true
+		},
+		debtorUndeleting() {
+			this.isDeleting = false
+		},
+		onClickUnlock() {
+			util.passwordCheck(this, () => {
+				this.showEdit()
+			})
+		},
+		onClickLock() {
+			this.onClickResetProfile()
+			this.onClickResetIdentify()
+			this.onClickResetCredit()
+			this.hideEdit()
+		},
+		onClickRefreshDebtor() {
+			this.initPage()
+		},
+		onClickDeleteDebtor() {
+			util.passwordCheck(this, () => {
+				this.debtorDeleting()
+				this.deleteDebtor()
+			})
+		},
+		async deleteDebtor() {
+			try {
+				await api.debtor.delete(this.$route.params.debtor_id)
+				util.closeCurrentPage(this.$store, this.$route.name, () => {
+					this.$router.push({
+						name: 'debtors_index',
+						query: {
+							action: 'refresh',
+						},
+					})
+				})
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.debtorUndeleting()
+			}
 		},
 		async loadAll() {
 			try {
@@ -294,8 +356,12 @@ export default {
 				switch (e.code) {
 					case 'D_B_GET_FAILED_ERROR':
 						this.$Message.error('错误: 未知的借款人ID')
-						this.closePage()
-						this.$router.go(-1)
+						util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
+							name: 'debtors_index',
+							query: {
+								action: 'refresh',
+							},
+						})
 						break
 					default:
 						this.$Message.error(e.message)
@@ -319,11 +385,11 @@ export default {
 		profileUnloading() {
 			this.profile.isLoading = false
 		},
-		profileSaving() {
-			this.profile.isSaving = true
+		profileSubmitting() {
+			this.profile.isSubmitting = true
 		},
-		profileUnsaving() {
-			this.profile.isSaving = false
+		profileUnsubmitting() {
+			this.profile.isSubmitting = false
 		},
 		initProfileForm() {
 			this.profile.form = {
@@ -345,7 +411,7 @@ export default {
 			this.initProfileForm()
 			this.uneditProfile()
 		},
-		onClickSaveProfile() {
+		onClickSubmitProfile() {
 			this.$refs.profileForm.validate((valid) => {
 				if (valid) {
 					const profile = {
@@ -355,7 +421,7 @@ export default {
 						primaryNumber: this.profile.form.primaryNumber,
 						alternativeNumber: this.profile.form.alternativeNumber,
 					}
-					this.profileSaving()
+					this.profileSubmitting()
 					this.updateProfile(profile)
 				}
 			})
@@ -387,7 +453,7 @@ export default {
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
-				this.profileUnsaving()
+				this.profileUnsubmitting()
 			}
 		},
 		// identify
@@ -403,11 +469,11 @@ export default {
 		identifyUnloading() {
 			this.identify.isLoading = false
 		},
-		identifySaving() {
-			this.identify.isSaving = true
+		identifySubmitting() {
+			this.identify.isSubmitting = true
 		},
-		identifyUnsaving() {
-			this.identify.isSaving = false
+		identifyUnsubmitting() {
+			this.identify.isSubmitting = false
 		},
 		initIdentifyForm() {
 			this.identify.form = {
@@ -430,7 +496,7 @@ export default {
 			this.initIdentifyForm()
 			this.uneditIdentify()
 		},
-		onClickSaveIdentify() {
+		onClickSubmitIdentify() {
 			this.$refs.identifyForm.validate((valid) => {
 				if (valid) {
 					const identify = {
@@ -441,7 +507,7 @@ export default {
 						backImageUrl: this.identify.form.backImageUrl,
 						backBlurImageUrl: this.identify.form.backBlurImageUrl,
 					}
-					this.identifySaving()
+					this.identifySubmitting()
 					this.updateIdentify(identify)
 				}
 			})
@@ -481,7 +547,7 @@ export default {
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
-				this.identifyUnsaving()
+				this.identifyUnsubmitting()
 			}
 		},
 		// credit
@@ -497,11 +563,11 @@ export default {
 		creditUnloading() {
 			this.credit.isLoading = false
 		},
-		creditSaving() {
-			this.credit.isSaving = true
+		creditSubmitting() {
+			this.credit.isSubmitting = true
 		},
-		creditUnsaving() {
-			this.credit.isSaving = false
+		creditUnsubmitting() {
+			this.credit.isSubmitting = false
 		},
 		initCreditForm() {
 			this.credit.form = {
@@ -525,7 +591,7 @@ export default {
 			this.initCreditForm()
 			this.uneditCredit()
 		},
-		onClickSaveCredit() {
+		onClickSubmitCredit() {
 			this.$refs.creditForm.validate((valid) => {
 				if (valid) {
 					const credit = {
@@ -537,7 +603,7 @@ export default {
 						hasCar: this.credit.form.hasCar,
 						hasHouse: this.credit.form.hasHouse,
 					}
-					this.creditSaving()
+					this.creditSubmitting()
 					this.updateCredit(credit)
 				}
 			})
@@ -578,7 +644,7 @@ export default {
 			} catch (e) {
 				this.$Message.error(e.message)
 			} finally {
-				this.creditUnsaving()
+				this.creditUnsubmitting()
 			}
 		},
 		onClickImage() {

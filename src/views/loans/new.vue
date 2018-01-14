@@ -547,11 +547,13 @@ export default {
 		async addLoan(loan) {
 			try {
 				const res = await api.loan.add(loan)
-				util.closeCurrentPage(this.$store, this.$route.name, this.$router, {
-					name: 'loan_detail',
-					params: {
-						loan_id: res,
-					},
+				util.closeCurrentPage(this.$store, this.$route.name, () => {
+					this.$router.push({
+						name: 'loan_detail',
+						params: {
+							loan_id: res,
+						},
+					})
 				})
 			} catch (e) {
 				this.$Message.error(e.message)

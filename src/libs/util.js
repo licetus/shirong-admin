@@ -328,15 +328,11 @@ util.passwordCheck = (vm, callback) => {
 	})
 }
 
-util.closeCurrentPage = (store, pageName, router, pushTo) => {
+util.closeCurrentPage = (store, pageName, callback) => {
 	store.commit('removeTag', pageName)
 	store.commit('closePage', pageName)
 	localStorage.pageOpenedList = JSON.stringify(store.state.app.pageOpenedList)
-	router.push({
-		name: pushTo.name,
-		params: pushTo.params || null,
-		query: pushTo.query || null,
-	})
+	callback()
 }
 
 util.setPageCache = (pageName, key, val) => {
