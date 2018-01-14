@@ -647,9 +647,6 @@ export default {
 				this.creditUnsubmitting()
 			}
 		},
-		onClickImage() {
-			console.log('upload img')
-		},
 
 	},
 }

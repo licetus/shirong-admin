@@ -5,13 +5,13 @@
 				<Card>
 					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">贷款信息</p>
-					<div v-show="isEditable && isLockVisible" slot="extra">
+					<div v-show="isEditable && isEditVisible" slot="extra">
 						<div v-show="!loan.isEditable">
-							<Button type="text" @click="onClickUnlockLoan">解锁</Button>
+							<Button type="text" @click="onClickEditMain">编辑</Button>
 						</div>
 						<div v-show="loan.isEditable">
-							<Button type="text" @click="onClickResetLoan">重置</Button>
-							<Button type="text" @click="onClickLockLoan">锁定</Button>
+							<Button type="text" @click="onClickResetMain">重置</Button>
+							<Button type="text" @click="onClickSubmitMain" :loading="loan.isSubmitting" :disabled="loan.sub.car.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form ref="loanForm" :model="loan.form" :rules="loan.rules" label-position="left" :label-width="loan.labelWidth" inline>
@@ -74,6 +74,11 @@
 							</FormItem></Col>
 						</Row>
 						<Row>
+							<Col :span="24"><FormItem label="项目备注">
+								 <p>{{loan.form.remark || '-'}}</p>
+							</FormItem></Col>
+						</Row>
+						<Row>
 							<Col :span="24"><FormItem label="项目描述">
 								<ProductDescription
 									:type="loan.form.type"
@@ -123,13 +128,13 @@
 				<Card v-if="loan.data.type === Enum.Loan.Type.Car" class="margin-top-10">
 					<Spin v-if="loan.isLoading" size="large" fix></Spin>
 					<p slot="title">车辆详情</p>
-					<div v-show="isEditable && isLockVisible" slot="extra">
+					<div v-show="isEditable && isEditVisible" slot="extra">
 						<div v-show="!loan.sub.car.isEditable">
-							<Button type="text" @click="onClickUnlockCar">解锁</Button>
+							<Button type="text" @click="onClickEditCar">编辑</Button>
 						</div>
 						<div v-show="loan.sub.car.isEditable">
 							<Button type="text" @click="onClickResetCar">重置</Button>
-							<Button type="text" @click="onClickLockCar">锁定</Button>
+							<Button type="text" @click="onClickSubmitCar" :loading="loan.sub.car.isSubmitting" :disabled="loan.isSubmitting">提交</Button>
 						</div>
 					</div>
 					<Form ref="carForm" :model="loan.sub.car.form" :rules="loan.sub.car.rules" label-position="left" :label-width="loan.sub.car.labelWidth" inline>
@@ -190,8 +195,8 @@
 					<Row type="flex" justify="space-between">
 						<Col>
 							<div v-if="isEditable && !loan.isLoading">
-								<div v-if="!isLockVisible">
-									<Button class="margin-right-10" type="primary" @click="onClickEditLoan">编辑</Button>
+								<div v-if="!isEditVisible">
+									<Button class="margin-right-10" type="primary" @click="onClickUnlock">解锁</Button>
 									<Button class="margin-right-10" type="error" @click="onClickDeleteLoan" :loading="loan.isDeleting">删除</Button>
 									<div v-if="isStartable" class="margin-top-20">
 										<Button class="margin-right-10" type="success" @click="onClickStartLoan" :loading="loan.isStarting">开始计息</Button>
@@ -202,7 +207,6 @@
 								</div>
 								<div v-else>
 									<Button class="margin-right-10" @click="onClickCancel">取消</Button>
-									<Button class="margin-right-10" type="primary" @click="onClickSubmitLoan" :loading="loan.isSubmitting">提交</Button>
 								</div>
 								<Button v-else-if="isCompleteable" class="margin-right-10" type="primary" @click="onClickCompleteLoan">完成</Button>
 							</div>
@@ -287,7 +291,7 @@ export default {
 			access: parseInt(Cookies.get('access'), 10),
 			Enum,
 			util,
-			isLockVisible: false,
+			isEditVisible: false,
 			loan: {
 				data: blank.loan,
 				isEditable: false,
@@ -310,6 +314,7 @@ export default {
 					car: {
 						data: blank.car,
 						isEditable: false,
+						isSubmitting: false,
 						labelWidth: 100,
 						form: {
 							carBrand: blank.car.carBrand,
@@ -412,19 +417,25 @@ export default {
 			this.loadLoan()
 			this.loadApprovalComments()
 		},
-		showLock() {
-			this.isLockVisible = true
+		showEdit() {
+			this.isEditVisible = true
 		},
-		hideLock() {
-			this.isLockVisible = false
+		hideEdit() {
+			this.isEditVisible = false
 		},
-		onClickEditLoan() {
-			this.showLock()
+		onClickUnlock() {
+			util.passwordCheck(this, () => {
+				this.showEdit()
+			})
 		},
 		onClickCancel() {
-			this.hideLock()
+			this.onClickResetMain()
+			this.onClickResetCar()
+			this.hideEdit()
 		},
 		onClickRefreshLoan() {
+			this.uneditMain()
+			this.uneditCar()
 			this.initPage()
 		},
 		// delete
@@ -520,47 +531,6 @@ export default {
 			this.loanLoading()
 			this.fetchLoan()
 		},
-		onClickSubmitLoan() {
-			if (this.loan.form.type) {
-				const subMapping = ['', 'other', 'car']
-				const loanCheck = this.$refs.loanForm.validate(valid => valid)
-				const subCheck = this.$refs[`${subMapping[this.loan.form.type]}Form`].validate(valid => valid)
-				if (loanCheck && subCheck) {
-					let sub = {}
-					switch (this.loan.form.type) {
-						case Enum.Loan.Type.Car:
-							sub = {
-								carBrand: this.loan.sub.car.form.carBrand,
-								purchasePrice: this.loan.sub.car.form.purchasePrice,
-								milage: this.loan.sub.car.form.milage,
-								evaluatePrice: this.loan.sub.car.form.evaluatePrice,
-								carFrontImageUrl: this.loan.sub.car.form.carFrontImageUrl,
-								carBackImageUrl: this.loan.sub.car.form.carBackImageUrl,
-								carMilageImageUrl: this.loan.sub.car.form.carMilageImageUrl,
-								carInsideImageUrl: this.loan.sub.car.form.carInsideImageUrl,
-								vehicleLicenseImageUrl: this.loan.sub.car.form.vehicleLicenseImageUrl,
-								inspectionLicenseImageUrl: this.loan.sub.car.form.inspectionLicenseImageUrl,
-							}
-							break
-						default:
-					}
-					const loan = {
-						debtorId: this.debtor.data.profile.id,
-						type: this.loan.form.type,
-						amount: this.loan.form.amount,
-						termType: this.loan.form.termType,
-						interestRate: this.loan.form.interestRate,
-						repaymentWay: this.loan.form.repaymentWay,
-						remark: this.loan.form.remark,
-						sub,
-					}
-					util.passwordCheck(this, () => {
-						this.loanSubmitting()
-						this.updateLoan(loan)
-					})
-				}
-			}
-		},
 		onClickStartApproval() {
 			this.showApprovalModal()
 		},
@@ -571,7 +541,7 @@ export default {
 					title: '更新成功, 正在刷新...',
 					duration: 3,
 				})
-				this.hideLock()
+				this.hideEdit()
 				this.loadLoan()
 			} catch (e) {
 				this.$Message.error(e.message)
@@ -623,11 +593,17 @@ export default {
 		},
 
 		// loan_main
-		editLoan() {
+		editMain() {
 			this.loan.isEditable = true
 		},
-		uneditLoan() {
+		uneditMain() {
 			this.loan.isEditable = false
+		},
+		mainSubmitting() {
+			this.loan.isSubmitting = true
+		},
+		mainUnsubmitting() {
+			this.loan.isSubmitting = false
 		},
 		initLoanForm() {
 			this.loan.form = {
@@ -650,15 +626,40 @@ export default {
 				default:
 			}
 		},
-		onClickUnlockLoan() {
-			this.editLoan()
+		onClickEditMain() {
+			this.editMain()
 		},
-		onClickResetLoan() {
+		onClickResetMain() {
 			this.initLoanForm()
-			this.uneditLoan()
+			this.uneditMain()
 		},
-		onClickLockLoan() {
-			this.uneditLoan()
+		onClickSubmitMain() {
+			// this.$refs.loanForm.validate((valid) => { // BUG validator doesnt work
+			// 	if (valid) {
+			// 	}
+			// })
+			const loan = {
+				object: this.loan.form.object,
+				amount: this.loan.form.amount,
+				interestRate: this.loan.form.interestRate,
+				remark: this.loan.form.remark,
+			}
+			this.mainSubmitting()
+			this.updateMain(loan)
+		},
+		async updateMain(loan) {
+			try {
+				await api.loan.update(loan, this.$route.params.loan_id)
+				this.$Notice.success({
+					title: '更新成功, 正在刷新...',
+					duration: 3,
+				})
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.mainUnsubmitting()
+			}
 		},
 		// loan_sub_car
 		editCar() {
@@ -666,6 +667,12 @@ export default {
 		},
 		uneditCar() {
 			this.loan.sub.car.isEditable = false
+		},
+		carSubmitting() {
+			this.loan.sub.car.isSubmitting = true
+		},
+		carUnsubmitting() {
+			this.loan.sub.car.isSubmitting = false
 		},
 		initCarForm() {
 			this.loan.sub.car.form = {
@@ -681,15 +688,48 @@ export default {
 				inspectionLicenseImageUrl: this.loan.data.sub.inspectionLicenseImageUrl,
 			}
 		},
-		onClickUnlockCar() {
+		onClickEditCar() {
 			this.editCar()
 		},
 		onClickResetCar() {
 			this.initCarForm()
 			this.uneditCar()
 		},
-		onClickLockCar() {
-			this.uneditCar()
+		onClickSubmitCar() {
+			// this.$refs.carForm.validate((valid) => { // BUG validator doesnt work
+			// 	if (valid) {
+			// 	}
+			// })
+			const loan = {
+				sub: {
+					carBrand: this.loan.sub.car.form.carBrand,
+					purchasePrice: this.loan.sub.car.form.purchasePrice,
+					milage: this.loan.sub.car.form.milage,
+					evaluatePrice: this.loan.sub.car.form.evaluatePrice,
+					carFrontImageUrl: this.loan.sub.car.form.carFrontImageUrl,
+					carBackImageUrl: this.loan.sub.car.form.carBackImageUrl,
+					carMilageImageUrl: this.loan.sub.car.form.carMilageImageUrl,
+					carInsideImageUrl: this.loan.sub.car.form.carInsideImageUrl,
+					vehicleLicenseImageUrl: this.loan.sub.car.form.vehicleLicenseImageUrl,
+					inspectionLicenseImageUrl: this.loan.sub.car.form.inspectionLicenseImageUrl,
+				},
+			}
+			this.carSubmitting()
+			this.updateCar(loan)
+		},
+		async updateCar(loan) {
+			try {
+				await api.loan.update(loan, this.$route.params.loan_id)
+				this.$Notice.success({
+					title: '更新成功, 正在刷新...',
+					duration: 3,
+				})
+				this.loadLoan()
+			} catch (e) {
+				this.$Message.error(e.message)
+			} finally {
+				this.carUnsubmitting()
+			}
 		},
 
 		// debtor
