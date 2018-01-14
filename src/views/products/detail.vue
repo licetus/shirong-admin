@@ -145,10 +145,10 @@
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="身份证正面">
-								<Row><Col :span="18"><SafeImg :src="loan.data.debtor.identify.frontImageUrl" type="certificate-md" viewable></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.debtor.identify.frontImageUrl)" type="certificate-md" viewable></SafeImg></Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="身份证背面">
-								<Row><Col :span="18"><SafeImg :src="loan.data.debtor.identify.backImageUrl" type="certificate-md" viewable></SafeImg></Col></Row>
+								<Row><Col :span="18"><SafeImg :src="util.generateImageUrl(loan.data.debtor.identify.backImageUrl)" type="certificate-md" viewable></SafeImg></Col></Row>
 							</FormItem></Col>
 						</Row>
 						<div v-if="loan.data.main.type === Enum.Loan.Type.Car">
