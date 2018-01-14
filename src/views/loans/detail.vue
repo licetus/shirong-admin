@@ -426,6 +426,7 @@ export default {
 	methods: {
 		// main
 		initPage() {
+			util.setPageCache(this.$route.name, 'path', this.$route.fullPath)
 			this.loadLoan()
 			this.loadApprovalComments()
 		},

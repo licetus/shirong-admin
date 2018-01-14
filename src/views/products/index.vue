@@ -79,17 +79,30 @@ export default {
 				},
 				{
 					name: 'status',
-					title: '状态',
+					title: '状态/上架',
 					key: 'status',
 					align: 'center',
 					render: (h, params) => {
 						const tag = util.getProductStatusTag(this, params.row.status)
-						return h('SimpleTag', {
+						return h('Row', {
 							props: {
-								color: tag.color,
-								text: tag.text || '-',
+								type: 'flex',
+								align: 'middle',
 							},
-						})
+						}, [
+							h('SimpleTag', {
+								props: {
+									color: tag.color,
+									text: tag.text || '-',
+								},
+							}),
+							h('Icon', {
+								props: {
+									type: `toggle${params.row.isOnSale ? '-filled' : ''}`,
+									size: 32,
+								},
+							}),
+						])
 					},
 				},
 				{
