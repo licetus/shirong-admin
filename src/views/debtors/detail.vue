@@ -70,13 +70,13 @@
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="身份证正面" prop="frontImageUrl">
 								<Row><Col :span="16">
-									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontImageUrl)" type="certificate-md"></SafeImg>
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontImageUrl)" type="certificate-md" viewable></SafeImg>
 									<ImageUploader v-else v-model="identify.form.frontImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="正面模糊" prop="frontBlurImageUrl">
 								<Row><Col :span="16">
-									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontBlurImageUrl)" type="certificate-md"></SafeImg>
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.frontBlurImageUrl)" type="certificate-md" viewable></SafeImg>
 									<ImageUploader v-else v-model="identify.form.frontBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
@@ -84,13 +84,13 @@
 						<Row>
 							<Col :span="12"><FormItem label="身份证背面" prop="backImageUrl">
 								<Row><Col :span="16">
-									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backImageUrl)" type="certificate-md"></SafeImg>
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backImageUrl)" type="certificate-md" viewable></SafeImg>
 									<ImageUploader v-else v-model="identify.form.backImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="背面模糊" prop="backBlurImageUrl">
 								<Row><Col :span="16">
-									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backBlurImageUrl)" type="certificate-md"></SafeImg>
+									<SafeImg v-if="!identify.isEditable" :src="util.generateImageUrl(identify.form.backBlurImageUrl)" type="certificate-md" viewable></SafeImg>
 									<ImageUploader v-else v-model="identify.form.backBlurImageUrl" :type="Enum.ImageType.IdCard"></ImageUploader>
 								</Col></Row>
 							</FormItem></Col>

@@ -153,31 +153,31 @@
 						</Row>
 						<Row class="margin-top-20">
 							<Col :span="12"><FormItem label="车辆行驶证">
-								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.vehicleLicenseImageUrl)" type="photo-md"></SafeImg>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.vehicleLicenseImageUrl)" type="photo-md" viewable></SafeImg>
 								<ImageUploader v-else v-model="loan.sub.car.form.vehicleLicenseImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="车辆检验证">
-								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.inspectionLicenseImageUrl)" type="photo-md"></SafeImg>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.inspectionLicenseImageUrl)" type="photo-md" viewable></SafeImg>
 								<ImageUploader v-else v-model="loan.sub.car.form.inspectionLicenseImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="正面照片">
-								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carFrontImageUrl)" type="photo-md"></SafeImg>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carFrontImageUrl)" type="photo-md" viewable></SafeImg>
 								<ImageUploader v-else v-model="loan.sub.car.form.carFrontImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="背面照片">
-								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carBackImageUrl)" type="photo-md"></SafeImg>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carBackImageUrl)" type="photo-md" viewable></SafeImg>
 								<ImageUploader v-else v-model="loan.sub.car.form.carBackImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 						</Row>
 						<Row>
 							<Col :span="12"><FormItem label="里程照片">
-								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carMilageImageUrl)" type="photo-md"></SafeImg>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carMilageImageUrl)" type="photo-md" viewable></SafeImg>
 								<ImageUploader v-else v-model="loan.sub.car.form.carMilageImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 							<Col :span="12"><FormItem label="内饰照片">
-								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carInsideImageUrl)" type="photo-md"></SafeImg>
+								<SafeImg v-if="!loan.sub.car.isEditable" :src="util.generateImageUrl(loan.sub.car.form.carInsideImageUrl)" type="photo-md" viewable></SafeImg>
 								<ImageUploader v-else v-model="loan.sub.car.form.carInsideImageUrl" :type="Enum.ImageType.Other"></ImageUploader>
 							</FormItem></Col>
 						</Row>

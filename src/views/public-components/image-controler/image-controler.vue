@@ -1,5 +1,11 @@
 <template>
-	<img class="safe-img" :src="imageUrl" @error="onImageError" :style="imgStyle"/>
+	<div>
+		<img class="safe-img" :src="imageUrl" @error="onImageError" :style="imgStyle" @click="onClick"/>
+		<Modal v-model="isModalVisible" class-name="image-modal" width="50%">
+			<img class="image-detail" :src="src"/>
+			<div slot="footer"></div>
+		</Modal>
+	</div>
 </template>
 
 <script>
@@ -24,17 +30,22 @@ export default {
 			default: '',
 		},
 		styles: String,
+		viewable: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	data() {
 		return {
-			showSrc: true,
+			isModalVisible: false,
+			showDefault: false,
 		}
 	},
 	mounted() {
 	},
 	watch: {
 		src() {
-			this.showSrc = true
+			this.showDefault = false
 		},
 	},
 	computed: {
@@ -45,6 +56,7 @@ export default {
 				height: 'auto',
 			}
 			if (this.type === 'avatar-md' || this.type === 'avatar-lg') this.$set(style, 'border-radius', '50%')
+			if (this.viewable && !this.showDefault) this.$set(style, 'cursor', 'pointer')
 			return style
 		},
 		default() {
@@ -69,16 +81,30 @@ export default {
 		},
 		imageUrl() {
 			if (!this.src || this.src === '') return this.default
-			return this.showSrc ? this.src : this.default
+			return this.showDefault ? this.default : this.src
 		},
 	},
 	methods: {
+		showModal() {
+			this.isModalVisible = true
+		},
 		onImageError() {
-			this.showSrc = false
+			this.showDefault = true
+		},
+		onClick() {
+			if (this.src && !this.showDefault && this.viewable) {
+				this.showModal()
+			}
 		},
 	},
 }
 </script>
 
 <style lang="less">
+@import '../../../styles/public.less';
+
+	.image-detail{
+		width: 100%;
+		height: auto;
+	}
 </style>
