@@ -205,7 +205,7 @@
 					<Row type="flex" justify="space-between">
 						<Col>
 							<Row v-if="!product.isLoading" type="flex" justify="end">
-								<Button v-if="isCancelable" class="margin-right-10" type="error" @click="onClickCancelProduct" :loading="product.isCanceling">取消</Button>
+								<Button v-if="isCancelable" class="margin-right-10" type="error" @click="onClickCancelProduct" :loading="product.isCanceling">终止</Button>
 								<Button v-if="isPublishable" class="margin-right-10" type="primary" @click="onClickPublishProduct" :loading="product.isPublishing">发布</Button>
 								<Button v-if="isPauseable" class="margin-right-10" type="warning" @click="onClickPauseProduct" :loading="product.isPausing">暂停</Button>
 								<Button v-if="isResumeable" class="margin-right-10" type="success" @click="onClickResumeProduct" :loading="product.isResuming">恢复</Button>
