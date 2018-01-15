@@ -158,7 +158,7 @@ export default {
 					render: (h, params) =>
 						h('div', [
 							h('Button', {
-								props: { type: 'primary',	size: 'small', loading: this.products[params.index].isViewing },
+								props: { type: 'text',	size: 'small', loading: this.products[params.index].isViewing },
 								style: { marginRight: '5px' },
 								on: {	click: () => this.onClickViewProduct(params.index) },
 							}, '查看'),
