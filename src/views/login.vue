@@ -26,7 +26,7 @@
 							<Button @click="onClickLogin" type="primary" :loading="isLoginLoading" long>登录</Button>
 						</FormItem>
 					</Form>
-					<p class="login-tip">输入任意用户名和密码即可</p>
+					<p class="login-tip">世融理财，灵活选择多样收益</p>
 				</div>
 			</Card>
 		</div>

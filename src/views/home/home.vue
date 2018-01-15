@@ -23,7 +23,7 @@
 							<div class="line-gray"></div>
 							<Row class="margin-top-8">
 								<Col span="8"><p class="notwrap">上次登录时间:</p></Col>
-								<Col span="16" class="padding-left-8">2018.01.15-10:32:20</Col>
+								<Col span="16" class="padding-left-8">2018.01.15-15:32:20</Col>
 							</Row>
 							<Row class="margin-top-8">
 								<Col span="8"><p class="notwrap">上次登录地点:</p></Col>
@@ -70,7 +70,7 @@
 					:end-val="count.createUser"
 					iconType="android-person-add"
 					color="#2d8cf0"
-					intro-text="今日新增用户"
+					intro-text="*今日新增用户"
 					></infor-card>
 				</Col>
 				<Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
@@ -80,7 +80,7 @@
 					iconType="ios-eye"
 					color="#64d572"
 					:iconSize="50"
-					intro-text="今日浏览总数"
+					intro-text="*今日浏览总数"
 					></infor-card>
 				</Col>
 				<Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
@@ -89,7 +89,7 @@
 					:end-val="count.collection"
 					iconType="cube"
 					color="#ffd572"
-					intro-text="今日新增项目"
+					intro-text="*今日新增项目"
 					></infor-card>
 				</Col>
 				<Col :xs="24" :sm="12" :md="6" :style="{marginBottom: '10px'}">
@@ -98,7 +98,7 @@
 					:end-val="count.transfer"
 					iconType="calculator"
 					color="#f25e43"
-					intro-text="今日收入总额"
+					intro-text="*今日收入总额"
 					></infor-card>
 				</Col>
 			</Row>
@@ -106,7 +106,7 @@
 				<Card :padding="0">
 					<p slot="title" class="card-title">
 						<Icon type="map"></Icon>
-						今日投资地理分布
+						*今日投资地理分布
 					</p>
 					<div class="map-con">
 						<Col span="10">
@@ -127,7 +127,7 @@
 			<Card>
 				<p slot="title" class="card-title">
 					<Icon type="android-map"></Icon>
-					上周每日访问量统计
+					*上周每日访问量统计
 				</p>
 				<div class="data-source-row">
 					<visite-volume></visite-volume>
@@ -138,7 +138,7 @@
 			<Card>
 				<p slot="title" class="card-title">
 					<Icon type="ios-pulse-strong"></Icon>
-					交易来源统计
+					*交易来源统计
 				</p>
 				<div class="data-source-row">
 					<data-source-pie></data-source-pie>
@@ -149,7 +149,7 @@
 			<Card>
 				<p slot="title" class="card-title">
 					<Icon type="android-wifi"></Icon>
-					今日项目销售情况
+					*今日项目销售情况
 				</p>
 				<div class="data-source-row">
 					<user-flow></user-flow>
@@ -161,7 +161,7 @@
 		<Card>
 			<p slot="title" class="card-title">
 				<Icon type="ios-shuffle-strong"></Icon>
-				上周每日销售总额(/笔)
+				*上周每日销售总额(/笔)
 			</p>
 			<div class="line-chart-con">
 				<service-requests></service-requests>
