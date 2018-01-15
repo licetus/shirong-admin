@@ -16,7 +16,7 @@ let util = {
 }
 
 util.title = function (title) {
-	title = title || 'iView admin'
+	title = title || 'Shirong admin'
 	window.document.title = title
 }
 
