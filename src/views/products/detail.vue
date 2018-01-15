@@ -470,7 +470,7 @@ export default {
 			this.fetchProduct()
 		},
 		onClickRefreshProduct() {
-			this.loadProduct()
+			this.initPage()
 		},
 		async fetchProduct() {
 			try {
@@ -908,7 +908,7 @@ export default {
 		},
 		async fetchInvestmentList() {
 			try {
-				const filters = `${this.investments.list.filters ? `${this.investment.list.filters},productId=${this.$route.params.product_id}` : `userId=${this.$route.params.product_id}`}`
+				const filters = `${this.investments.list.filters ? `${this.investment.list.filters},productId=${this.$route.params.product_id}` : `productId=${this.$route.params.product_id}`}`
 				const res = await api.investment.fetchList(
 					this.investments.list.pagesize,
 					this.investments.list.page,
